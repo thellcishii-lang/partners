@@ -1,4 +1,4 @@
-import { db, FV, TS, REGION } from './lib/admin';
+import { db, FV, TS } from './lib/admin';
 import { COLLECTIONS, LOW_DEPOSIT_THRESHOLD } from './lib/constants';
 import { enqueueMail } from './lib/mail';
 
