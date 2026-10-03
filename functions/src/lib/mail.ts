@@ -1,4 +1,4 @@
-import { db, FV, TS } from './admin';
+import { db, TS } from './admin';
 import { COLLECTIONS } from './constants';
 
 export type MailTemplate =
