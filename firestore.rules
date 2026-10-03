@@ -1,0 +1,246 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ============================================================
+    // ヘルパー
+    // ============================================================
+    function isAuth() {
+      return request.auth != null;
+    }
+
+    function uid() {
+      return request.auth.uid;
+    }
+
+    function userDoc() {
+      return get(/databases/$(database)/documents/users/$(uid())).data;
+    }
+
+    function isAdmin() {
+      return isAuth() && userDoc().role == 'admin';
+    }
+
+    // 自分の advertiser ドキュメント
+    function myAdv() {
+      return get(/databases/$(database)/documents/advertisers/$(uid())).data;
+    }
+
+    // 課金フィールド（クライアントから書けない）
+    function protectedAdvFields() {
+      return [
+        'depositBalance',
+        'plan',
+        'freeUntil',
+        'pendingCount',
+        'lowDepositNotified',
+        'stripeCustomerId'
+      ];
+    }
+
+    // 更新差分に保護フィールドが含まれていないか
+    function noProtectedFields() {
+      return !request.resource.data
+        .diff(resource.data)
+        .affectedKeys()
+        .hasAny(protectedAdvFields());
+    }
+
+    // ============================================================
+    // users : 自分の役割ドキュメント
+    // ============================================================
+    match /users/{userId} {
+      allow read: if isAuth() && (userId == uid() || isAdmin());
+      // role はクライアントから書けない（Functions が付与）
+      allow create: if isAuth() && userId == uid()
+                    && !request.resource.data.keys().hasAny(['role'])
+                    && request.resource.data.email == request.auth.token.email;
+      allow update: if isAuth() && userId == uid()
+                    && !request.resource.data.diff(resource.data)
+                         .affectedKeys().hasAny(['role', 'email']);
+      allow delete: if isAdmin();
+    }
+
+    // ============================================================
+    // advertisers : 募集者プロフィール
+    // ============================================================
+    match /advertisers/{advId} {
+      allow read: if isAuth() && (advId == uid() || isAdmin());
+
+      // 作成：自分のuid のみ、課金フィールドは含められない（Functions が後で入れる）
+      allow create: if isAuth() && advId == uid()
+                    && !request.resource.data.keys().hasAny(protectedAdvFields());
+
+      // 更新：自分のuid、かつ保護フィールドを触らない
+      allow update: if isAuth() && advId == uid()
+                    && noProtectedFields()
+                    && request.resource.data.companyName is string
+                    && request.resource.data.companyName.size() > 0
+                    && request.resource.data.companyName.size() <= 100;
+
+      allow delete: if isAdmin();
+    }
+
+    // ============================================================
+    // applicants : 応募者プロフィール
+    // ============================================================
+    match /applicants/{appId} {
+      allow read: if isAuth() && (appId == uid() || isAdmin());
+      allow create, update: if isAuth() && appId == uid()
+                    && request.resource.data.displayName is string
+                    && request.resource.data.displayName.size() > 0;
+      allow delete: if isAdmin();
+    }
+
+    // ============================================================
+    // listings : 案件
+    // ============================================================
+    match /listings/{listingId} {
+      // 公開中は誰でも読める。draft 等は本人とadminのみ
+      allow read: if resource.data.status == 'published'
+                  || isAdmin()
+                  || (isAuth() && resource.data.advertiserId == uid());
+
+      allow create: if isAuth()
+                    && request.resource.data.advertiserId == uid()
+                    && request.resource.data.status in ['draft', 'reviewing']
+                    && request.resource.data.title is string
+                    && request.resource.data.title.size() > 0
+                    && request.resource.data.title.size() <= 120;
+
+      allow update: if (isAuth() && resource.data.advertiserId == uid()
+                        // 本人は published へ直接はできない（審査経由）
+                        && request.resource.data.status in ['draft', 'reviewing', 'paused', 'closed']
+                        && request.resource.data.advertiserId == resource.data.advertiserId)
+                    || isAdmin();
+
+      allow delete: if isAdmin()
+                    || (isAuth() && resource.data.advertiserId == uid()
+                        && resource.data.status == 'draft');
+    }
+
+    // ============================================================
+    // inquiries : 応募メタ（マスク情報）
+    // ============================================================
+    match /inquiries/{inquiryId} {
+      allow read: if isAuth() && (
+        resource.data.applicantId == uid() ||
+        resource.data.advertiserId == uid() ||
+        isAdmin()
+      );
+
+      // 作成：応募者本人が、自分のuidで、status は 'pending' 固定で作る
+      // （delivered への遷移は Functions のみ）
+      allow create: if isAuth()
+                    && request.resource.data.applicantId == uid()
+                    && request.resource.data.status == 'pending'
+                    && request.resource.data.depositTransactionId == null
+                    && request.resource.data.deliveredAt == null
+                    && request.resource.data.keys().hasAll(
+                         ['listingId', 'advertiserId', 'applicantId', 'maskedPreview']);
+
+      // 更新：募集者は status と memo のみ。応募者はキャンセル(status:'cancelled')のみ
+      allow update: if isAdmin()
+                    || (isAuth() && resource.data.advertiserId == uid()
+                        && request.resource.data.diff(resource.data)
+                             .affectedKeys().hasOnly(['status', 'memo', 'updatedAt'])
+                        && request.resource.data.status in ['won', 'lost'])
+                    || (isAuth() && resource.data.applicantId == uid()
+                        && request.resource.data.diff(resource.data)
+                             .affectedKeys().hasOnly(['status', 'updatedAt'])
+                        && request.resource.data.status == 'cancelled');
+
+      allow delete: if isAdmin();
+    }
+
+    // ============================================================
+    // inquiryDetails : 個人情報本体（最重要）
+    //   - 親 inquiries の status が delivered/won/lost のときだけ
+    //     募集者が読める。pending では絶対に読めない。
+    //   - 書き込みは Functions（Admin SDK）のみ
+    // ============================================================
+    match /inquiryDetails/{inquiryId} {
+      function parentStatus() {
+        return get(/databases/$(database)/documents/inquiries/$(inquiryId)).data.status;
+      }
+
+      allow read: if isAuth() && (
+        // 応募者本人
+        resource.data.applicantId == uid() ||
+        // 管理者
+        isAdmin() ||
+        // 募集者：開示済みのみ
+        (resource.data.advertiserId == uid()
+         && parentStatus() in ['delivered', 'won', 'lost'])
+      );
+
+      allow write: if false;  // Functions 専用
+    }
+
+    // ============================================================
+    // depositTransactions : 台帳（追記のみ・不変）
+    // ============================================================
+    match /depositTransactions/{txId} {
+      allow read: if isAuth() && (
+        resource.data.advertiserId == uid() || isAdmin()
+      );
+      allow write: if false;  // Functions 専用
+    }
+
+    // ============================================================
+    // depositOrders : デポジット購入
+    // ============================================================
+    match /depositOrders/{orderId} {
+      allow read: if isAuth() && (
+        resource.data.advertiserId == uid() || isAdmin()
+      );
+
+      // 作成：pending ステータスで、金額・クレジットはマスタから
+      // クライアントが指定するが、Webhook で検証する
+      allow create: if isAuth()
+                    && request.resource.data.advertiserId == uid()
+                    && request.resource.data.status == 'pending'
+                    && request.resource.data.paidAt == null
+                    && request.resource.data.credits is int
+                    && request.resource.data.credits > 0
+                    && request.resource.data.credits <= 1000
+                    && request.resource.data.priceJpy is int
+                    && request.resource.data.priceJpy > 0;
+
+      // 更新は Functions（Webhook）のみ
+      allow update, delete: if false;
+    }
+
+    // ============================================================
+    // depositPackages : マスタ（読み取りのみ公開）
+    // ============================================================
+    match /depositPackages/{packageId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // ============================================================
+    // mailLogs : メール送信ログ
+    // ============================================================
+    match /mailLogs/{logId} {
+      allow read: if isAdmin();
+      allow write: if false;  // Functions 専用
+    }
+
+    // ============================================================
+    // settings : グローバル設定
+    // ============================================================
+    match /settings/{docId} {
+      allow read: if true;   // freeTrialMonths など公開情報のみ
+      allow write: if isAdmin();
+    }
+
+    // ============================================================
+    // デフォルト：全拒否
+    // ============================================================
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
