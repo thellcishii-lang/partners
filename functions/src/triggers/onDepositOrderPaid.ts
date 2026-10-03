@@ -17,7 +17,9 @@ export const onDepositOrderPaid = onDocumentUpdated(
     // pending → paid の遷移だけ処理
     if (before.status === 'paid' || after.status !== 'paid') return;
 
-    const { advertiserId, credits, orderId } = { ...after, orderId: event.params.orderId };
+    const advertiserId = after.advertiserId as string;
+　　　　　　　　const credits = after.credits as number;
+　　　　　　　　const orderId = event.params.orderId;
 
     // 1) 残高加算
     await grantDeposit({
