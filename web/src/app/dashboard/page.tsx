@@ -1,38 +1,52 @@
 'use client';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { doc, getDoc, collection, query, where, getCountFromServer } from 'firebase/firestore';
+import { doc, getDoc, getDocs, collection, query, where, getCountFromServer } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { useRequireAuth } from '@/hooks/useRequireAuth';
 import { Button } from '@/components/ui/Button';
-import type { Advertiser } from '@/types';
+import { LISTING_STATUS_LABELS, type Advertiser, type Listing } from '@/types';
 
 export default function DashboardPage() {
   const { user, loading } = useRequireAuth();
   const [adv, setAdv] = useState<Advertiser | null>(null);
   const [pendingCount, setPendingCount] = useState(0);
   const [deliveredCount, setDeliveredCount] = useState(0);
+  const [listings, setListings] = useState<Listing[]>([]);
+  const [error, setError] = useState('');
+  const [dataLoading, setDataLoading] = useState(true);
 
   useEffect(() => {
     if (!user) return;
+    let active = true;
+    setDataLoading(true);
+    setError('');
     (async () => {
       const snap = await getDoc(doc(db, 'advertisers', user.uid));
-      setAdv(snap.exists() ? ({ uid: user.uid, ...snap.data() } as Advertiser) : null);
+      if (!snap.exists()) throw new Error('募集者プロフィールがありません。募集者登録を行ってください。');
 
-      const [p, d] = await Promise.all([
+      const [p, d, ownListings] = await Promise.all([
         getCountFromServer(
           query(collection(db, 'inquiries'), where('advertiserId', '==', user.uid), where('status', '==', 'pending'))
         ),
         getCountFromServer(
           query(collection(db, 'inquiries'), where('advertiserId', '==', user.uid), where('status', '==', 'delivered'))
         ),
+        getDocs(query(collection(db, 'listings'), where('advertiserId', '==', user.uid))),
       ]);
+      if (!active) return;
+      setAdv({ ...snap.data(), uid: user.uid } as Advertiser);
       setPendingCount(p.data().count);
       setDeliveredCount(d.data().count);
-    })();
+      setListings(ownListings.docs.map((item) => ({ ...item.data(), id: item.id } as Listing)));
+    })().catch((error: unknown) => {
+      if (active) setError(error instanceof Error ? error.message : 'ダッシュボードの取得に失敗しました。');
+    }).finally(() => { if (active) setDataLoading(false); });
+    return () => { active = false; };
   }, [user]);
 
-  if (loading || !adv) return <p className="text-center text-sm text-gray-500">読み込み中…</p>;
+  if (loading || !user || dataLoading) return <p className="text-center text-sm text-gray-500">読み込み中…</p>;
+  if (error || !adv) return <p role="alert" className="text-red-600">{error}</p>;
 
   const balance = adv.depositBalance ?? 0;
 
@@ -76,6 +90,22 @@ export default function DashboardPage() {
           残り{balance}件です。お早めに追加をご検討ください。
         </div>
       )}
+
+      <section className="space-y-4">
+        <h2 className="text-lg font-bold">自分の案件一覧</h2>
+        {listings.length === 0 && <p className="text-sm text-gray-600">まだ案件がありません。</p>}
+        {listings.map((listing) => (
+          <div key={listing.id} className="flex flex-wrap items-center justify-between gap-3 rounded-xl bg-white p-5 shadow-sm">
+            <div>
+              <Link href={`/listings/${listing.id}`} className="font-bold text-brand-700">{listing.title}</Link>
+              <span className="ml-3 rounded-full bg-gray-100 px-3 py-1 text-xs">
+                {LISTING_STATUS_LABELS[listing.status]}
+              </span>
+            </div>
+            <Link href={`/listings/${listing.id}/edit`} className="text-sm text-brand-700 underline">編集</Link>
+          </div>
+        ))}
+      </section>
     </div>
   );
 }

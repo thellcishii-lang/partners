@@ -38,13 +38,13 @@ export default function SignupPage() {
       await setDoc(doc(db, 'users', cred.user.uid), {
         email,
         displayName,
-        role: 'advertiser',
         createdAt: serverTimestamp(),
       });
 
       // advertisers/{uid} — 課金フィールドはクライアントから書けないので
       // ここでは触らない。Functions（次フェーズ）で初期残高を付与する。
       await setDoc(doc(db, 'advertisers', cred.user.uid), {
+        email: cred.user.email,
         companyName,
         industry: industry || null,
         phone: phone || null,
@@ -75,7 +75,6 @@ export default function SignupPage() {
         {
           email: cred.user.email,
           displayName: cred.user.displayName ?? '',
-          role: 'advertiser',
           createdAt: serverTimestamp(),
         },
         { merge: true }
@@ -83,6 +82,7 @@ export default function SignupPage() {
       await setDoc(
         doc(db, 'advertisers', uid),
         {
+          email: cred.user.email,
           companyName: '',
           onboardingCompleted: false,
           createdAt: serverTimestamp(),

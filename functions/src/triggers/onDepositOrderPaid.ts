@@ -18,8 +18,13 @@ export const onDepositOrderPaid = onDocumentUpdated(
     if (before.status === 'paid' || after.status !== 'paid') return;
 
     const advertiserId = after.advertiserId as string;
+<<<<<<< HEAD
 　　　　　　　　const credits = after.credits as number;
 　　　　　　　　const orderId = event.params.orderId;
+=======
+    const credits = after.credits as number;
+    const orderId = event.params.orderId;
+>>>>>>> 454c1f6 (Add listing and application flows)
 
     // 1) 残高加算
     await grantDeposit({

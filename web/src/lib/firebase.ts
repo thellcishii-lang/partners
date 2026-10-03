@@ -1,4 +1,5 @@
 import { initializeApp, getApps } from 'firebase/app';
+import { getFunctions, connectFunctionsEmulator } from 'firebase/functions';
 import {
   getAuth,
   connectAuthEmulator,
@@ -28,6 +29,7 @@ const app = getApps().length === 0 ? initializeApp(config) : getApps()[0];
 export const auth = getAuth(app);
 export const db = getFirestore(app);
 export const storage = getStorage(app);
+export const functions = getFunctions(app, 'asia-northeast1');
 
 // SSR での永続化は browser のみ
 if (typeof window !== 'undefined') {
@@ -41,6 +43,7 @@ if (useEmu && typeof window !== 'undefined') {
     connectAuthEmulator(auth, 'http://127.0.0.1:9099', { disableWarnings: true });
     connectFirestoreEmulator(db, '127.0.0.1', 8080);
     connectStorageEmulator(storage, '127.0.0.1', 9199);
+    connectFunctionsEmulator(functions, '127.0.0.1', 5001);
     w.__FB_EMU__ = true;
   }
 }
