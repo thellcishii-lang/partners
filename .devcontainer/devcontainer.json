@@ -1,0 +1,19 @@
+{
+  "name": "agency-deposit",
+  "image": "mcr.microsoft.com/devcontainers/typescript-node:20",
+  "features": {
+    "ghcr.io/devcontainers/features/java:1": { "version": "17" },
+    "ghcr.io/devcontainers/features/firebase-cli:1": {}
+  },
+  "forwardPorts": [3000, 4000, 8080, 9099, 5001],
+  "postCreateCommand": "npm --prefix functions install && npm --prefix web install",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "toba.vsfire"
+      ]
+    }
+  }
+}
