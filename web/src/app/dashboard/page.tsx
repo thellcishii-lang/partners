@@ -74,6 +74,12 @@ export default function DashboardPage() {
         <Card label="開示済み" value={deliveredCount} unit="件" />
       </div>
 
+      {balance > 0 && (
+        <div className="text-right">
+          <Link href="/deposit" className="text-sm text-brand-700 underline">デポジットを追加</Link>
+        </div>
+      )}
+
       {balance <= 0 && (
         <div className="rounded-xl border border-red-200 bg-red-50 p-4">
           <p className="text-sm font-medium text-red-800">

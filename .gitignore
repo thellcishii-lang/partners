@@ -7,3 +7,8 @@ web/node_modules/
 .env*.local
 *.log
 .DS_Store
+.secret.local
+
+# generated
+web/tsconfig.tsbuildinfo
+web/audit-report.json

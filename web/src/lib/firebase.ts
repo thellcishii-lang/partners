@@ -67,7 +67,7 @@ if (useEmu) {
 
   if (!w.__FB_EMU__) {
     if (isCodespaces) {
-      connectAuthEmulator(auth, `${window.location.origin}/__firebase/auth`, {
+      connectAuthEmulator(auth, window.location.origin, {
         disableWarnings: true,
       });
 

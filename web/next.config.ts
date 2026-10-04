@@ -14,8 +14,16 @@ const config: NextConfig = {
 
     return [
       {
-        source: '/__firebase/auth/:path*',
-        destination: 'http://127.0.0.1:9099/:path*',
+        source: '/identitytoolkit.googleapis.com/:path*',
+        destination: 'http://127.0.0.1:9099/identitytoolkit.googleapis.com/:path*',
+      },
+      {
+        source: '/securetoken.googleapis.com/:path*',
+        destination: 'http://127.0.0.1:9099/securetoken.googleapis.com/:path*',
+      },
+      {
+        source: '/emulator/auth/:path*',
+        destination: 'http://127.0.0.1:9099/emulator/auth/:path*',
       },
       {
         source: '/__firebase/functions/:path*',
