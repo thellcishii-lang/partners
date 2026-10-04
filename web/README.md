@@ -170,6 +170,20 @@ allowed as Checkout return URLs in `functions/.env`, for example
 `APP_ORIGINS=https://example.com`. Register the deployed `stripeWebhook` URL as
 a Stripe webhook endpoint with the same four events.
 
+The production project is the `production` alias (`partners-ab2a3`). Both
+secrets currently hold the placeholder `unset`, so Checkout reports
+"決済の設定が完了していません" and the webhook returns 400. Only values starting
+with `sk_`/`rk_` and `whsec_` count as configured. To go live:
+
+```sh
+firebase functions:secrets:set STRIPE_SECRET_KEY --project production
+firebase functions:secrets:set STRIPE_WEBHOOK_SECRET --project production
+firebase deploy --only functions --project production
+```
+
+The webhook endpoint URL is
+`https://asia-northeast1-partners-ab2a3.cloudfunctions.net/stripeWebhook`.
+
 ## Emulator integration tests
 
 After building Functions, run from the repository root:

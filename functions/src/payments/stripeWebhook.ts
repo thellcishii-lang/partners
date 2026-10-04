@@ -3,7 +3,7 @@ import { onRequest } from 'firebase-functions/v2/https';
 import { logger } from 'firebase-functions';
 import { db, FV, REGION } from '../lib/admin';
 import { COLLECTIONS } from '../lib/constants';
-import { STRIPE_WEBHOOK_SECRET } from '../lib/stripe';
+import { STRIPE_WEBHOOK_SECRET, webhookSecret } from '../lib/stripe';
 
 type Outcome = 'paid' | 'already-paid' | 'expired' | 'ignored' | 'mismatch' | 'not-found';
 
@@ -54,15 +54,15 @@ export const stripeWebhook = onRequest(
       res.status(405).send('Method Not Allowed');
       return;
     }
-    const webhookSecret = STRIPE_WEBHOOK_SECRET.value();
+    const secret = webhookSecret();
     const signature = req.get('stripe-signature');
-    if (!webhookSecret || !signature) {
+    if (!secret || !signature) {
       res.status(400).send('Webhook is not configured or signature is missing');
       return;
     }
     let event: Stripe.Event;
     try {
-      event = Stripe.webhooks.constructEvent(req.rawBody, signature, webhookSecret);
+      event = Stripe.webhooks.constructEvent(req.rawBody, signature, secret);
     } catch (error) {
       logger.warn('Invalid Stripe webhook signature', { error });
       res.status(400).send('Invalid signature');

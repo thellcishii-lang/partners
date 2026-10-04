@@ -14,6 +14,7 @@ const { getFirestore } = require('firebase-admin/firestore');
 const { creditsForAmount } = require('../lib/depositPricing');
 const { allowedReturnOrigin } = require('../lib/payments/createDepositCheckout');
 const { stripeWebhook } = require('../lib/payments/stripeWebhook');
+const { configuredSecret } = require('../lib/lib/stripe');
 
 const admin = getFirestore();
 const authHost = `http://${process.env.FIREBASE_AUTH_EMULATOR_HOST}`;
@@ -83,6 +84,14 @@ test('deposit amounts follow the 2,500 yen unit price', () => {
   for (const invalid of [0, 2500, 12500, 27500, 31000, 2502500, 10000.5, '10000', null]) {
     assert.equal(creditsForAmount(invalid), null, String(invalid));
   }
+});
+
+test('placeholder Stripe secrets are treated as not configured', () => {
+  assert.equal(configuredSecret('unset', 'sk_'), null);
+  assert.equal(configuredSecret('', 'whsec_'), null);
+  assert.equal(configuredSecret(undefined, 'sk_'), null);
+  assert.equal(configuredSecret(' sk_test_abc ', 'sk_'), 'sk_test_abc');
+  assert.equal(configuredSecret('whsec_abc', 'whsec_'), 'whsec_abc');
 });
 
 test('checkout return origins are allowlisted', () => {
