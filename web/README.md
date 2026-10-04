@@ -166,8 +166,9 @@ CVC.
 For production, set the secrets with
 `firebase functions:secrets:set STRIPE_SECRET_KEY` and
 `firebase functions:secrets:set STRIPE_WEBHOOK_SECRET`. List the site origins
-allowed as Checkout return URLs in `functions/.env`, for example
-`APP_ORIGINS=https://example.com`. Register the deployed `stripeWebhook` URL as
+allowed as Checkout return URLs in `functions/.env.production` (currently
+`APP_ORIGINS=https://partners-tau-kohl.vercel.app`; comma-separate extra
+domains). Register the deployed `stripeWebhook` URL as
 a Stripe webhook endpoint with the same four events.
 
 The production project is the `production` alias (`partners-ab2a3`). Both
