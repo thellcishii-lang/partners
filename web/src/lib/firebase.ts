@@ -36,26 +36,16 @@ const app = getApps().length === 0 ? initializeApp(config) : getApps()[0];
 
 const useEmu = process.env.NEXT_PUBLIC_USE_EMULATOR === 'true' && typeof window !== 'undefined';
 
-// Codespaces では各ポートが https://<codespace>-<port>.app.github.dev として公開される。
-// ブラウザからは 127.0.0.1 に届かないので、Web(3000) のホスト名のポート部分を置換して接続する。
-const codespacesHostFor = (port: number): string | null => {
-  if (typeof window === 'undefined') return null;
-  const { hostname } = window.location;
-  if (!hostname.endsWith('.app.github.dev')) return null;
-  return hostname.replace(/-\d+(\.app\.github\.dev)$/, `-${port}$1`);
-};
-
-const isCodespaces = useEmu && codespacesHostFor(EMULATOR_PORTS.auth) !== null;
+const isCodespaces = useEmu && window.location.hostname.endsWith('.app.github.dev');
 
 export const auth = getAuth(app);
 
-// connectFirestoreEmulator は Firebase Studio 以外では ssl:false 固定のため、
-// Codespaces では initializeFirestore で https(443) の host を直接指定する。
+// Codespaces の Emulator 通信は Next.js の同一オリジン proxy 経由にする。
 const createDb = (): Firestore => {
   if (!isCodespaces) return getFirestore(app);
   try {
     return initializeFirestore(app, {
-      host: `${codespacesHostFor(EMULATOR_PORTS.firestore)}:443`,
+      host: `${window.location.hostname}:443`,
       ssl: true,
     });
   } catch {
@@ -77,16 +67,15 @@ if (useEmu) {
 
   if (!w.__FB_EMU__) {
     if (isCodespaces) {
-      connectAuthEmulator(auth, `https://${codespacesHostFor(EMULATOR_PORTS.auth)}`, {
+      connectAuthEmulator(auth, `${window.location.origin}/__firebase/auth`, {
         disableWarnings: true,
       });
 
-      // connectStorageEmulator / connectFunctionsEmulator も http 固定なので https に差し替える
-      connectStorageEmulator(storage, codespacesHostFor(EMULATOR_PORTS.storage)!, 443);
+      connectStorageEmulator(storage, window.location.hostname, 443);
       (storage as unknown as { _protocol: string })._protocol = 'https';
 
       (functions as unknown as { emulatorOrigin: string }).emulatorOrigin =
-        `https://${codespacesHostFor(EMULATOR_PORTS.functions)}`;
+        `${window.location.origin}/__firebase/functions`;
     } else {
       connectAuthEmulator(auth, `http://127.0.0.1:${EMULATOR_PORTS.auth}`, {
         disableWarnings: true,

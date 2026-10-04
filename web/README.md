@@ -1,24 +1,26 @@
 # Web development
 
-Use Next.js 15 and React 19. Install dependencies with `npm ci` in this
+Use Next.js and React 19. Install dependencies with `npm ci` in this
 directory, then run `npm run dev`.
 
 ## Firebase
 
 Copy `.env.local.example` to `.env.local` and provide the Firebase project
-configuration. For isolated local development, use a `demo-` project ID,
-matching emulator configuration, and `NEXT_PUBLIC_USE_EMULATOR=true`.
-Start Auth, Firestore, and Functions emulators from the repository root:
+configuration. For isolated local development, use a `demo-` project ID and
+`NEXT_PUBLIC_USE_EMULATOR=true`. In Codespaces, start the emulators from the
+repository root:
 
 ```sh
 npm --prefix functions run build
-firebase emulators:start --only auth,firestore,functions --project demo-partners
+FIREBASE_CLI_EXPERIMENTS=webframeworks npx --yes firebase-tools@14.0.0 \
+  emulators:start --only auth,firestore,functions,storage --project demo-partners
 ```
 
-The default emulator addresses are `127.0.0.1:9099`, `127.0.0.1:8080`, and
-`127.0.0.1:5001`. When opening a Codespaces forwarded page on another machine,
-also forward these ports to that machine's localhost. Forwarding only port
-3000 is not sufficient for authentication or submission.
+Open the web app with `npm run dev` from `web/`. The browser connects to the
+emulators through same-origin Next.js rewrites, so keep emulator ports private;
+only the web app needs to be forwarded to the browser. The local emulator
+addresses are `127.0.0.1:9099`, `127.0.0.1:8080`, `127.0.0.1:5001`, and
+`127.0.0.1:9199`.
 
 ## Listings and applications
 
@@ -57,7 +59,8 @@ are entered separately; never enter identifying information in them.
 After building Functions, run from the repository root:
 
 ```sh
-firebase emulators:exec --only auth,firestore,functions --project demo-partners \
+FIREBASE_CLI_EXPERIMENTS=webframeworks npx --yes firebase-tools@14.0.0 \
+  emulators:exec --only auth,firestore,functions --project demo-partners \
   "node --test functions/test/createInquiry.test.cjs"
 ```
 
