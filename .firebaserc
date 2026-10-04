@@ -1,5 +1,6 @@
 {
   "projects": {
-    "default": "demo-agency"
+    "default": "demo-partners",
+    "production": "partners-ab2a3"
   }
 }

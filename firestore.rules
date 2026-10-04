@@ -22,11 +22,6 @@ service cloud.firestore {
       return isAuth() && userDoc().role == 'admin';
     }
 
-    // 自分の advertiser ドキュメント
-    function myAdv() {
-      return get(/databases/$(database)/documents/advertisers/$(uid())).data;
-    }
-
     // 課金フィールド（クライアントから書けない）
     function protectedAdvFields() {
       return [
