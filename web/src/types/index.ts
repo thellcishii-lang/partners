@@ -33,9 +33,57 @@ export interface Advertiser {
   updatedAt?: unknown;
 }
 
+// ============================================================
+// マスタ（categories / areas / costRanges）
+// ============================================================
+export type CategoryAxis = 'target' | 'product' | 'model';
+
+export interface Category {
+  slug: string;
+  label: string;
+  axis: CategoryAxis;
+  parentSlug: string | null;
+  order: number;
+  seoTitle: string;
+  seoDescription: string;
+  isActive: boolean;
+}
+
+export type AreaType = 'region' | 'prefecture' | 'city';
+
+export interface Area {
+  slug: string;
+  label: string;
+  type: AreaType;
+  parentSlug: string | null;
+  prefectures: string[];
+  order: number;
+  seoTitle: string;
+  seoDescription: string;
+  isActive: boolean;
+}
+
+export type CostRangeType = 'initial_cost' | 'expected_revenue';
+
+export interface CostRange {
+  slug: string;
+  label: string;
+  type: CostRangeType;
+  min: number;
+  max: number | null;
+  order: number;
+  seoTitle: string;
+  isActive: boolean;
+}
+
+// ============================================================
+// 案件
+// ============================================================
 export const LISTING_CATEGORIES = ['代理店', '加盟店', 'FC', '業務委託'] as const;
 export type ListingCategory = typeof LISTING_CATEGORIES[number];
+
 export type ListingStatus = 'draft' | 'reviewing' | 'published' | 'paused' | 'closed';
+
 export const LISTING_STATUS_LABELS: Record<ListingStatus, string> = {
   draft: '下書き',
   reviewing: '審査中',
@@ -61,8 +109,36 @@ export interface Listing {
   publishedAt: { seconds: number; nanoseconds: number } | null;
   createdAt?: unknown;
   updatedAt?: unknown;
+
+  // ============================================================
+  // フィルタ用（3軸 + 地域 + 費用）
+  // ============================================================
+  targetSlugs: string[];        // ['target-retail', 'target-individual']
+  targetLabels: string[];       // ['小売・店舗ビジネス', '個人']
+  productSlugs: string[];       // ['product-ai-it', 'product-ai']
+  productLabels: string[];      // ['AI / IT / DX / SaaS', 'AI']
+  modelSlugs: string[];         // ['model-low-risk']
+  modelLabels: string[];        // ['簡単・低リスクで始める']
+
+  prefectureSlug: string;       // 'tokyo'
+  prefectureLabel: string;      // '東京都'
+  regionSlug: string;           // 'kanto'
+  regionLabel: string;          // '関東'
+
+  initialCostYen: number | null;    // 数値（円）。不明は null
+  initialCostRange: string;         // 'initial-free' など
+  initialCostLabel: string;         // '初期費用無料'
+
+  expectedRevenueYen: number | null;
+  expectedRevenueRange: string;     // 'revenue-under500' など
+  expectedRevenueLabel: string;
+
+  searchText: string;               // 検索用の結合テキスト
 }
 
+// ============================================================
+// 応募
+// ============================================================
 export interface ApplicationInput {
   inquiryId: string;
   listingId: string;
