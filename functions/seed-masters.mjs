@@ -1,4 +1,4 @@
-// scripts/seed-masters.mjs
+// functions/seed-masters.mjs
 // 実行: node scripts/seed-masters.mjs
 // 前提: エミュレータ起動中、または本番の認証情報が通っていること
 //
