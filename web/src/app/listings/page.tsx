@@ -11,6 +11,14 @@ import { cn } from '@/lib/cn';
 import type { Listing } from '@/types';
 
 export default function ListingsPage() {
+  return (
+    <Suspense fallback={<p className="text-sm text-gray-500">読み込み中…</p>}>
+      <ListingsContent />
+    </Suspense>
+  );
+}
+
+function ListingsContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { categories, areas, loading: mastersLoading } = useMasters();
