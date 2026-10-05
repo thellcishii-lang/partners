@@ -231,6 +231,21 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
+　　　　　　　　　// ============================================================
+// マスタデータ（公開読み取り）
+// ============================================================
+match /categories/{slug} {
+  allow read: if true;
+  allow write: if isAdmin();
+}
+match /areas/{slug} {
+  allow read: if true;
+  allow write: if isAdmin();
+}
+match /costRanges/{slug} {
+  allow read: if true;
+  allow write: if isAdmin();
+}
     // ============================================================
     // デフォルト：全拒否
     // ============================================================
