@@ -1,0 +1,143 @@
+// ============================================================
+// 案件のフィルタ用計算ロジック
+// functions/seed-masters.mjs の定義と整合させること
+// ============================================================
+
+// 都道府県 slug → 地域 slug
+export const PREFECTURE_TO_REGION: Record<string, string> = {
+  hokkaido: 'hokkaido',
+  aomori: 'tohoku', iwate: 'tohoku', miyagi: 'tohoku',
+  akita: 'tohoku', yamagata: 'tohoku', fukushima: 'tohoku',
+  tokyo: 'kanto', kanagawa: 'kanto', saitama: 'kanto',
+  chiba: 'kanto', ibaraki: 'kanto', tochigi: 'kanto', gunma: 'kanto',
+  niigata: 'chubu', toyama: 'chubu', ishikawa: 'chubu',
+  fukui: 'chubu', yamanashi: 'chubu', nagano: 'chubu',
+  gifu: 'chubu', shizuoka: 'chubu', aichi: 'chubu',
+  mie: 'kansai', shiga: 'kansai', kyoto: 'kansai',
+  osaka: 'kansai', hyogo: 'kansai', nara: 'kansai', wakayama: 'kansai',
+  tottori: 'chugoku', shimane: 'chugoku', okayama: 'chugoku',
+  hiroshima: 'chugoku', yamaguchi: 'chugoku',
+  tokushima: 'shikoku', kagawa: 'shikoku', ehime: 'shikoku', kochi: 'shikoku',
+  fukuoka: 'kyushu', saga: 'kyushu', nagasaki: 'kyushu',
+  kumamoto: 'kyushu', oita: 'kyushu', miyazaki: 'kyushu',
+  kagoshima: 'kyushu', okinawa: 'kyushu',
+};
+
+export const REGION_LABELS: Record<string, string> = {
+  hokkaido: '北海道',
+  tohoku: '東北',
+  kanto: '関東',
+  chubu: '中部',
+  kansai: '関西',
+  chugoku: '中国',
+  shikoku: '四国',
+  kyushu: '九州・沖縄',
+};
+
+// ============================================================
+// 初期費用レンジ
+// ============================================================
+export type InitialCostRangeSlug =
+  | 'initial-free'
+  | 'initial-under100'
+  | 'initial-under300'
+  | 'initial-over300'
+  | 'initial-unknown';
+
+export const INITIAL_COST_RANGES: {
+  slug: InitialCostRangeSlug;
+  label: string;
+}[] = [
+  { slug: 'initial-free',     label: '初期費用無料' },
+  { slug: 'initial-under100', label: '100万円以下' },
+  { slug: 'initial-under300', label: '300万円以下' },
+  { slug: 'initial-over300',  label: '300万円以上' },
+  { slug: 'initial-unknown',  label: '応相談' },
+];
+
+export function getInitialCostRange(yen: number | null): InitialCostRangeSlug {
+  if (yen === null) return 'initial-unknown';
+  if (yen === 0) return 'initial-free';
+  if (yen <= 1_000_000) return 'initial-under100';
+  if (yen <= 3_000_000) return 'initial-under300';
+  return 'initial-over300';
+}
+
+export function getInitialCostLabel(slug: string): string {
+  return INITIAL_COST_RANGES.find((r) => r.slug === slug)?.label ?? '応相談';
+}
+
+// ============================================================
+// 想定売上（年商）レンジ
+// ============================================================
+export type ExpectedRevenueRangeSlug =
+  | 'revenue-under300'
+  | 'revenue-under500'
+  | 'revenue-under1000'
+  | 'revenue-over1000'
+  | 'revenue-unknown';
+
+export const EXPECTED_REVENUE_RANGES: {
+  slug: ExpectedRevenueRangeSlug;
+  label: string;
+}[] = [
+  { slug: 'revenue-under300',  label: '年商300万円以下' },
+  { slug: 'revenue-under500',  label: '年商500万円以下' },
+  { slug: 'revenue-under1000', label: '年商1000万円以下' },
+  { slug: 'revenue-over1000',  label: '年商1000万円以上' },
+  { slug: 'revenue-unknown',   label: '応相談' },
+];
+
+export function getExpectedRevenueRange(yen: number | null): ExpectedRevenueRangeSlug {
+  if (yen === null) return 'revenue-unknown';
+  if (yen <= 3_000_000) return 'revenue-under300';
+  if (yen <= 5_000_000) return 'revenue-under500';
+  if (yen <= 10_000_000) return 'revenue-under1000';
+  return 'revenue-over1000';
+}
+
+export function getExpectedRevenueLabel(slug: string): string {
+  return EXPECTED_REVENUE_RANGES.find((r) => r.slug === slug)?.label ?? '応相談';
+}
+
+// ============================================================
+// 地域
+// ============================================================
+export function getRegionSlug(prefectureSlug: string): string {
+  return PREFECTURE_TO_REGION[prefectureSlug] ?? 'other';
+}
+
+export function getRegionLabel(prefectureSlug: string): string {
+  const region = getRegionSlug(prefectureSlug);
+  return REGION_LABELS[region] ?? 'その他';
+}
+
+// ============================================================
+// 検索用テキスト生成
+// ============================================================
+export function buildSearchText(input: {
+  title: string;
+  description: string;
+  targetLabels: string[];
+  productLabels: string[];
+  modelLabels: string[];
+  prefectureLabel: string;
+  regionLabel: string;
+  category: string;
+  companyName: string;
+}): string {
+  return [
+    input.title,
+    input.description,
+    input.companyName,
+    input.category,
+    ...input.targetLabels,
+    ...input.productLabels,
+    ...input.modelLabels,
+    input.prefectureLabel,
+    input.regionLabel,
+  ]
+    .filter(Boolean)
+    .join(' ')
+    .slice(0, 5000);
+}
