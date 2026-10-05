@@ -18,7 +18,9 @@ export function Header() {
           {loading ? null : user ? (
             <>
               <Link href="/dashboard" className="hover:text-brand-700">マイページ</Link>
-              <span className="text-gray-400 hidden sm:inline">{profile?.displayName ?? user.email}</span>
+              <span className="hidden text-gray-400 sm:inline">
+                {profile?.displayName ?? user.email}
+              </span>
               <Button variant="ghost" size="sm" onClick={() => signOut(auth)}>
                 ログアウト
               </Button>
@@ -26,8 +28,11 @@ export function Header() {
           ) : (
             <>
               <Link href="/login" className="hover:text-brand-700">ログイン</Link>
-              <Link href="/signup">
-                <Button size="sm">募集者登録（3ヶ月無料）</Button>
+              <Link
+                href="/signup"
+                className="rounded-lg border border-brand-600 px-3 py-1.5 text-brand-700 hover:bg-brand-50"
+              >
+                掲載についてはこちら
               </Link>
             </>
           )}
