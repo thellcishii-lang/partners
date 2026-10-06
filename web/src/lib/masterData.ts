@@ -147,3 +147,111 @@ export const COST_RANGES: CostRange[] = [
   { slug: 'revenue-over1000',  label: '年商1000万円以上', type: 'expected_revenue', min: 10_000_001, max: null,       order: 40, seoTitle: '', isActive: true },
   { slug: 'revenue-unknown',   label: '応相談',           type: 'expected_revenue', min: -1,         max: null,       order: 50, seoTitle: '', isActive: true },
 ];
+
+export const PREFECTURE_TO_REGION: Record<string, string> = Object.fromEntries(
+  AREAS
+    .filter((area): area is Area & { parentSlug: string } =>
+      area.type === 'prefecture' && area.parentSlug !== null
+    )
+    .map((area) => [area.slug, area.parentSlug])
+);
+
+export const REGION_LABELS: Record<string, string> = Object.fromEntries(
+  AREAS
+    .filter((area) => area.type === 'region')
+    .map((area) => [area.slug, area.label])
+);
+
+export const INITIAL_COST_RANGES = COST_RANGES
+  .filter((range) => range.type === 'initial_cost')
+  .map(({ slug, label }) => ({ slug, label }));
+
+export const EXPECTED_REVENUE_RANGES = COST_RANGES
+  .filter((range) => range.type === 'expected_revenue')
+  .map(({ slug, label }) => ({ slug, label }));
+
+export type InitialCostRangeSlug = typeof INITIAL_COST_RANGES[number]['slug'];
+export type ExpectedRevenueRangeSlug = typeof EXPECTED_REVENUE_RANGES[number]['slug'];
+
+export function getInitialCostRange(yen: number | null): InitialCostRangeSlug {
+  if (yen === null) return 'initial-unknown';
+  if (yen === 0) return 'initial-free';
+  if (yen <= 1_000_000) return 'initial-under100';
+  if (yen <= 3_000_000) return 'initial-under300';
+  return 'initial-over300';
+}
+
+export function getInitialCostLabel(slug: string): string {
+  return INITIAL_COST_RANGES.find((range) => range.slug === slug)?.label ?? '応相談';
+}
+
+export function getExpectedRevenueRange(yen: number | null): ExpectedRevenueRangeSlug {
+  if (yen === null) return 'revenue-unknown';
+  if (yen <= 3_000_000) return 'revenue-under300';
+  if (yen <= 5_000_000) return 'revenue-under500';
+  if (yen <= 10_000_000) return 'revenue-under1000';
+  return 'revenue-over1000';
+}
+
+export function getExpectedRevenueLabel(slug: string): string {
+  return EXPECTED_REVENUE_RANGES.find((range) => range.slug === slug)?.label ?? '応相談';
+}
+
+export function getRegionSlug(prefectureSlug: string): string {
+  return PREFECTURE_TO_REGION[prefectureSlug] ?? 'other';
+}
+
+export function getRegionLabel(prefectureSlug: string): string {
+  return REGION_LABELS[getRegionSlug(prefectureSlug)] ?? 'その他';
+}
+
+export const FRANCHISE_FEE_RANGES = [
+  { slug: 'free', label: '無料' },
+  { slug: 'under10', label: '10万円以下' },
+  { slug: 'under50', label: '50万円以下' },
+  { slug: 'under100', label: '100万円以下' },
+  { slug: 'over100', label: '100万円以上' },
+] as const;
+
+export function getFranchiseFeeRange(yen: number | null): string {
+  if (yen === null) return '';
+  if (yen === 0) return 'free';
+  if (yen <= 100_000) return 'under10';
+  if (yen <= 500_000) return 'under50';
+  if (yen <= 1_000_000) return 'under100';
+  return 'over100';
+}
+
+export const STOCK_TYPES = [
+  { slug: 'none', label: '仕入れ不要' },
+  { slug: 'single', label: '1個から' },
+  { slug: 'small_lot', label: '小ロット' },
+  { slug: 'no_risk', label: '在庫リスクなし' },
+  { slug: 'buyback', label: '買取あり' },
+] as const;
+
+export const REVENUE_AMOUNTS = [
+  { slug: 'under50', label: '〜50万円/月' },
+  { slug: 'under100', label: '〜100万円/月' },
+  { slug: 'under300', label: '〜300万円/月' },
+  { slug: 'over100', label: '300万円以上' },
+] as const;
+
+export const PROFIT_AMOUNTS = [
+  { slug: 'under50', label: '〜50万円/月' },
+  { slug: 'over50', label: '50万円以上' },
+  { slug: 'over100', label: '100万円以上' },
+] as const;
+
+export const REVENUE_TYPES = [
+  { slug: 'stock', label: 'ストック型' },
+  { slug: 'flow', label: 'フロー型' },
+  { slug: 'both', label: '複合型' },
+] as const;
+
+export const ORGANIZATION_TYPES = [
+  { slug: 'individual', label: '個人可' },
+  { slug: 'side_job', label: '副業可' },
+  { slug: 'org', label: '組織拡大可' },
+  { slug: 'corp', label: '法人のみ' },
+] as const;
