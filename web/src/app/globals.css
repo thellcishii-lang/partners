@@ -10,14 +10,13 @@
 html { -webkit-text-size-adjust: 100%; }
 body { font-family: system-ui, -apple-system, "Segoe UI", "Hiragino Sans", "Noto Sans JP", sans-serif; }
 
-/* ヒーローの流れる背景 */
-@keyframes blob {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  33% { transform: translate(40px, -60px) scale(1.1); }
-  66% { transform: translate(-30px, 30px) scale(0.95); }
+/* ヒーローの流れるグラデーション */
+@keyframes flow-gradient {
+  0%   { background-position:   0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position:   0% 50%; }
 }
-.animate-blob {
-  animation: blob 12s infinite ease-in-out;
+.animate-flow {
+  background-size: 300% 300%;
+  animation: flow-gradient 18s ease-in-out infinite;
 }
-.animation-delay-2000 { animation-delay: 2s; }
-.animation-delay-4000 { animation-delay: 4s; }
