@@ -79,18 +79,17 @@ export default function SignupPage() {
         },
         { merge: true }
       );
-      await setDoc(
-        doc(db, 'advertisers', uid),
-        {
+      const advRef = doc(db, 'advertisers', uid);
+      const existing = await getDoc(advRef);
+      if (!existing.exists()) {
+        await setDoc(advRef, {
           email: cred.user.email,
           companyName: '',
           onboardingCompleted: false,
           createdAt: serverTimestamp(),
           updatedAt: serverTimestamp(),
-        },
-        { merge: true }
-      );
-
+        });
+      }
       router.push('/onboarding');
     } catch (e) {
       setError(e instanceof Error ? e.message : '登録に失敗しました');
