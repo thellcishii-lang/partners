@@ -75,6 +75,37 @@ export function ListingForm({
   });
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
+  
+  // 会社情報（詳細ページのサイドバー）
+  const [companyInfo, setCompanyInfo] = useState({
+    companyAddress: listing?.companyAddress ?? '',
+    companyRepresentative: listing?.companyRepresentative ?? '',
+    companyEstablished: listing?.companyEstablished ?? '',
+    companyBusiness: listing?.companyBusiness ?? '',
+  });
+
+  // こんな方におすすめ（最大5個）
+  const [recommendedFor, setRecommendedFor] = useState<string[]>(
+    listing?.recommendedFor ?? ['']
+  );
+
+  // ビジネスの説明（固定5個）
+  const [businessPoints, setBusinessPoints] = useState<
+    { title: string; body: string }[]
+  >(() => {
+    const existing = listing?.businessPoints ?? [];
+    return Array.from({ length: 5 }, (_, i) => existing[i] ?? { title: '', body: '' });
+  });
+
+  // 詳細情報（サイドバー）
+  const [detailInfo, setDetailInfo] = useState({
+    salesTarget: listing?.salesTarget ?? '',
+    salesMethod: listing?.salesMethod ?? '',
+    earnings: listing?.earnings ?? '',
+  });
+  const [agentFit, setAgentFit] = useState<string[]>(
+    listing?.agentFit ?? ['']
+  );
 
   // ============================================================
   // マスタの絞り込み
@@ -219,7 +250,22 @@ export function ListingForm({
         expectedRevenueRange,
         expectedRevenueLabel,
 
-        searchText,
+                searchText,
+
+        // 会社情報
+        ...companyInfo,
+
+        // こんな方におすすめ（空行除外）
+        recommendedFor: recommendedFor.map((v) => v.trim()).filter(Boolean),
+
+        // ビジネスの説明（空行除外）
+        businessPoints: businessPoints
+          .map((p) => ({ title: p.title.trim(), body: p.body.trim() }))
+          .filter((p) => p.title || p.body),
+
+        // 詳細情報
+        ...detailInfo,
+        agentFit: agentFit.map((v) => v.trim()).filter(Boolean),
 
         status,
         updatedAt: serverTimestamp(),
@@ -474,6 +520,206 @@ export function ListingForm({
           </div>
         </Field>
       </section>
+
+            {/* ============================================================
+          会社情報（詳細ページのサイドバー）
+      ============================================================ */}
+      <section className="space-y-5 rounded-2xl bg-white p-6 shadow-sm">
+        <h2 className="font-bold">会社情報</h2>
+        <p className="text-xs text-gray-500">
+          案件詳細ページのサイドバーに表示されます。任意項目です。
+        </p>
+        <Field label="所在地">
+          <Input
+            value={companyInfo.companyAddress}
+            onChange={(e) =>
+              setCompanyInfo({ ...companyInfo, companyAddress: e.target.value })
+            }
+            placeholder="〒100-0001 東京都千代田区..."
+          />
+        </Field>
+        <Field label="代表者">
+          <Input
+            value={companyInfo.companyRepresentative}
+            onChange={(e) =>
+              setCompanyInfo({ ...companyInfo, companyRepresentative: e.target.value })
+            }
+            placeholder="代表取締役 山田 太郎"
+          />
+        </Field>
+        <Field label="設立">
+          <Input
+            value={companyInfo.companyEstablished}
+            onChange={(e) =>
+              setCompanyInfo({ ...companyInfo, companyEstablished: e.target.value })
+            }
+            placeholder="2010年4月"
+          />
+        </Field>
+        <Field label="事業内容">
+          <Textarea
+            rows={2}
+            value={companyInfo.companyBusiness}
+            onChange={(e) =>
+              setCompanyInfo({ ...companyInfo, companyBusiness: e.target.value })
+            }
+            placeholder="電気通信事業、情報処理サービス業..."
+          />
+        </Field>
+      </section>
+
+      {/* ============================================================
+          ビジネスの説明（固定5個）
+      ============================================================ */}
+      <section className="space-y-5 rounded-2xl bg-white p-6 shadow-sm">
+        <h2 className="font-bold">ビジネスの説明</h2>
+        <p className="text-xs text-gray-500">
+          番号付きで最大5項目まで。空欄の項目は表示されません。
+        </p>
+        {businessPoints.map((point, i) => (
+          <div key={i} className="space-y-3 rounded-lg border border-gray-200 p-4">
+            <p className="text-xs font-bold text-gray-500">項目 {i + 1}</p>
+            <Field label="見出し">
+              <Input
+                value={point.title}
+                onChange={(e) => {
+                  const next = [...businessPoints];
+                  next[i] = { ...next[i], title: e.target.value };
+                  setBusinessPoints(next);
+                }}
+                placeholder="SIMは1枚から仕入れ可能。大量在庫を抱えず小さくスタート"
+              />
+            </Field>
+            <Field label="本文">
+              <Textarea
+                rows={4}
+                value={point.body}
+                onChange={(e) => {
+                  const next = [...businessPoints];
+                  next[i] = { ...next[i], body: e.target.value };
+                  setBusinessPoints(next);
+                }}
+                placeholder="本文を入力（改行で段落分けできます）"
+              />
+            </Field>
+          </div>
+        ))}
+      </section>
+
+      {/* ============================================================
+          こんな方におすすめ（最大5個）
+      ============================================================ */}
+      <section className="space-y-5 rounded-2xl bg-white p-6 shadow-sm">
+        <h2 className="font-bold">こんな方におすすめ</h2>
+        <p className="text-xs text-gray-500">
+          案件詳細ページに箇条書きで表示されます。最大5個まで。
+        </p>
+        {recommendedFor.map((item, i) => (
+          <div key={i} className="flex gap-2">
+            <Input
+              value={item}
+              onChange={(e) => {
+                const next = [...recommendedFor];
+                next[i] = e.target.value;
+                setRecommendedFor(next);
+              }}
+              placeholder="既存の顧客基盤に新しい商材を加えたい"
+            />
+            {recommendedFor.length > 1 && (
+              <button
+                type="button"
+                onClick={() =>
+                  setRecommendedFor(recommendedFor.filter((_, j) => j !== i))
+                }
+                className="shrink-0 rounded-lg border border-gray-300 px-3 text-sm text-gray-500 hover:bg-gray-50"
+              >
+                削除
+              </button>
+            )}
+          </div>
+        ))}
+        {recommendedFor.length < 5 && (
+          <button
+            type="button"
+            onClick={() => setRecommendedFor([...recommendedFor, ''])}
+            className="text-sm text-emerald-700 underline hover:no-underline"
+          >
+            ＋ 項目を追加
+          </button>
+        )}
+      </section>
+
+      {/* ============================================================
+          詳細情報（サイドバー）
+      ============================================================ */}
+      <section className="space-y-5 rounded-2xl bg-white p-6 shadow-sm">
+        <h2 className="font-bold">詳細情報</h2>
+        <p className="text-xs text-gray-500">
+          案件詳細ページのサイドバーに表示されます。任意項目です。
+        </p>
+        <Field label="販売先">
+          <Input
+            value={detailInfo.salesTarget}
+            onChange={(e) =>
+              setDetailInfo({ ...detailInfo, salesTarget: e.target.value })
+            }
+            placeholder="法人、個人ほか"
+          />
+        </Field>
+        <Field label="販売方法">
+          <Input
+            value={detailInfo.salesMethod}
+            onChange={(e) =>
+              setDetailInfo({ ...detailInfo, salesMethod: e.target.value })
+            }
+            placeholder="訪問販売、テレアポ、既存顧客への紹介ほか"
+          />
+        </Field>
+        <Field label="収益">
+          <Input
+            value={detailInfo.earnings}
+            onChange={(e) =>
+              setDetailInfo({ ...detailInfo, earnings: e.target.value })
+            }
+            placeholder="卸価格と貴社販売価格の差益（ストック収益）"
+          />
+        </Field>
+        <div className="space-y-2">
+          <p className="text-sm font-medium text-gray-800">最適な代理店様</p>
+          {agentFit.map((item, i) => (
+            <div key={i} className="flex gap-2">
+              <Input
+                value={item}
+                onChange={(e) => {
+                  const next = [...agentFit];
+                  next[i] = e.target.value;
+                  setAgentFit(next);
+                }}
+                placeholder="通信事業を始めたい方"
+              />
+              {agentFit.length > 1 && (
+                <button
+                  type="button"
+                  onClick={() => setAgentFit(agentFit.filter((_, j) => j !== i))}
+                  className="shrink-0 rounded-lg border border-gray-300 px-3 text-sm text-gray-500 hover:bg-gray-50"
+                >
+                  削除
+                </button>
+              )}
+            </div>
+          ))}
+          {agentFit.length < 5 && (
+            <button
+              type="button"
+              onClick={() => setAgentFit([...agentFit, ''])}
+              className="text-sm text-emerald-700 underline hover:no-underline"
+            >
+              ＋ 項目を追加
+            </button>
+          )}
+        </div>
+      </section>
+
 
       {/* ============================================================
           その他
