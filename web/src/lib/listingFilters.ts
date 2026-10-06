@@ -71,7 +71,6 @@ export function getInitialCostLabel(slug: string): string {
 // 想定売上（年商）レンジ
 // ============================================================
 export type ExpectedRevenueRangeSlug =
-  | 'revenue-under300'
   | 'revenue-under500'
   | 'revenue-under1000'
   | 'revenue-over1000'
@@ -81,7 +80,6 @@ export const EXPECTED_REVENUE_RANGES: {
   slug: ExpectedRevenueRangeSlug;
   label: string;
 }[] = [
-  { slug: 'revenue-under300',  label: '年商300万円以下' },
   { slug: 'revenue-under500',  label: '年商500万円以下' },
   { slug: 'revenue-under1000', label: '年商1000万円以下' },
   { slug: 'revenue-over1000',  label: '年商1000万円以上' },
@@ -90,7 +88,6 @@ export const EXPECTED_REVENUE_RANGES: {
 
 export function getExpectedRevenueRange(yen: number | null): ExpectedRevenueRangeSlug {
   if (yen === null) return 'revenue-unknown';
-  if (yen <= 3_000_000) return 'revenue-under300';
   if (yen <= 5_000_000) return 'revenue-under500';
   if (yen <= 10_000_000) return 'revenue-under1000';
   return 'revenue-over1000';
@@ -150,7 +147,6 @@ export function buildSearchText(input: {
 export const FRANCHISE_FEE_RANGES = [
   { slug: 'free',      label: '無料' },
   { slug: 'under10',   label: '10万円以下' },
-  { slug: 'under30',   label: '30万円以下' },
   { slug: 'under50',   label: '50万円以下' },
   { slug: 'under100',  label: '100万円以下' },
   { slug: 'over100',   label: '100万円以上' },
@@ -160,7 +156,6 @@ export function getFranchiseFeeRange(yen: number | null): string {
   if (yen === null) return '';
   if (yen === 0) return 'free';
   if (yen <= 100_000) return 'under10';
-  if (yen <= 300_000) return 'under30';
   if (yen <= 500_000) return 'under50';
   if (yen <= 1_000_000) return 'under100';
   return 'over100';
@@ -177,20 +172,17 @@ export const STOCK_TYPES = [
 
 // 売上推定
 export const REVENUE_AMOUNTS = [
-  { slug: 'under10',  label: '〜10万円/月' },
-  { slug: 'under30',  label: '〜30万円/月' },
   { slug: 'under50',  label: '〜50万円/月' },
   { slug: 'under100', label: '〜100万円/月' },
   { slug: 'over100',  label: '100万円以上' },
+  { slug: 'over100',  label: '300万円以上' },
 ] as const;
 
 // 利益推定
 export const PROFIT_AMOUNTS = [
-  { slug: 'under5',   label: '〜5万円/月' },
-  { slug: 'under10',  label: '〜10万円/月' },
-  { slug: 'under30',  label: '〜30万円/月' },
   { slug: 'under50',  label: '〜50万円/月' },
   { slug: 'over50',   label: '50万円以上' },
+  { slug: 'over50',   label: '100万円以上' },
 ] as const;
 
 // 収益タイプ
