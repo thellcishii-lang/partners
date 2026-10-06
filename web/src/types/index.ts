@@ -134,6 +134,26 @@ export interface Listing {
   expectedRevenueLabel: string;
 
   searchText: string;               // 検索用の結合テキスト
+
+  // ============================================================
+  // 拡張フィルタ項目
+  // ============================================================
+  franchiseFeeYen: number | null;
+  franchiseFeeRange: string;
+  franchiseFeeLabel: string;
+
+  stockType: string;
+  stockLabel: string;
+
+  expectedProfitYen: number | null;
+  expectedProfitRange: string;
+  expectedProfitLabel: string;
+
+  revenueType: string;
+  revenueTypeLabel: string;
+
+  organizationType: string;
+  organizationTypeLabel: string;
 }
 
 // ============================================================
