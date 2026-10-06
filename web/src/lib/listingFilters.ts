@@ -174,7 +174,7 @@ export const STOCK_TYPES = [
 export const REVENUE_AMOUNTS = [
   { slug: 'under50',  label: '〜50万円/月' },
   { slug: 'under100', label: '〜100万円/月' },
-  { slug: 'over100',  label: '100万円以上' },
+  { slug: 'under300', label: '〜300万円/月' },
   { slug: 'over100',  label: '300万円以上' },
 ] as const;
 
