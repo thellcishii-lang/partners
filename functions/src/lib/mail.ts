@@ -11,22 +11,28 @@ export type MailTemplate =
   | 'PENDING_RELEASED'
   | 'FREE_TRIAL_ENDING'
   | 'APPLICATION_RECEIVED'
-  | 'APPLICATION_EXPIRED';
+  | 'APPLICATION_EXPIRED'
+  | 'LISTING_APPROVED'
+  | 'LISTING_REJECTED';
 
-// 冪等キー：同じ関連ID + テンプレートで二重送信を防ぐ
 export async function enqueueMail(
   template: MailTemplate,
   to: string,
-  params: Record<string, unknown> & { inquiryId?: string; orderId?: string; advertiserId?: string }
+  params: Record<string, unknown> & {
+    inquiryId?: string;
+    orderId?: string;
+    advertiserId?: string;
+    listingId?: string;
+  }
 ): Promise<void> {
   const idempotencyKey = [
     template,
     params.inquiryId ?? '',
     params.orderId ?? '',
     params.advertiserId ?? '',
+    params.listingId ?? '',
   ].join('|');
 
-  // 既存チェック（簡易。厳密には doc id をキーに）
   const existing = await db.collection(COLLECTIONS.MAIL_LOGS)
     .where('idempotencyKey', '==', idempotencyKey)
     .limit(1)
