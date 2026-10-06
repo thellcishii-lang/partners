@@ -98,6 +98,7 @@ export function ListingForm({
   const productSubs = categories.filter((c) => c.axis === 'product' && c.parentSlug);
   const modelCategories = categories.filter((c) => c.axis === 'model');
   const prefectures = areas.filter((a) => a.type === 'prefecture');
+  const previewImages = [...images, ...imagePreviews];
 
   const toggle = (list: string[], setList: (v: string[]) => void, slug: string) => {
     setList(list.includes(slug) ? list.filter((s) => s !== slug) : [...list, slug]);
@@ -318,6 +319,8 @@ export function ListingForm({
 
   return (
     <form onSubmit={save} className="space-y-6">
+      <div className="grid items-start gap-6 xl:grid-cols-[minmax(0,1.15fr)_minmax(360px,0.85fr)]">
+      <div className="order-2 space-y-6 xl:order-1">
       {/* ============================================================
           基本情報
       ============================================================ */}
@@ -628,6 +631,64 @@ export function ListingForm({
         <Button type="submit" value="reviewing" loading={saving}>
           審査申請
         </Button>
+      </div>
+      </div>
+
+      <aside className="order-1 xl:sticky xl:top-6 xl:order-2">
+        <div className="mb-3">
+          <h2 className="font-bold">掲載画面プレビュー</h2>
+          <p className="mt-1 text-xs text-gray-500">入力内容がリアルタイムで反映されます。</p>
+        </div>
+        <article className="space-y-5 rounded-2xl bg-white p-5 shadow-sm">
+          <div>
+            <p className="text-sm text-brand-700">{category} · 募集中</p>
+            <h3 className={`mt-2 text-xl font-bold ${title.trim() ? '' : 'text-gray-400'}`}>
+              {title.trim() || '案件タイトル'}
+            </h3>
+            <p className="mt-1 text-sm text-gray-600">{advertiser.companyName || '会社名未設定'}</p>
+          </div>
+
+          {previewImages.length > 0 ? (
+            <div className="grid grid-cols-2 gap-2">
+              {previewImages.map((image, index) => (
+                <img
+                  key={image}
+                  src={image}
+                  alt={`掲載画像 ${index + 1}`}
+                  className="max-h-48 w-full rounded-lg bg-gray-50 object-contain"
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="flex h-32 items-center justify-center rounded-lg bg-gray-50 text-sm text-gray-400">
+              募集画像はまだありません
+            </div>
+          )}
+
+          {([
+            ['募集内容', description],
+            ['応募条件', fields.requirements],
+            ['報酬体系', fields.reward],
+            ['初期費用', fields.initialCost],
+            ['ロイヤリティ', fields.royalty],
+            ['募集エリア', fields.area || prefectures.find((prefecture) => prefecture.slug === prefectureSlug)?.label || ''],
+          ] as const).map(([label, value]) => (
+            <section key={label}>
+              <h4 className="font-bold">{label}</h4>
+              <p className={`mt-2 whitespace-pre-wrap text-sm ${value.trim() ? '' : 'text-gray-400'}`}>
+                {value.trim() || '未設定'}
+              </p>
+            </section>
+          ))}
+
+          <div>
+            <span className="inline-flex rounded-lg bg-brand-600 px-6 py-3 font-medium text-white">
+              応募する
+            </span>
+            <p className="mt-2 text-xs text-gray-500">公開後、掲載ページに表示されます。</p>
+          </div>
+        </article>
+      </aside>
       </div>
     </form>
   );

@@ -15,7 +15,7 @@ export default function EditListingPage() {
     return <p role="alert" className="text-red-600">この案件は編集できません。</p>;
   }
   return (
-    <div className="mx-auto max-w-2xl space-y-6">
+    <div className="mx-auto max-w-7xl space-y-6">
       <h1 className="text-xl font-bold">案件を編集</h1>
       <ListingForm key={id} advertiser={advertiser} listing={state.listing} />
     </div>

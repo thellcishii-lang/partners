@@ -39,7 +39,9 @@ export default function ListingPage() {
       ] as const).map(([key, label]) => (
         <section key={key}>
           <h2 className="font-bold">{label}</h2>
-          <p className="mt-2 whitespace-pre-wrap text-sm">{listing[key] || '未設定'}</p>
+          <p className="mt-2 whitespace-pre-wrap text-sm">
+            {listing[key] || (key === 'area' ? listing.prefectureLabel : '') || '未設定'}
+          </p>
         </section>
       ))}
       {listing.status === 'published' ? (
