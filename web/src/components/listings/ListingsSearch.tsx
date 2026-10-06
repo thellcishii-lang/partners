@@ -636,7 +636,7 @@ function ListingCard({ listing }: { listing: Listing }) {
         <img
           src={listing.images[0]}
           alt=""
-          className="mb-3 h-44 w-full rounded-lg object-cover"
+          className="mb-3 aspect-video w-full rounded-lg bg-gray-50 object-contain"
         />
       )}
       <div className="flex flex-wrap gap-1">

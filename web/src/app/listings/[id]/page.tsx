@@ -24,7 +24,7 @@ export default function ListingPage() {
               key={image}
               src={image}
               alt={`${listing.title}の募集画像 ${index + 1}`}
-              className="max-h-96 w-full rounded-xl object-cover"
+              className="max-h-[70vh] w-full rounded-xl bg-gray-50 object-contain"
             />
           ))}
         </div>

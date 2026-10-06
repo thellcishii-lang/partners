@@ -101,7 +101,7 @@ export function FilteredListingList({
                   <img
                     src={listing.images[0]}
                     alt=""
-                    className="h-44 w-full rounded-lg object-cover"
+                    className="aspect-video w-full rounded-lg bg-gray-50 object-contain"
                   />
                 )}
                 <div className="flex flex-wrap gap-1">

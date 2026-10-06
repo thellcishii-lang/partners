@@ -587,7 +587,7 @@ export function ListingForm({
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
             {images.map((image, index) => (
               <div key={image} className="space-y-1">
-                <img src={image} alt={`募集画像 ${index + 1}`} className="h-32 w-full rounded-lg object-cover" />
+                <img src={image} alt={`募集画像 ${index + 1}`} className="h-48 w-full rounded-lg bg-gray-50 object-contain" />
                 <button
                   type="button"
                   className="text-sm text-red-600 underline"
@@ -600,7 +600,7 @@ export function ListingForm({
             ))}
             {imagePreviews.map((preview, index) => (
               <div key={preview} className="space-y-1">
-                <img src={preview} alt={`追加する募集画像 ${index + 1}`} className="h-32 w-full rounded-lg object-cover" />
+                <img src={preview} alt={`追加する募集画像 ${index + 1}`} className="h-48 w-full rounded-lg bg-gray-50 object-contain" />
                 <button
                   type="button"
                   className="text-sm text-red-600 underline"
