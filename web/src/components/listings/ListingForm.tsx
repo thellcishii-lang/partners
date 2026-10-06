@@ -7,6 +7,7 @@ import { db } from '@/lib/firebase';
 import { Button } from '@/components/ui/Button';
 import { Field, Input, Textarea } from '@/components/ui/Input';
 import { useMasters } from '@/hooks/useMasters';
+import { ImageUploader } from './ImageUploader';
 import {
   buildSearchText,
   getInitialCostLabel,
@@ -75,6 +76,8 @@ export function ListingForm({
   });
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
+  // 画像（最大6枚）
+  const [images, setImages] = useState<string[]>(listing?.images ?? []);
   
   // 会社情報（詳細ページのサイドバー）
   const [companyInfo, setCompanyInfo] = useState({
@@ -251,6 +254,7 @@ export function ListingForm({
         expectedRevenueLabel,
 
                 searchText,
+                images,
 
         // 会社情報
         ...companyInfo,
@@ -333,6 +337,22 @@ export function ListingForm({
             onChange={(e) => setDescription(e.target.value)}
           />
         </Field>
+      </section>
+
+            {/* ============================================================
+          画像（最大6枚）
+      ============================================================ */}
+      <section className="space-y-5 rounded-2xl bg-white p-6 shadow-sm">
+        <h2 className="font-bold">画像</h2>
+        <p className="text-xs text-gray-500">
+          案件詳細ページのトップに表示されます。1枚目がメイン画像になります。
+        </p>
+        <ImageUploader
+          advertiserId={advertiser.uid}
+          images={images}
+          onChange={setImages}
+          maxImages={6}
+        />
       </section>
 
       {/* ============================================================
