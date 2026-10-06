@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useListing } from '@/hooks/useListing';
@@ -10,6 +11,7 @@ export default function ListingPage() {
   const { id } = useParams<{ id: string }>();
   const { listing, loading, error } = useListing(id);
   const { user } = useAuth();
+  const [imageIndex, setImageIndex] = useState(0);
 
   if (loading) {
     return <p className="py-12 text-center text-sm text-gray-500">読み込み中…</p>;
@@ -24,6 +26,10 @@ export default function ListingPage() {
 
   const isOwner = user?.uid === listing.advertiserId;
   const canApply = listing.status === 'published';
+  const images = listing.images ?? [];
+  const recommendedFor = listing.recommendedFor ?? [];
+  const businessPoints = listing.businessPoints ?? [];
+  const agentFit = listing.agentFit ?? [];
 
   const keyTiles: { label: string; value: string; small?: string; highlight?: boolean }[] = [
     { label: '加盟金', value: listing.franchiseFeeLabel || '応相談', highlight: listing.franchiseFeeYen === 0 },
@@ -42,10 +48,6 @@ export default function ListingPage() {
     ...(listing.modelLabels ?? []),
   ];
 
-  const recommendedFor = listing.recommendedFor ?? [];
-  const businessPoints = listing.businessPoints ?? [];
-  const agentFit = listing.agentFit ?? [];
-
   return (
     <article className="mx-auto max-w-6xl">
       <nav className="px-1 py-3.5 text-xs text-gray-500">
@@ -63,22 +65,78 @@ export default function ListingPage() {
       </nav>
 
       <section className="mb-5 rounded-2xl bg-white p-5">
-        <div className="relative flex aspect-[21/9] items-center justify-center overflow-hidden rounded-xl bg-gradient-to-br from-gray-100 to-gray-200">
-          <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth={1.5}
-            className="h-24 w-24 text-gray-300"
-          >
-            <rect x="3" y="3" width="18" height="18" rx="2" />
-            <circle cx="8.5" cy="8.5" r="1.5" />
-            <path d="M21 15l-5-5L5 21" />
-          </svg>
-          <span className="absolute bottom-3.5 right-3.5 rounded-full bg-black bg-opacity-60 px-3 py-1 text-xs text-white">
-            1 / 1
-          </span>
-        </div>
+        {images.length > 0 ? (
+          <>
+            <div className="relative flex aspect-[21/9] items-center justify-center overflow-hidden rounded-xl bg-gray-100">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={images[Math.min(imageIndex, images.length - 1)]}
+                alt={listing.title}
+                className="h-full w-full object-cover"
+              />
+              {images.length > 1 && (
+                <>
+                  <button
+                    type="button"
+                    aria-label="前の画像"
+                    onClick={() => setImageIndex((i) => (i - 1 + images.length) % images.length)}
+                    className="absolute left-3 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white bg-opacity-90 text-xl text-gray-700 shadow"
+                  >
+                    ‹
+                  </button>
+                  <button
+                    type="button"
+                    aria-label="次の画像"
+                    onClick={() => setImageIndex((i) => (i + 1) % images.length)}
+                    className="absolute right-3 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-white bg-opacity-90 text-xl text-gray-700 shadow"
+                  >
+                    ›
+                  </button>
+                </>
+              )}
+              <span className="absolute bottom-3.5 right-3.5 rounded-full bg-black bg-opacity-60 px-3 py-1 text-xs text-white">
+                {Math.min(imageIndex, images.length - 1) + 1} / {images.length}
+              </span>
+            </div>
+            {images.length > 1 && (
+              <div className="mt-3 grid grid-cols-6 gap-2.5">
+                {images.map((url, i) => (
+                  <button
+                    key={url}
+                    type="button"
+                    onClick={() => setImageIndex(i)}
+                    className={
+                      'aspect-video overflow-hidden rounded-md border-2 transition ' +
+                      (i === imageIndex
+                        ? 'border-emerald-600'
+                        : 'border-transparent opacity-70 hover:opacity-100')
+                    }
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={url} alt="" className="h-full w-full object-cover" />
+                  </button>
+                ))}
+              </div>
+            )}
+          </>
+        ) : (
+          <div className="relative flex aspect-[21/9] items-center justify-center overflow-hidden rounded-xl bg-gradient-to-br from-gray-100 to-gray-200">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={1.5}
+              className="h-24 w-24 text-gray-300"
+            >
+              <rect x="3" y="3" width="18" height="18" rx="2" />
+              <circle cx="8.5" cy="8.5" r="1.5" />
+              <path d="M21 15l-5-5L5 21" />
+            </svg>
+            <span className="absolute bottom-3.5 right-3.5 rounded-full bg-black bg-opacity-60 px-3 py-1 text-xs text-white">
+              画像未設定
+            </span>
+          </div>
+        )}
       </section>
 
       <section className="mb-5 rounded-2xl bg-white px-8 py-7">
@@ -123,12 +181,7 @@ export default function ListingPage() {
                   : 'border-emerald-100 bg-gradient-to-b from-emerald-50 to-emerald-50')
               }
             >
-              <p
-                className={
-                  'mb-1.5 text-[11px] font-bold tracking-wide ' +
-                  (tile.highlight ? 'text-emerald-700' : 'text-emerald-700')
-                }
-              >
+              <p className="mb-1.5 text-[11px] font-bold tracking-wide text-emerald-700">
                 {tile.label}
               </p>
               <p className="text-lg font-extrabold leading-tight text-gray-900">
