@@ -6,7 +6,7 @@ export default function HomePage() {
   return (
     <div className="space-y-8">
       {/* 全幅ヒーロー */}
-      <section className="relative left-1/2 w-screen -translate-x-1/2 bg-gradient-to-br from-brand-600 to-brand-700">
+      <section className="relative left-1/2 w-screen -translate-x-1/2 bg-gradient-to-br from-emerald-600 to-emerald-700">
         <div className="mx-auto max-w-6xl px-4 py-14 text-center text-white sm:py-20">
           <h1 className="text-3xl font-bold leading-tight sm:text-5xl">
             いい代理店と、<br className="sm:hidden" />いい募集案件を、ここで。
@@ -32,6 +32,12 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* 検索 */}
+      <ListingsSearch />
+    </div>
+  );
+}
 
       {/* 検索 */}
       <ListingsSearch />
