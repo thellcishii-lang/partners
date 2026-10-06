@@ -11,13 +11,13 @@ export function Header() {
   return (
     <header className="border-b bg-white">
       <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4">
-        <Link href="/" className="font-bold text-brand-700">
+        <Link href="/" className="font-bold text-emerald-700">
           代理店募集・加盟店募集.com
         </Link>
         <nav className="flex items-center gap-3 text-sm">
           {loading ? null : user ? (
             <>
-              <Link href="/dashboard" className="hover:text-brand-700">マイページ</Link>
+              <Link href="/dashboard" className="hover:text-emerald-700">マイページ</Link>
               <span className="hidden text-gray-400 sm:inline">
                 {profile?.displayName ?? user.email}
               </span>
@@ -27,10 +27,10 @@ export function Header() {
             </>
           ) : (
             <>
-              <Link href="/login" className="hover:text-brand-700">ログイン</Link>
+              <Link href="/login" className="hover:text-emerald-700">ログイン</Link>
               <Link
                 href="/signup"
-                className="rounded-lg border border-brand-600 px-3 py-1.5 text-brand-700 hover:bg-brand-50"
+                className="rounded-lg border border-emerald-600 px-3 py-1.5 text-emerald-700 hover:bg-emerald-50"
               >
                 掲載についてはこちら
               </Link>
