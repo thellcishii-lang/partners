@@ -52,8 +52,4 @@ export default function HomePage() {
   );
 }
 
-      {/* 検索 */}
-      <ListingsSearch />
-    </div>
-  );
-}
+     
