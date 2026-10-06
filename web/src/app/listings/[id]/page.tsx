@@ -247,44 +247,21 @@ export default function ListingPage() {
         </div>
       </section>
 
-      {/* ============================================================
-          仕様 + こんな方におすすめ
+           {/* ============================================================
+          こんな方におすすめ
       ============================================================ */}
-      <section className="mb-5 grid gap-7 rounded-2xl bg-white px-7 py-6 md:grid-cols-2">
-        <dl className="overflow-hidden rounded-[10px] border border-blue-200 bg-blue-50">
-          {(
-            [
-              ['募集地域', listing.prefectureLabel || listing.regionLabel || '全国'],
-              ['募集対象', '法人・個人事業主'],
-              ['加盟金', listing.franchiseFeeLabel || '無料'],
-              ['初期費用', listing.initialCostLabel || '無料'],
-            ] as const
-          ).map(([label, value], i, arr) => (
-            <div
-              key={label}
-              className={
-                'grid grid-cols-[110px_1fr] gap-2 px-4 py-3 text-sm ' +
-                (i < arr.length - 1 ? 'border-b border-blue-200' : '')
-              }
-            >
-              <dt className="font-semibold text-gray-500">{label}</dt>
-              <dd className="font-semibold text-gray-900">{value}</dd>
-            </div>
+      <section className="mb-5 rounded-2xl bg-white px-7 py-6">
+        <h2 className="mb-3 text-[15px] font-extrabold text-brand-700">
+          こんな方におすすめ
+        </h2>
+        <ul className="space-y-1.5">
+          {PLACEHOLDER.recommendedFor.map((item) => (
+            <li key={item} className="flex items-start gap-2 text-sm text-gray-700">
+              <span className="flex-shrink-0 font-black text-brand-600">✓</span>
+              <span>{item}</span>
+            </li>
           ))}
-        </dl>
-        <div>
-          <h2 className="mb-3 text-[15px] font-extrabold text-brand-700">
-            こんな方におすすめ
-          </h2>
-          <ul className="space-y-1.5">
-            {PLACEHOLDER.recommendedFor.map((item) => (
-              <li key={item} className="flex items-start gap-2 text-sm text-gray-700">
-                <span className="flex-shrink-0 font-black text-brand-600">✓</span>
-                <span>{item}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
+        </ul>
       </section>
 
       {/* ============================================================
