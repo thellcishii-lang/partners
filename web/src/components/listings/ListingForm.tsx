@@ -319,8 +319,8 @@ export function ListingForm({
 
   return (
     <form onSubmit={save} className="space-y-6">
-      <div className="grid items-start gap-6 xl:grid-cols-[minmax(0,1.15fr)_minmax(360px,0.85fr)]">
-      <div className="order-2 space-y-6 xl:order-1">
+      <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1.15fr)_minmax(320px,0.85fr)]">
+      <div className="order-2 space-y-6 lg:order-1">
       {/* ============================================================
           基本情報
       ============================================================ */}
@@ -634,7 +634,7 @@ export function ListingForm({
       </div>
       </div>
 
-      <aside className="order-1 xl:sticky xl:top-6 xl:order-2">
+      <aside className="order-1 lg:sticky lg:top-6 lg:order-2">
         <div className="mb-3">
           <h2 className="font-bold">掲載画面プレビュー</h2>
           <p className="mt-1 text-xs text-gray-500">入力内容がリアルタイムで反映されます。</p>
