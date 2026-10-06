@@ -3,3 +3,5 @@ export { onDepositOrderPaid } from './triggers/onDepositOrderPaid';
 export { createInquiry } from './applications/createInquiry';
 export { createDepositCheckout } from './payments/createDepositCheckout';
 export { stripeWebhook } from './payments/stripeWebhook';
+export { approveListing } from './admin/approveListing';
+export { rejectListing } from './admin/rejectListing';
