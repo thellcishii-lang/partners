@@ -4,6 +4,17 @@ import { Suspense, useEffect, useMemo, useState, type FormEvent } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { collection, getDocs, query, where } from 'firebase/firestore';
+import {
+  Wallet,
+  Coins,
+  Package,
+  TrendingUp,
+  LineChart,
+  Repeat,
+  Users,
+  MapPin,
+  type LucideIcon,
+} from 'lucide-react';
 import { db } from '@/lib/firebase';
 import { useMasters } from '@/hooks/useMasters';
 import {
@@ -47,8 +58,20 @@ const TOP_FILTERS: { key: TopFilterKey; label: string; options: { slug: string; 
   { key: 'profit',      label: '利益推定',     options: [...PROFIT_AMOUNTS] },
   { key: 'revenueType', label: '収益タイプ',   options: [...REVENUE_TYPES] },
   { key: 'org',         label: '組織拡大',     options: [...ORGANIZATION_TYPES] },
-  { key: 'area',        label: '対応エリア',   options: [] }, // 都道府県は別途
+  { key: 'area',        label: '対応エリア',   options: [] },
 ];
+
+// 各項目のアイコン
+const FILTER_ICONS: Record<TopFilterKey, LucideIcon> = {
+  fee: Wallet,
+  initial: Coins,
+  stock: Package,
+  revenue: TrendingUp,
+  profit: LineChart,
+  revenueType: Repeat,
+  org: Users,
+  area: MapPin,
+};
 
 function SearchContent() {
   const router = useRouter();
@@ -63,7 +86,6 @@ function SearchContent() {
   const [openTopFilter, setOpenTopFilter] = useState<TopFilterKey | null>(null);
   const [keywordInput, setKeywordInput] = useState(searchParams.get('q') ?? '');
 
-  // URLクエリ
   const selectedTargets = useMemo(
     () => searchParams.get('target')?.split(',').filter(Boolean) ?? [],
     [searchParams]
@@ -83,7 +105,6 @@ function SearchContent() {
   const selectedPref = searchParams.get('pref') ?? '';
   const keyword = searchParams.get('q') ?? '';
 
-  // 拡張フィルタ
   const selectedFee = searchParams.get('fee') ?? '';
   const selectedStock = searchParams.get('stock') ?? '';
   const selectedRevenue = searchParams.get('revenue') ?? '';
@@ -195,7 +216,6 @@ function SearchContent() {
     !!selectedRevenueType ||
     !!selectedOrg;
 
-  // 上位8項目の選択済み値を取得
   const getTopValue = (key: TopFilterKey): string => {
     switch (key) {
       case 'fee': return selectedFee;
@@ -238,12 +258,13 @@ function SearchContent() {
     <div className="space-y-4">
 
       {/* ============================================================
-          上位8項目のアコーディオン検索
+          上位8項目のタイル検索
       ============================================================ */}
       <div className="rounded-2xl bg-white p-4 shadow-sm">
-        <div className="flex flex-wrap gap-2">
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
           {TOP_FILTERS.map((f) => {
             const label = getTopLabel(f.key);
+            const Icon = FILTER_ICONS[f.key];
             const isOpen = openTopFilter === f.key;
             const isActive = !!label;
             return (
@@ -252,16 +273,34 @@ function SearchContent() {
                 type="button"
                 onClick={() => setOpenTopFilter(isOpen ? null : f.key)}
                 className={cn(
-                  'flex items-center gap-1 rounded-full border px-4 py-2 text-sm transition',
+                  'flex items-start gap-3 rounded-xl border-2 p-3.5 text-left transition',
                   isActive
-                    ? 'border-brand-600 bg-brand-600 text-white'
-                    : 'border-gray-300 bg-white text-gray-700 hover:border-brand-500 hover:text-brand-700',
-                  isOpen && !isActive && 'border-brand-500 bg-brand-50 text-brand-700',
+                    ? 'border-emerald-500 bg-gradient-to-b from-emerald-50 to-emerald-100 shadow-sm'
+                    : 'border-emerald-100 bg-gradient-to-b from-emerald-50/60 to-emerald-50 hover:border-emerald-300',
+                  isOpen && 'ring-2 ring-emerald-400',
                 )}
               >
-                <span className="font-medium">{f.label}</span>
-                {label && <span className="text-xs opacity-90">: {label}</span>}
-                <span className={cn('ml-1 text-xs', isOpen && 'rotate-180')}>▾</span>
+                <div
+                  className={cn(
+                    'flex h-9 w-9 shrink-0 items-center justify-center rounded-lg',
+                    isActive ? 'bg-emerald-500 text-white' : 'bg-emerald-100 text-emerald-700',
+                  )}
+                >
+                  <Icon className="h-5 w-5" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-[11px] font-bold tracking-wide text-emerald-700">
+                    {f.label}
+                  </p>
+                  <p
+                    className={cn(
+                      'mt-0.5 truncate text-sm font-bold',
+                      isActive ? 'text-gray-900' : 'text-gray-400',
+                    )}
+                  >
+                    {label ?? '未選択'}
+                  </p>
+                </div>
               </button>
             );
           })}
@@ -269,9 +308,9 @@ function SearchContent() {
 
         {/* 展開中の選択肢 */}
         {openTopFilter && (
-          <div className="mt-3 rounded-xl border border-brand-200 bg-brand-50/50 p-4">
+          <div className="mt-4 rounded-xl border border-emerald-200 bg-emerald-50/50 p-4">
             <div className="mb-2 flex items-center justify-between">
-              <p className="text-xs font-bold text-brand-700">
+              <p className="text-xs font-bold text-emerald-700">
                 {TOP_FILTERS.find((f) => f.key === openTopFilter)?.label}
               </p>
               <button
@@ -305,8 +344,8 @@ function SearchContent() {
                       className={cn(
                         'rounded-full border px-3 py-1 text-xs transition',
                         isSelected
-                          ? 'border-brand-600 bg-brand-600 text-white'
-                          : 'border-gray-300 bg-white text-gray-700 hover:border-brand-500',
+                          ? 'border-emerald-600 bg-emerald-600 text-white'
+                          : 'border-gray-300 bg-white text-gray-700 hover:border-emerald-500',
                       )}
                     >
                       {o.label}
@@ -323,7 +362,7 @@ function SearchContent() {
           <button
             type="button"
             onClick={() => router.refresh()}
-            className="rounded-lg bg-brand-600 px-8 py-3 text-sm font-bold text-white hover:bg-brand-700"
+            className="rounded-lg bg-emerald-600 px-8 py-3 text-sm font-bold text-white hover:bg-emerald-700"
           >
             この条件で検索
           </button>
@@ -378,7 +417,7 @@ function SearchContent() {
                 />
                 <button
                   type="submit"
-                  className="h-9 rounded-lg bg-brand-600 px-3 text-xs text-white hover:bg-brand-700"
+                  className="h-9 rounded-lg bg-emerald-600 px-3 text-xs text-white hover:bg-emerald-700"
                 >
                   検索
                 </button>
@@ -440,7 +479,6 @@ function SearchContent() {
                   ))}
                 </FilterGroup>
 
-                {/* 拡張フィルタ（上位8項目で未掲載のもの） */}
                 <FilterGroup title="仕入れ">
                   {STOCK_TYPES.map((t) => (
                     <RadioRow
@@ -560,13 +598,13 @@ function SearchContent() {
               </>
             )}
 
-            <div className="rounded-xl border border-brand-200 bg-brand-50 p-4">
+            <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4">
               <p className="text-xs text-gray-700">
                 代理店・加盟店を募集したい企業の方
               </p>
               <Link
                 href="/signup"
-                className="mt-2 block text-center rounded-lg bg-brand-600 px-3 py-2 text-xs font-medium text-white hover:bg-brand-700"
+                className="mt-2 block rounded-lg bg-emerald-600 px-3 py-2 text-center text-xs font-medium text-white hover:bg-emerald-700"
               >
                 掲載についてはこちら
               </Link>
@@ -605,7 +643,7 @@ function SearchContent() {
                     <button
                       type="button"
                       onClick={clearAll}
-                      className="mt-3 text-sm text-brand-700 underline"
+                      className="mt-3 text-sm text-emerald-700 underline"
                     >
                       条件をクリア
                     </button>
@@ -630,11 +668,11 @@ function ListingCard({ listing }: { listing: Listing }) {
   return (
     <Link
       href={`/listings/${listing.id}`}
-      className="block rounded-2xl bg-white p-5 shadow-sm transition hover:ring-2 hover:ring-brand-500"
+      className="block rounded-2xl bg-white p-5 shadow-sm transition hover:ring-2 hover:ring-emerald-500"
     >
       <div className="flex flex-wrap gap-1">
         {listing.productLabels?.slice(0, 2).map((label) => (
-          <span key={label} className="rounded-full bg-brand-50 px-2 py-0.5 text-xs text-brand-700">
+          <span key={label} className="rounded-full bg-emerald-50 px-2 py-0.5 text-xs text-emerald-700">
             {label}
           </span>
         ))}
