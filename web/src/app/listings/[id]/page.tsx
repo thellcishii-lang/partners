@@ -17,6 +17,18 @@ export default function ListingPage() {
       <p className="text-sm text-brand-700">{listing.category} · {LISTING_STATUS_LABELS[listing.status]}</p>
       <h1 className="text-2xl font-bold">{listing.title}</h1>
       <p className="text-gray-600">{listing.companyName}</p>
+      {listing.images?.length > 0 && (
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          {listing.images.map((image, index) => (
+            <img
+              key={image}
+              src={image}
+              alt={`${listing.title}の募集画像 ${index + 1}`}
+              className="max-h-96 w-full rounded-xl object-cover"
+            />
+          ))}
+        </div>
+      )}
       {([
         ['description', '募集内容'],
         ['requirements', '応募条件'],

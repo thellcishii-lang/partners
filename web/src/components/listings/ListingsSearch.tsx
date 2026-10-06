@@ -632,6 +632,13 @@ function ListingCard({ listing }: { listing: Listing }) {
       href={`/listings/${listing.id}`}
       className="block rounded-2xl bg-white p-5 shadow-sm transition hover:ring-2 hover:ring-brand-500"
     >
+      {listing.images?.[0] && (
+        <img
+          src={listing.images[0]}
+          alt=""
+          className="mb-3 h-44 w-full rounded-lg object-cover"
+        />
+      )}
       <div className="flex flex-wrap gap-1">
         {listing.productLabels?.slice(0, 2).map((label) => (
           <span key={label} className="rounded-full bg-brand-50 px-2 py-0.5 text-xs text-brand-700">

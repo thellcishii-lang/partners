@@ -97,6 +97,13 @@ export function FilteredListingList({
                 href={`/listings/${listing.id}`}
                 className="space-y-3 rounded-2xl bg-white p-6 shadow-sm hover:ring-2 hover:ring-brand-500"
               >
+                {listing.images?.[0] && (
+                  <img
+                    src={listing.images[0]}
+                    alt=""
+                    className="h-44 w-full rounded-lg object-cover"
+                  />
+                )}
                 <div className="flex flex-wrap gap-1">
                   {listing.productLabels?.slice(0, 2).map((label) => (
                     <span

@@ -1,9 +1,10 @@
 'use client';
 
-import { useState, type FormEvent } from 'react';
+import { useEffect, useState, type FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
-import { addDoc, collection, doc, serverTimestamp, updateDoc } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
+import { collection, doc, serverTimestamp, setDoc, updateDoc } from 'firebase/firestore';
+import { deleteObject, getDownloadURL, ref, uploadBytes, type StorageReference } from 'firebase/storage';
+import { db, storage } from '@/lib/firebase';
 import { Button } from '@/components/ui/Button';
 import { Field, Input, Textarea } from '@/components/ui/Input';
 import { useMasters } from '@/hooks/useMasters';
@@ -23,6 +24,10 @@ import {
   type ListingCategory,
 } from '@/types';
 import { cn } from '@/lib/cn';
+
+const MAX_IMAGES = 5;
+const MAX_IMAGE_SIZE = 5 * 1024 * 1024;
+const ALLOWED_IMAGE_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif']);
 
 export function ListingForm({
   advertiser,
@@ -75,6 +80,15 @@ export function ListingForm({
   });
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
+  const [images, setImages] = useState<string[]>(listing?.images ?? []);
+  const [imageFiles, setImageFiles] = useState<File[]>([]);
+  const [imagePreviews, setImagePreviews] = useState<string[]>([]);
+
+  useEffect(() => {
+    const previews = imageFiles.map((file) => URL.createObjectURL(file));
+    setImagePreviews(previews);
+    return () => previews.forEach((preview) => URL.revokeObjectURL(preview));
+  }, [imageFiles]);
 
   // ============================================================
   // マスタの絞り込み
@@ -147,6 +161,8 @@ export function ListingForm({
     setSaving(true);
     setError('');
 
+    const uploadedImageRefs: StorageReference[] = [];
+    let listingSaved = false;
     try {
       // ============================================================
       // フィルタ用のdenormalize
@@ -225,22 +241,75 @@ export function ListingForm({
         updatedAt: serverTimestamp(),
       };
 
+      const listingRef = listing
+        ? doc(db, 'listings', listing.id)
+        : doc(collection(db, 'listings'));
+      const uploadedImages: string[] = [];
+      for (const file of imageFiles) {
+        const imageRef = ref(
+          storage,
+          `listings/${advertiser.uid}/${listingRef.id}/${crypto.randomUUID()}`
+        );
+        await uploadBytes(imageRef, file, { contentType: file.type });
+        uploadedImageRefs.push(imageRef);
+        uploadedImages.push(await getDownloadURL(imageRef));
+      }
+      const savedImages = [...images, ...uploadedImages];
+
       if (listing) {
-        await updateDoc(doc(db, 'listings', listing.id), data);
+        await updateDoc(listingRef, { ...data, images: savedImages });
       } else {
-        await addDoc(collection(db, 'listings'), {
+        await setDoc(listingRef, {
           ...data,
           advertiserId: advertiser.uid,
-          images: [],
+          images: savedImages,
           publishedAt: null,
           createdAt: serverTimestamp(),
         });
       }
+      listingSaved = true;
+      const removedImages = (listing?.images ?? []).filter((image) => !images.includes(image));
+      if (removedImages.length > 0) {
+        await Promise.all(removedImages.map((image) => deleteObject(ref(storage, image))));
+      }
       router.push('/dashboard');
     } catch (error) {
-      setError(error instanceof Error ? error.message : '案件の保存に失敗しました。');
+      let message = error instanceof Error ? error.message : '案件の保存に失敗しました。';
+      if (listingSaved) {
+        message = `案件は保存されましたが、画像の削除に失敗しました: ${message}`;
+      } else if (uploadedImageRefs.length > 0) {
+        try {
+          await Promise.all(uploadedImageRefs.map((imageRef) => deleteObject(imageRef)));
+        } catch (cleanupError) {
+          const cleanupMessage = cleanupError instanceof Error
+            ? cleanupError.message
+            : '不明なエラー';
+          message += ` 画像の後片付けにも失敗しました: ${cleanupMessage}`;
+        }
+      }
+      setError(message);
       setSaving(false);
     }
+  };
+
+  const addImages = (files: FileList | null) => {
+    if (!files?.length) return;
+    const selectedFiles = Array.from(files);
+    const invalidType = selectedFiles.find((file) => !ALLOWED_IMAGE_TYPES.has(file.type));
+    if (invalidType) {
+      setError('画像はJPEG、PNG、WebP、GIF形式を選択してください。');
+      return;
+    }
+    if (selectedFiles.some((file) => file.size > MAX_IMAGE_SIZE)) {
+      setError('画像は1枚あたり5MB以下にしてください。');
+      return;
+    }
+    if (images.length + imageFiles.length + selectedFiles.length > MAX_IMAGES) {
+      setError(`画像は最大${MAX_IMAGES}枚まで添付できます。`);
+      return;
+    }
+    setError('');
+    setImageFiles((current) => [...current, ...selectedFiles]);
   };
 
   if (mastersLoading) {
@@ -498,7 +567,53 @@ export function ListingForm({
         ))}
       </section>
 
-      <p className="text-sm text-gray-500">画像アップロードは今後対応予定です。</p>
+      <section className="space-y-4 rounded-2xl bg-white p-6 shadow-sm">
+        <h2 className="font-bold">募集画像</h2>
+        <p className="text-sm text-gray-600">
+          JPEG、PNG、WebP、GIF形式。1枚5MB以下、最大{MAX_IMAGES}枚まで添付できます。
+        </p>
+        <input
+          aria-label="募集画像を追加"
+          type="file"
+          accept="image/jpeg,image/png,image/webp,image/gif"
+          multiple
+          disabled={saving || images.length + imageFiles.length >= MAX_IMAGES}
+          onChange={(event) => {
+            addImages(event.currentTarget.files);
+            event.currentTarget.value = '';
+          }}
+        />
+        {(images.length > 0 || imageFiles.length > 0) && (
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+            {images.map((image, index) => (
+              <div key={image} className="space-y-1">
+                <img src={image} alt={`募集画像 ${index + 1}`} className="h-32 w-full rounded-lg object-cover" />
+                <button
+                  type="button"
+                  className="text-sm text-red-600 underline"
+                  disabled={saving}
+                  onClick={() => setImages((current) => current.filter((_, imageIndex) => imageIndex !== index))}
+                >
+                  この画像を削除
+                </button>
+              </div>
+            ))}
+            {imagePreviews.map((preview, index) => (
+              <div key={preview} className="space-y-1">
+                <img src={preview} alt={`追加する募集画像 ${index + 1}`} className="h-32 w-full rounded-lg object-cover" />
+                <button
+                  type="button"
+                  className="text-sm text-red-600 underline"
+                  disabled={saving}
+                  onClick={() => setImageFiles((current) => current.filter((_, fileIndex) => fileIndex !== index))}
+                >
+                  追加を取り消す
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+      </section>
       {listing && (
         <p className="text-sm text-gray-600">
           保存すると下書き、または審査中になります。再公開には審査が必要です。
