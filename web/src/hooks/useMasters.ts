@@ -1,6 +1,6 @@
 'use client';
 
-import { CATEGORIES, AREAS, COST_RANGES } from '@/lib/masterLabels';
+import { CATEGORIES, AREAS, COST_RANGES } from '@/lib/masterData';
 
 export function useMasters() {
   return {
