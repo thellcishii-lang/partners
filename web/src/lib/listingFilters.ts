@@ -141,3 +141,69 @@ export function buildSearchText(input: {
     .join(' ')
     .slice(0, 5000);
 }
+
+// ============================================================
+// 拡張フィルタ
+// ============================================================
+
+// 加盟金
+export const FRANCHISE_FEE_RANGES = [
+  { slug: 'free',      label: '無料' },
+  { slug: 'under10',   label: '10万円以下' },
+  { slug: 'under30',   label: '30万円以下' },
+  { slug: 'under50',   label: '50万円以下' },
+  { slug: 'under100',  label: '100万円以下' },
+  { slug: 'over100',   label: '100万円以上' },
+] as const;
+
+export function getFranchiseFeeRange(yen: number | null): string {
+  if (yen === null) return '';
+  if (yen === 0) return 'free';
+  if (yen <= 100_000) return 'under10';
+  if (yen <= 300_000) return 'under30';
+  if (yen <= 500_000) return 'under50';
+  if (yen <= 1_000_000) return 'under100';
+  return 'over100';
+}
+
+// 仕入れ
+export const STOCK_TYPES = [
+  { slug: 'none',      label: '仕入れ不要' },
+  { slug: 'single',    label: '1個から' },
+  { slug: 'small_lot', label: '小ロット' },
+  { slug: 'no_risk',   label: '在庫リスクなし' },
+  { slug: 'buyback',   label: '買取あり' },
+] as const;
+
+// 売上推定
+export const REVENUE_AMOUNTS = [
+  { slug: 'under10',  label: '〜10万円/月' },
+  { slug: 'under30',  label: '〜30万円/月' },
+  { slug: 'under50',  label: '〜50万円/月' },
+  { slug: 'under100', label: '〜100万円/月' },
+  { slug: 'over100',  label: '100万円以上' },
+] as const;
+
+// 利益推定
+export const PROFIT_AMOUNTS = [
+  { slug: 'under5',   label: '〜5万円/月' },
+  { slug: 'under10',  label: '〜10万円/月' },
+  { slug: 'under30',  label: '〜30万円/月' },
+  { slug: 'under50',  label: '〜50万円/月' },
+  { slug: 'over50',   label: '50万円以上' },
+] as const;
+
+// 収益タイプ
+export const REVENUE_TYPES = [
+  { slug: 'stock', label: 'ストック型' },
+  { slug: 'flow',  label: 'フロー型' },
+  { slug: 'both',  label: '複合型' },
+] as const;
+
+// 組織拡大
+export const ORGANIZATION_TYPES = [
+  { slug: 'individual', label: '個人可' },
+  { slug: 'side_job',   label: '副業可' },
+  { slug: 'org',        label: '組織拡大可' },
+  { slug: 'corp',       label: '法人のみ' },
+] as const;
