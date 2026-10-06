@@ -5,6 +5,24 @@ directory, then run `npm run dev`.
 
 ## Firebase
 
+### Storage rules
+
+The repository root `firebase.json` configures Storage rules in `storage.rules`.
+File uploads are not implemented yet, so these rules deny all client reads and
+writes, including authenticated requests. Define the required access policy
+before enabling uploads. Deploying these rules also restricts client access to
+any existing objects; Admin SDK access is not governed by these rules.
+
+Deploy only Storage rules from the repository root:
+
+```sh
+firebase deploy --only storage --project production
+```
+
+This deploys rules, not files, and does not deploy Functions or Firestore rules.
+
+### Local development
+
 Copy `.env.local.example` to `.env.local` and provide the Firebase project
 configuration. For isolated local development, use a `demo-` project ID and
 `NEXT_PUBLIC_USE_EMULATOR=true`. In Codespaces, start the emulators from the
