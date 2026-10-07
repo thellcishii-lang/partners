@@ -6,11 +6,25 @@ import {
   GoogleAuthProvider,
   signInWithPopup,
   sendPasswordResetEmail,
+  type User,
 } from 'firebase/auth';
+import { doc, getDoc } from 'firebase/firestore';
 import { Eye, EyeOff } from 'lucide-react';
-import { auth } from '@/lib/firebase';
+import { auth, db } from '@/lib/firebase';
 import { Button } from '@/components/ui/Button';
 import { Input, Field } from '@/components/ui/Input';
+
+async function redirectAfterLogin(user: User, router: ReturnType<typeof useRouter>) {
+  try {
+    const snap = await getDoc(doc(db, 'users', user.uid));
+    const role = snap.data()?.role;
+    if (role === 'admin') router.push('/admin');
+    else if (role === 'applicant') router.push('/applicant');
+    else router.push('/dashboard');
+  } catch {
+    router.push('/dashboard');
+  }
+}
 
 export default function LoginPage() {
   const router = useRouter();
@@ -27,8 +41,8 @@ export default function LoginPage() {
     setInfo('');
     setLoading(true);
     try {
-      await signInWithEmailAndPassword(auth, email, password);
-      router.push('/');
+      const cred = await signInWithEmailAndPassword(auth, email, password);
+      await redirectAfterLogin(cred.user, router);
     } catch {
       setError('メールアドレスまたはパスワードが正しくありません');
     } finally {
@@ -41,8 +55,8 @@ export default function LoginPage() {
     setInfo('');
     setLoading(true);
     try {
-      await signInWithPopup(auth, new GoogleAuthProvider());
-      router.push('/');
+      const cred = await signInWithPopup(auth, new GoogleAuthProvider());
+      await redirectAfterLogin(cred.user, router);
     } catch (e) {
       setError(e instanceof Error ? e.message : 'ログインに失敗しました');
     } finally {
