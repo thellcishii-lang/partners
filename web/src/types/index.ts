@@ -193,8 +193,59 @@ export interface Listing {
 }
 
 // ============================================================
-// 応募
+// 応募（inquiries / inquiryDetails）
 // ============================================================
+export type InquiryStatus =
+  | 'pending'
+  | 'delivered'
+  | 'won'
+  | 'lost'
+  | 'cancelled'
+  | 'expired';
+
+export const INQUIRY_STATUS_LABELS: Record<InquiryStatus, string> = {
+  pending: '未開示（保留）',
+  delivered: '開示済み',
+  won: '採用',
+  lost: '不採用',
+  cancelled: '辞退',
+  expired: '期限切れ',
+};
+
+export interface Inquiry {
+  id: string;
+  listingId: string;
+  advertiserId: string;
+  applicantId: string;
+  status: InquiryStatus;
+  maskedPreview: {
+    prefecture: string;
+    ageRange: string;
+    budget: string;
+    hasExperience: boolean;
+  };
+  depositTransactionId: string | null;
+  deliveredAt: { seconds: number; nanoseconds: number } | null;
+  createdAt: { seconds: number; nanoseconds: number } | null;
+  memo?: string;
+}
+
+export interface InquiryDetail {
+  inquiryId: string;
+  applicantId: string;
+  advertiserId: string;
+  fullName: string;
+  kana: string;
+  email: string;
+  phone: string;
+  lineId: string;
+  message: string;
+  snapshot?: {
+    displayName?: string;
+    email?: string;
+  };
+  createdAt?: unknown;
+}
 export interface ApplicationInput {
   inquiryId: string;
   listingId: string;
