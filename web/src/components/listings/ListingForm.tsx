@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/Button';
 import { Field, Input, Textarea } from '@/components/ui/Input';
 import { useMasters } from '@/hooks/useMasters';
 import { ImageUploader } from './ImageUploader';
-import { ListingDetail } from './ListingDetail';
+import { PreviewModal } from './PreviewModal';
 import {
   buildSearchText,
   getInitialCostLabel,
@@ -115,6 +115,7 @@ export function ListingForm({
   });
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
+  const [previewOpen, setPreviewOpen] = useState(false);
   // 画像（最大6枚）
   const [images, setImages] = useState<string[]>(listing?.images ?? []);
 
@@ -162,7 +163,6 @@ export function ListingForm({
     setList(list.includes(slug) ? list.filter((s) => s !== slug) : [...list, slug]);
   };
 
-  // 大分類を切り替えたら、そのサブも一緒に外す
   const toggleProductParent = (parentSlug: string) => {
     if (productSlugs.includes(parentSlug)) {
       const subs = productSubs.filter((s) => s.parentSlug === parentSlug).map((s) => s.slug);
@@ -235,7 +235,7 @@ export function ListingForm({
     });
 
     return {
-            title: title.trim(),
+      title: title.trim(),
       category,
       description: description.trim(),
       requirements: fields.requirements.trim(),
@@ -299,7 +299,7 @@ export function ListingForm({
   };
 
   // ============================================================
-  // プレビュー用オブジェクト（毎レンダー再計算）
+  // プレビュー用オブジェクト
   // ============================================================
   const previewListing: Listing = {
     id: listing?.id ?? 'preview',
@@ -309,6 +309,7 @@ export function ListingForm({
     publishedAt: listing?.publishedAt ?? null,
     createdAt: listing?.createdAt,
     updatedAt: listing?.updatedAt,
+    pendingEdit: listing?.pendingEdit ?? null,
   };
 
   // ============================================================
@@ -376,11 +377,27 @@ export function ListingForm({
   }
 
   return (
-    <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,520px)]">
-      {/* ============================================================
-          左カラム：入力フォーム
-      ============================================================ */}
+    <>
       <form onSubmit={save} className="space-y-6">
+        {/* 上部バー：プレビューボタン */}
+        <div className="flex items-center justify-between rounded-2xl bg-white p-4 shadow-sm">
+          <div>
+            <p className="text-sm font-bold">
+              {listing ? '案件を編集' : '新規案件作成'}
+            </p>
+            <p className="text-xs text-gray-500">
+              入力内容はプレビューで確認できます
+            </p>
+          </div>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => setPreviewOpen(true)}
+          >
+            プレビュー
+          </Button>
+        </div>
+
         {/* 基本情報 */}
         <section className="space-y-5 rounded-2xl bg-white p-6 shadow-sm">
           <h2 className="font-bold">基本情報</h2>
@@ -980,18 +997,12 @@ export function ListingForm({
         </div>
       </form>
 
-      {/* ============================================================
-          右カラム：ライブプレビュー（lg 以上のみ）
-      ============================================================ */}
-      <aside className="hidden lg:block">
-        <div className="sticky top-4 max-h-[calc(100vh-2rem)] overflow-y-auto rounded-2xl border border-gray-200 bg-gray-100 p-3">
-          <div className="mb-3 flex items-center justify-between px-1">
-            <span className="text-xs font-bold text-gray-500">ライブプレビュー</span>
-            <span className="text-[10px] text-gray-400">保存前の見た目</span>
-          </div>
-          <ListingDetail listing={previewListing} preview />
-        </div>
-      </aside>
-    </div>
+      {previewOpen && (
+        <PreviewModal
+          listing={previewListing}
+          onClose={() => setPreviewOpen(false)}
+        />
+      )}
+    </>
   );
 }
