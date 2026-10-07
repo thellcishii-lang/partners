@@ -7,4 +7,6 @@ export { approveListing } from './admin/approveListing';
 export { rejectListing } from './admin/rejectListing';
 export { approvePendingEdit } from './admin/approvePendingEdit';
 export { rejectPendingEdit } from './admin/rejectPendingEdit';
+export { forcePauseListing } from './admin/forcePauseListing';
+export { forceCloseListing } from './admin/forceCloseListing';
 export { setSmsVerified } from './auth/setSmsVerified';
