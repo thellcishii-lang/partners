@@ -2,12 +2,15 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { doc, getDoc, getDocs, collection, query, where, getCountFromServer } from 'firebase/firestore';
+import {
+  doc, getDoc, getDocs, collection, query, where, getCountFromServer,
+  updateDoc, deleteDoc, serverTimestamp,
+} from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { useRequireAuth } from '@/hooks/useRequireAuth';
 import { Button } from '@/components/ui/Button';
 import { PreviewModal } from '@/components/listings/PreviewModal';
-import { LISTING_STATUS_LABELS, type Advertiser, type Listing } from '@/types';
+import { LISTING_STATUS_LABELS, type Advertiser, type Listing, type ListingStatus } from '@/types';
 
 export default function DashboardPage() {
   const { user, loading } = useRequireAuth();
@@ -16,6 +19,7 @@ export default function DashboardPage() {
   const [deliveredCount, setDeliveredCount] = useState(0);
   const [listings, setListings] = useState<Listing[]>([]);
   const [previewListing, setPreviewListing] = useState<Listing | null>(null);
+  const [busy, setBusy] = useState<string>('');
   const [error, setError] = useState('');
   const [dataLoading, setDataLoading] = useState(true);
 
@@ -47,6 +51,52 @@ export default function DashboardPage() {
     }).finally(() => { if (active) setDataLoading(false); });
     return () => { active = false; };
   }, [user]);
+
+  // ============================================================
+  // 公開 / 非公開トグル
+  // ============================================================
+  const togglePublish = async (listing: Listing) => {
+    if (listing.status !== 'published' && listing.status !== 'paused') return;
+    const next: ListingStatus = listing.status === 'published' ? 'paused' : 'published';
+    const label = next === 'paused' ? '非公開に' : '公開';
+    if (!window.confirm(`この案件を${label}しますか？`)) return;
+    setBusy(listing.id);
+    setError('');
+    try {
+      await updateDoc(doc(db, 'listings', listing.id), {
+        status: next,
+        updatedAt: serverTimestamp(),
+      });
+      setListings((prev) =>
+        prev.map((l) => (l.id === listing.id ? { ...l, status: next } : l))
+      );
+    } catch (e) {
+      setError(e instanceof Error ? e.message : '更新に失敗しました。');
+    } finally {
+      setBusy('');
+    }
+  };
+
+  // ============================================================
+  // 削除
+  // ============================================================
+  const removeListing = async (listing: Listing) => {
+    if (listing.status === 'published') {
+      window.alert('公開中の案件は削除できません。先に「非公開にする」を押してください。');
+      return;
+    }
+    if (!window.confirm(`「${listing.title}」を削除しますか？この操作は取り消せません。`)) return;
+    setBusy(listing.id);
+    setError('');
+    try {
+      await deleteDoc(doc(db, 'listings', listing.id));
+      setListings((prev) => prev.filter((l) => l.id !== listing.id));
+    } catch (e) {
+      setError(e instanceof Error ? e.message : '削除に失敗しました。');
+    } finally {
+      setBusy('');
+    }
+  };
 
   if (loading || !user || dataLoading) return <p className="text-center text-sm text-gray-500">読み込み中…</p>;
   if (error || !adv) return <p role="alert" className="text-red-600">{error}</p>;
@@ -100,46 +150,74 @@ export default function DashboardPage() {
         </div>
       )}
 
+      {error && <p role="alert" className="text-sm text-red-600">{error}</p>}
+
       <section className="space-y-4">
         <h2 className="text-lg font-bold">自分の案件一覧</h2>
         {listings.length === 0 && <p className="text-sm text-gray-600">まだ案件がありません。</p>}
-        {listings.map((listing) => (
-          <div
-            key={listing.id}
-            className="flex flex-wrap items-center justify-between gap-3 rounded-xl bg-white p-5 shadow-sm"
-          >
-            <div className="min-w-0 flex-1">
-              <p className="truncate font-bold">{listing.title}</p>
-              <div className="mt-1 flex flex-wrap items-center gap-2 text-xs">
-                <span className="rounded-full bg-gray-100 px-3 py-1">
-                  {LISTING_STATUS_LABELS[listing.status]}
-                </span>
-                {listing.pendingEdit?.submittedAt && (
-                  <span className="rounded-full bg-orange-100 px-3 py-1 text-orange-800">
-                    編集審査中
+        {listings.map((listing) => {
+          const isBusy = busy === listing.id;
+          const canToggle = listing.status === 'published' || listing.status === 'paused';
+          const canDelete = listing.status !== 'published';
+
+          return (
+            <div
+              key={listing.id}
+              className="flex flex-wrap items-center justify-between gap-3 rounded-xl bg-white p-5 shadow-sm"
+            >
+              <div className="min-w-0 flex-1">
+                <p className="truncate font-bold">{listing.title}</p>
+                <div className="mt-1 flex flex-wrap items-center gap-2 text-xs">
+                  <span className="rounded-full bg-gray-100 px-3 py-1">
+                    {LISTING_STATUS_LABELS[listing.status]}
                   </span>
+                  {listing.pendingEdit?.submittedAt && (
+                    <span className="rounded-full bg-orange-100 px-3 py-1 text-orange-800">
+                      編集審査中
+                    </span>
+                  )}
+                  {listing.pendingEdit && !listing.pendingEdit.submittedAt && (
+                    <span className="rounded-full bg-yellow-100 px-3 py-1 text-yellow-800">
+                      未提出の変更あり
+                    </span>
+                  )}
+                </div>
+              </div>
+              <div className="flex shrink-0 flex-wrap gap-2">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  disabled={isBusy}
+                  onClick={() => setPreviewListing(listing)}
+                >
+                  プレビュー
+                </Button>
+                <Link href={`/listings/${listing.id}/edit`}>
+                  <Button size="sm" variant="outline" disabled={isBusy}>編集</Button>
+                </Link>
+                {canToggle && (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    disabled={isBusy}
+                    onClick={() => togglePublish(listing)}
+                  >
+                    {listing.status === 'published' ? '非公開にする' : '公開する'}
+                  </Button>
                 )}
-                {listing.pendingEdit && !listing.pendingEdit.submittedAt && (
-                  <span className="rounded-full bg-yellow-100 px-3 py-1 text-yellow-800">
-                    未提出の変更あり
-                  </span>
-                )}
+                <Button
+                  size="sm"
+                  variant="danger"
+                  disabled={isBusy || !canDelete}
+                  onClick={() => removeListing(listing)}
+                  title={!canDelete ? '公開中の案件は先に非公開にしてください' : undefined}
+                >
+                  削除
+                </Button>
               </div>
             </div>
-            <div className="flex shrink-0 gap-2">
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => setPreviewListing(listing)}
-              >
-                プレビュー
-              </Button>
-              <Link href={`/listings/${listing.id}/edit`}>
-                <Button size="sm" variant="outline">編集</Button>
-              </Link>
-            </div>
-          </div>
-        ))}
+          );
+        })}
       </section>
 
       {previewListing && (
@@ -163,4 +241,3 @@ function Card({ label, value, unit, highlight }: { label: string; value: number;
     </div>
   );
 }
-
