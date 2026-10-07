@@ -22,7 +22,11 @@ service cloud.firestore {
       return isAuth() && userDoc().role == 'admin';
     }
 
-    // 課金フィールド（クライアントから書けない）
+    // SMS 認証済みか（カスタムクレームで判定）
+    function isSmsVerified() {
+      return isAuth() && request.auth.token.smsVerified == true;
+    }
+
     function protectedAdvFields() {
       return [
         'depositBalance',
@@ -34,7 +38,6 @@ service cloud.firestore {
       ];
     }
 
-    // 更新差分に保護フィールドが含まれていないか
     function noProtectedFields() {
       return !request.resource.data
         .diff(resource.data)
@@ -47,7 +50,6 @@ service cloud.firestore {
     // ============================================================
     match /users/{userId} {
       allow read: if isAuth() && (userId == uid() || isAdmin());
-      // role はクライアントから書けない（Functions が付与）
       allow create: if isAuth() && userId == uid()
                     && !request.resource.data.keys().hasAny(['role'])
                     && request.resource.data.email == request.auth.token.email;
@@ -62,18 +64,13 @@ service cloud.firestore {
     // ============================================================
     match /advertisers/{advId} {
       allow read: if isAuth() && (advId == uid() || isAdmin());
-
-      // 作成：自分のuid のみ、課金フィールドは含められない（Functions が後で入れる）
       allow create: if isAuth() && advId == uid()
                     && !request.resource.data.keys().hasAny(protectedAdvFields());
-
-      // 更新：自分のuid、かつ保護フィールドを触らない
       allow update: if isAuth() && advId == uid()
                     && noProtectedFields()
                     && request.resource.data.companyName is string
                     && request.resource.data.companyName.size() > 0
                     && request.resource.data.companyName.size() <= 100;
-
       allow delete: if isAdmin();
     }
 
@@ -91,8 +88,7 @@ service cloud.firestore {
     // ============================================================
     // listings : 案件
     // ============================================================
-            match /listings/{listingId} {
-      // 公開中は誰でも読める。draft 等は本人とadminのみ
+    match /listings/{listingId} {
       allow read: if resource.data.status == 'published'
                   || isAdmin()
                   || (isAuth() && resource.data.advertiserId == uid());
@@ -106,15 +102,19 @@ service cloud.firestore {
 
       allow update: if isAdmin()
                     || (isAuth() && resource.data.advertiserId == uid() && (
-                      // ① 通常編集：published 以外は内容変更OK
+                      // ① 通常編集（draft/reviewing/paused/closed 間）
+                      //    ただし reviewing への遷移は SMS 必須
                       (resource.data.status in ['draft', 'reviewing', 'paused', 'closed']
                        && request.resource.data.status in ['draft', 'reviewing', 'paused', 'closed']
-                       && request.resource.data.advertiserId == resource.data.advertiserId)
-                      // ② published 中の編集 → pendingEdit に保存
+                       && request.resource.data.advertiserId == resource.data.advertiserId
+                       && (request.resource.data.status != 'reviewing' || isSmsVerified()))
+                      // ② published 中の編集：pendingEdit に保存
+                      //    審査提出（pendingEditSubmitted: true）は SMS 必須
                       || (resource.data.status == 'published'
                           && request.resource.data.status == 'published'
                           && request.resource.data.diff(resource.data)
-                               .affectedKeys().hasOnly(['pendingEdit', 'pendingEditSubmitted', 'updatedAt']))
+                               .affectedKeys().hasOnly(['pendingEdit', 'pendingEditSubmitted', 'updatedAt'])
+                          && (request.resource.data.pendingEditSubmitted == false || isSmsVerified()))
                       // ③ 非公開化：published → paused
                       || (resource.data.status == 'published'
                           && request.resource.data.status == 'paused'
@@ -142,9 +142,9 @@ service cloud.firestore {
         isAdmin()
       );
 
-      // 作成：応募者本人が、自分のuidで、status は 'pending' 固定で作る
-      // （delivered への遷移は Functions のみ）
+      // 作成：SMS 認証済みの応募者本人のみ
       allow create: if isAuth()
+                    && isSmsVerified()
                     && request.resource.data.applicantId == uid()
                     && request.resource.data.status == 'pending'
                     && request.resource.data.depositTransactionId == null
@@ -152,12 +152,11 @@ service cloud.firestore {
                     && request.resource.data.keys().hasAll(
                          ['listingId', 'advertiserId', 'applicantId', 'maskedPreview']);
 
-      // 更新：募集者は status と memo のみ。応募者はキャンセル(status:'cancelled')のみ
       allow update: if isAdmin()
                     || (isAuth() && resource.data.advertiserId == uid()
                         && request.resource.data.diff(resource.data)
                              .affectedKeys().hasOnly(['status', 'memo', 'updatedAt'])
-                        && request.resource.data.status in ['won', 'lost'])
+                        && request.resource.data.status in ['delivered', 'won', 'lost'])
                     || (isAuth() && resource.data.applicantId == uid()
                         && request.resource.data.diff(resource.data)
                              .affectedKeys().hasOnly(['status', 'updatedAt'])
@@ -167,37 +166,26 @@ service cloud.firestore {
     }
 
     // ============================================================
-    // inquiryDetails : 個人情報本体（最重要）
-    //   - 親 inquiries の status が delivered/won/lost のときだけ
-    //     募集者が読める。pending では絶対に読めない。
+    // inquiryDetails : 個人情報本体
+    //   - 応募者本人と admin のみ読める。募集者は読めない（メールで受け取る想定）
     //   - 書き込みは Functions（Admin SDK）のみ
     // ============================================================
     match /inquiryDetails/{inquiryId} {
-      function parentStatus() {
-        return get(/databases/$(database)/documents/inquiries/$(inquiryId)).data.status;
-      }
-
       allow read: if isAuth() && (
-        // 応募者本人
         resource.data.applicantId == uid() ||
-        // 管理者
-        isAdmin() ||
-        // 募集者：開示済みのみ
-        (resource.data.advertiserId == uid()
-         && parentStatus() in ['delivered', 'won', 'lost'])
+        isAdmin()
       );
-
-      allow write: if false;  // Functions 専用
+      allow write: if false;
     }
 
     // ============================================================
-    // depositTransactions : 台帳（追記のみ・不変）
+    // depositTransactions : 台帳
     // ============================================================
     match /depositTransactions/{txId} {
       allow read: if isAuth() && (
         resource.data.advertiserId == uid() || isAdmin()
       );
-      allow write: if false;  // Functions 専用
+      allow write: if false;
     }
 
     // ============================================================
@@ -207,9 +195,6 @@ service cloud.firestore {
       allow read: if isAuth() && (
         resource.data.advertiserId == uid() || isAdmin()
       );
-
-      // 作成：pending ステータスで、金額・クレジットはマスタから
-      // クライアントが指定するが、Webhook で検証する
       allow create: if isAuth()
                     && request.resource.data.advertiserId == uid()
                     && request.resource.data.status == 'pending'
@@ -219,50 +204,43 @@ service cloud.firestore {
                     && request.resource.data.credits <= 1000
                     && request.resource.data.priceJpy is int
                     && request.resource.data.priceJpy > 0;
-
-      // 更新は Functions（Webhook）のみ
       allow update, delete: if false;
     }
 
     // ============================================================
-    // depositPackages : マスタ（読み取りのみ公開）
+    // depositPackages / mailLogs / settings
     // ============================================================
     match /depositPackages/{packageId} {
       allow read: if true;
       allow write: if isAdmin();
     }
 
-    // ============================================================
-    // mailLogs : メール送信ログ
-    // ============================================================
     match /mailLogs/{logId} {
       allow read: if isAdmin();
-      allow write: if false;  // Functions 専用
+      allow write: if false;
     }
 
-    // ============================================================
-    // settings : グローバル設定
-    // ============================================================
     match /settings/{docId} {
-      allow read: if true;   // freeTrialMonths など公開情報のみ
+      allow read: if true;
       allow write: if isAdmin();
     }
 
     // ============================================================
-// マスタデータ（公開読み取り）
-// ============================================================
-match /categories/{slug} {
-  allow read: if true;
-  allow write: if isAdmin();
-}
-match /areas/{slug} {
-  allow read: if true;
-  allow write: if isAdmin();
-}
-match /costRanges/{slug} {
-  allow read: if true;
-  allow write: if isAdmin();
-}
+    // マスタデータ（公開読み取り）
+    // ============================================================
+    match /categories/{slug} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /areas/{slug} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /costRanges/{slug} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
     // ============================================================
     // デフォルト：全拒否
     // ============================================================
