@@ -371,6 +371,7 @@ export function ListingForm({
             submittedAt: wantsReview ? serverTimestamp() : null,
             note: editNote.trim() || null,
           },
+          pendingEditSubmitted: wantsReview,
           updatedAt: serverTimestamp(),
         });
       } else if (listing) {
