@@ -235,12 +235,14 @@ export function ListingForm({
     });
 
     return {
-      title: title.trim(),
+            title: title.trim(),
       category,
       description: description.trim(),
-      ...Object.fromEntries(
-        Object.entries(fields).map(([key, value]) => [key, value.trim()])
-      ),
+      requirements: fields.requirements.trim(),
+      reward: fields.reward.trim(),
+      initialCost: fields.initialCost.trim(),
+      royalty: fields.royalty.trim(),
+      area: fields.area.trim(),
       companyName: advertiser.companyName,
 
       targetSlugs,
