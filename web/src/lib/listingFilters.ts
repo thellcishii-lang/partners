@@ -3,7 +3,9 @@
 // functions/seed-masters.mjs の定義と整合させること
 // ============================================================
 
+// ============================================================
 // 都道府県 slug → 地域 slug
+// ============================================================
 export const PREFECTURE_TO_REGION: Record<string, string> = {
   hokkaido: 'hokkaido',
   aomori: 'tohoku', iwate: 'tohoku', miyagi: 'tohoku',
@@ -140,16 +142,14 @@ export function buildSearchText(input: {
 }
 
 // ============================================================
-// 拡張フィルタ
+// 加盟金（0円〜）
 // ============================================================
-
-// 加盟金
 export const FRANCHISE_FEE_RANGES = [
-  { slug: 'free',      label: '無料' },
-  { slug: 'under10',   label: '10万円以下' },
-  { slug: 'under50',   label: '50万円以下' },
-  { slug: 'under100',  label: '100万円以下' },
-  { slug: 'over100',   label: '100万円以上' },
+  { slug: 'free',     label: '無料' },
+  { slug: 'under10',  label: '10万円以下' },
+  { slug: 'under50',  label: '50万円以下' },
+  { slug: 'under100', label: '100万円以下' },
+  { slug: 'over100',  label: '100万円以上' },
 ] as const;
 
 export function getFranchiseFeeRange(yen: number | null): string {
@@ -161,7 +161,14 @@ export function getFranchiseFeeRange(yen: number | null): string {
   return 'over100';
 }
 
+export function getFranchiseFeeLabel(yen: number | null): string {
+  const slug = getFranchiseFeeRange(yen);
+  return FRANCHISE_FEE_RANGES.find((r) => r.slug === slug)?.label ?? '応相談';
+}
+
+// ============================================================
 // 仕入れ
+// ============================================================
 export const STOCK_TYPES = [
   { slug: 'none',      label: '仕入れ不要' },
   { slug: 'single',    label: '1個から' },
@@ -170,32 +177,79 @@ export const STOCK_TYPES = [
   { slug: 'buyback',   label: '買取あり' },
 ] as const;
 
-// 売上推定（4段階）
+export type StockTypeSlug = (typeof STOCK_TYPES)[number]['slug'];
+
+export function getStockLabel(slug: string): string {
+  return STOCK_TYPES.find((t) => t.slug === slug)?.label ?? '';
+}
+
+// ============================================================
+// 売上推定：月商レンジ（4段階）
+// ============================================================
 export const REVENUE_AMOUNTS = [
   { slug: 'under50',  label: '〜50万円/月' },
   { slug: 'under100', label: '〜100万円/月' },
   { slug: 'under300', label: '〜300万円/月' },
-  { slug: 'over300',  label: '300万円以上' },   // ✅ slug を label に合わせる
+  { slug: 'over300',  label: '300万円以上' },
 ] as const;
 
-// 利益推定（3段階）
+export function getRevenueAmountRange(yen: number | null): string {
+  if (yen === null) return '';
+  if (yen <= 500_000) return 'under50';
+  if (yen <= 1_000_000) return 'under100';
+  if (yen <= 3_000_000) return 'under300';
+  return 'over300';
+}
+
+export function getRevenueAmountLabel(yen: number | null): string {
+  const slug = getRevenueAmountRange(yen);
+  return REVENUE_AMOUNTS.find((r) => r.slug === slug)?.label ?? '';
+}
+
+// ============================================================
+// 利益推定：月利益レンジ（3段階）。売上とは別指標
+// ============================================================
 export const PROFIT_AMOUNTS = [
   { slug: 'under50',  label: '〜50万円/月' },
   { slug: 'over50',   label: '50万円以上' },
-  { slug: 'over100',  label: '100万円以上' },   // ✅ slug を一意に
+  { slug: 'over100',  label: '100万円以上' },
 ] as const;
 
+export function getProfitAmountRange(yen: number | null): string {
+  if (yen === null) return '';
+  if (yen <= 500_000) return 'under50';
+  if (yen <= 1_000_000) return 'over50';
+  return 'over100';
+}
+
+export function getProfitAmountLabel(yen: number | null): string {
+  const slug = getProfitAmountRange(yen);
+  return PROFIT_AMOUNTS.find((r) => r.slug === slug)?.label ?? '';
+}
+
+// ============================================================
 // 収益タイプ
+// ============================================================
 export const REVENUE_TYPES = [
   { slug: 'stock', label: 'ストック型' },
   { slug: 'flow',  label: 'フロー型' },
   { slug: 'both',  label: '複合型' },
 ] as const;
 
+export function getRevenueTypeLabel(slug: string): string {
+  return REVENUE_TYPES.find((t) => t.slug === slug)?.label ?? '';
+}
+
+// ============================================================
 // 組織拡大
+// ============================================================
 export const ORGANIZATION_TYPES = [
   { slug: 'individual', label: '個人可' },
   { slug: 'side_job',   label: '副業可' },
   { slug: 'org',        label: '組織拡大可' },
   { slug: 'corp',       label: '法人のみ' },
 ] as const;
+
+export function getOrganizationTypeLabel(slug: string): string {
+  return ORGANIZATION_TYPES.find((t) => t.slug === slug)?.label ?? '';
+}
