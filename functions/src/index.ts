@@ -5,3 +5,5 @@ export { createDepositCheckout } from './payments/createDepositCheckout';
 export { stripeWebhook } from './payments/stripeWebhook';
 export { approveListing } from './admin/approveListing';
 export { rejectListing } from './admin/rejectListing';
+export { approvePendingEdit } from './admin/approvePendingEdit';
+export { rejectPendingEdit } from './admin/rejectPendingEdit';
