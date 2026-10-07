@@ -6,6 +6,8 @@ import { useParams } from 'next/navigation';
 import { useListing } from '@/hooks/useListing';
 import { useAuth } from '@/providers/AuthProvider';
 import { LISTING_STATUS_LABELS } from '@/types';
+import { ListingDetail } from '@/components/listings/ListingDetail';
+// useListing で取得 → ListingDetail に渡すだけに
 
 export default function ListingPage() {
   const { id } = useParams<{ id: string }>();
