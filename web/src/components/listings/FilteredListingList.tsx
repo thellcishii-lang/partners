@@ -1,21 +1,8 @@
-'use client';
-
-import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
-import { collection, getDocs, query, where } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
+import { getServerListings, type FilterKey } from '@/lib/serverListings';
 import type { Listing } from '@/types';
 
-type FilterKey =
-  | 'targetSlugs'
-  | 'productSlugs'
-  | 'modelSlugs'
-  | 'prefectureSlug'
-  | 'regionSlug'
-  | 'initialCostRange'
-  | 'expectedRevenueRange';
-
-export function FilteredListingList({
+export async function FilteredListingList({
   filterKey,
   filterValue,
   heading,
@@ -26,38 +13,15 @@ export function FilteredListingList({
   heading: string;
   description?: string;
 }) {
-  const [listings, setListings] = useState<Listing[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  let listings: Listing[] = [];
+  let error = '';
 
-  useEffect(() => {
-    let active = true;
-    setLoading(true);
-    setError('');
-    getDocs(query(collection(db, 'listings'), where('status', '==', 'published')))
-      .then((snap) => {
-        if (!active) return;
-        setListings(snap.docs.map((item) => ({ ...item.data(), id: item.id } as Listing)));
-      })
-      .catch((error: unknown) => {
-        if (active)
-          setError(error instanceof Error ? error.message : '案件一覧の取得に失敗しました。');
-      })
-      .finally(() => {
-        if (active) setLoading(false);
-      });
-    return () => {
-      active = false;
-    };
-  }, []);
-
-  const filtered = useMemo(() => {
-    return listings.filter((l) => {
-      const value = l[filterKey];
-      if (Array.isArray(value)) return value.includes(filterValue);
-      return value === filterValue;
-    });
-  }, [listings, filterKey, filterValue]);
+  try {
+    listings = await getServerListings(filterKey, filterValue);
+  } catch (e) {
+    error = e instanceof Error ? e.message : '案件一覧の取得に失敗しました。';
+    console.error('getServerListings failed', { filterKey, filterValue, error: e });
+  }
 
   return (
     <div className="space-y-6">
@@ -68,14 +32,15 @@ export function FilteredListingList({
         )}
       </header>
 
-      {loading && <p className="text-sm text-gray-500">読み込み中…</p>}
-      {error && <p role="alert" className="text-red-600">{error}</p>}
+      {error && (
+        <p role="alert" className="text-red-600">{error}</p>
+      )}
 
-      {!loading && !error && (
+      {!error && (
         <>
-          <p className="text-sm text-gray-600">{filtered.length}件の案件</p>
+          <p className="text-sm text-gray-600">{listings.length}件の案件</p>
 
-          {filtered.length === 0 && (
+          {listings.length === 0 && (
             <div className="rounded-2xl bg-white p-8 text-center shadow-sm">
               <p className="text-gray-600">現在、該当する案件はありません。</p>
               <p className="mt-2 text-sm text-gray-500">
@@ -91,7 +56,7 @@ export function FilteredListingList({
           )}
 
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {filtered.map((listing) => (
+            {listings.map((listing) => (
               <Link
                 key={listing.id}
                 href={`/listings/${listing.id}`}
