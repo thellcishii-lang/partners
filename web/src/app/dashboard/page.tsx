@@ -1,10 +1,12 @@
 'use client';
+
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { doc, getDoc, getDocs, collection, query, where, getCountFromServer } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { useRequireAuth } from '@/hooks/useRequireAuth';
 import { Button } from '@/components/ui/Button';
+import { PreviewModal } from '@/components/listings/PreviewModal';
 import { LISTING_STATUS_LABELS, type Advertiser, type Listing } from '@/types';
 
 export default function DashboardPage() {
@@ -13,6 +15,7 @@ export default function DashboardPage() {
   const [pendingCount, setPendingCount] = useState(0);
   const [deliveredCount, setDeliveredCount] = useState(0);
   const [listings, setListings] = useState<Listing[]>([]);
+  const [previewListing, setPreviewListing] = useState<Listing | null>(null);
   const [error, setError] = useState('');
   const [dataLoading, setDataLoading] = useState(true);
 
@@ -101,17 +104,50 @@ export default function DashboardPage() {
         <h2 className="text-lg font-bold">自分の案件一覧</h2>
         {listings.length === 0 && <p className="text-sm text-gray-600">まだ案件がありません。</p>}
         {listings.map((listing) => (
-          <div key={listing.id} className="flex flex-wrap items-center justify-between gap-3 rounded-xl bg-white p-5 shadow-sm">
-            <div>
-              <Link href={`/listings/${listing.id}`} className="font-bold text-brand-700">{listing.title}</Link>
-              <span className="ml-3 rounded-full bg-gray-100 px-3 py-1 text-xs">
-                {LISTING_STATUS_LABELS[listing.status]}
-              </span>
+          <div
+            key={listing.id}
+            className="flex flex-wrap items-center justify-between gap-3 rounded-xl bg-white p-5 shadow-sm"
+          >
+            <div className="min-w-0 flex-1">
+              <p className="truncate font-bold">{listing.title}</p>
+              <div className="mt-1 flex flex-wrap items-center gap-2 text-xs">
+                <span className="rounded-full bg-gray-100 px-3 py-1">
+                  {LISTING_STATUS_LABELS[listing.status]}
+                </span>
+                {listing.pendingEdit?.submittedAt && (
+                  <span className="rounded-full bg-orange-100 px-3 py-1 text-orange-800">
+                    編集審査中
+                  </span>
+                )}
+                {listing.pendingEdit && !listing.pendingEdit.submittedAt && (
+                  <span className="rounded-full bg-yellow-100 px-3 py-1 text-yellow-800">
+                    未提出の変更あり
+                  </span>
+                )}
+              </div>
             </div>
-            <Link href={`/listings/${listing.id}/edit`} className="text-sm text-brand-700 underline">編集</Link>
+            <div className="flex shrink-0 gap-2">
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => setPreviewListing(listing)}
+              >
+                プレビュー
+              </Button>
+              <Link href={`/listings/${listing.id}/edit`}>
+                <Button size="sm" variant="outline">編集</Button>
+              </Link>
+            </div>
           </div>
         ))}
       </section>
+
+      {previewListing && (
+        <PreviewModal
+          listing={previewListing}
+          onClose={() => setPreviewListing(null)}
+        />
+      )}
     </div>
   );
 }
