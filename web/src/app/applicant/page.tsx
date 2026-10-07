@@ -2,22 +2,28 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { collection, doc, getDoc, getDocs, query, where } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { useRequireAuth } from '@/hooks/useRequireAuth';
 import { Button } from '@/components/ui/Button';
+import { SmsVerificationModal } from '@/components/auth/SmsVerificationModal';
 import {
   INQUIRY_STATUS_LABELS,
   type Inquiry,
   type Listing,
 } from '@/types';
 
+const REVERIFY_KEY = 'smsReverified';
+
 export default function ApplicantDashboardPage() {
+  const router = useRouter();
   const { user, loading } = useRequireAuth();
   const [inquiries, setInquiries] = useState<Inquiry[]>([]);
   const [listings, setListings] = useState<Record<string, Listing | null>>({});
   const [dataLoading, setDataLoading] = useState(true);
   const [error, setError] = useState('');
+  const [pendingListingId, setPendingListingId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!user) return;
@@ -35,7 +41,6 @@ export default function ApplicantDashboardPage() {
         return bt - at;
       });
 
-      // 各 listingId のタイトルを取得
       const map: Record<string, Listing | null> = {};
       const ids = Array.from(new Set(items.map((i) => i.listingId).filter(Boolean)));
       await Promise.all(
@@ -60,6 +65,27 @@ export default function ApplicantDashboardPage() {
     return () => { active = false; };
   }, [user]);
 
+  const handleViewResource = (listingId: string) => {
+    const alreadyVerified =
+      typeof window !== 'undefined' &&
+      window.sessionStorage.getItem(REVERIFY_KEY) === '1';
+
+    if (alreadyVerified) {
+      router.push(`/listings/${listingId}`);
+      return;
+    }
+    setPendingListingId(listingId);
+  };
+
+  const handleVerified = () => {
+    if (typeof window !== 'undefined') {
+      window.sessionStorage.setItem(REVERIFY_KEY, '1');
+    }
+    const target = pendingListingId;
+    setPendingListingId(null);
+    if (target) router.push(`/listings/${target}`);
+  };
+
   if (loading || !user || dataLoading) {
     return <p className="text-center text-sm text-gray-500">読み込み中…</p>;
   }
@@ -68,7 +94,12 @@ export default function ApplicantDashboardPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-xl font-bold">応募履歴</h1>
+        <div>
+          <h1 className="text-xl font-bold">応募履歴</h1>
+          <p className="mt-1 text-xs text-gray-500">
+            資料の閲覧には、セキュリティ保護のためSMS再認証が必要です。
+          </p>
+        </div>
         <Link href="/listings">
           <Button variant="outline">案件を探す</Button>
         </Link>
@@ -102,12 +133,7 @@ export default function ApplicantDashboardPage() {
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div className="min-w-0 flex-1">
                   {listing ? (
-                    <Link
-                      href={`/listings/${listing.id}`}
-                      className="font-bold text-brand-700 hover:underline"
-                    >
-                      {listing.title}
-                    </Link>
+                    <p className="font-bold">{listing.title}</p>
                   ) : (
                     <p className="font-bold text-gray-400">（募集終了）</p>
                   )}
@@ -144,11 +170,32 @@ export default function ApplicantDashboardPage() {
                     </div>
                   )}
                 </div>
+                <div className="shrink-0">
+                  {listing ? (
+                    <Button
+                      size="sm"
+                      onClick={() => handleViewResource(listing.id)}
+                    >
+                      資料を閲覧
+                    </Button>
+                  ) : (
+                    <Button size="sm" variant="outline" disabled>
+                      閲覧不可
+                    </Button>
+                  )}
+                </div>
               </div>
             </div>
           );
         })}
       </div>
+
+      {pendingListingId && (
+        <SmsVerificationModal
+          onSuccess={handleVerified}
+          onClose={() => setPendingListingId(null)}
+        />
+      )}
     </div>
   );
 }
