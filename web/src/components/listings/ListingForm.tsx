@@ -39,14 +39,16 @@ import { cn } from '@/lib/cn';
 export function ListingForm({
   advertiser,
   listing,
+  adminMode = false,
 }: {
   advertiser: Advertiser;
   listing?: Listing;
+  adminMode?: boolean;
 }) {
   const router = useRouter();
   const { categories, areas, loading: mastersLoading } = useMasters();
 
-  const isPublished = listing?.status === 'published';
+  const isPublished = !adminMode && listing?.status === 'published';
 
   // pendingEdit があればその内容を、なければ本体を編集元にする
   const source: Partial<Listing> = listing?.pendingEdit?.data
@@ -352,10 +354,10 @@ export function ListingForm({
       setError('募集者プロフィールに会社名を登録してから案件を保存してください。');
       return;
     }
-    if (isPublished && wantsReview && !editNote.trim()) {
-      setError('変更内容を入力してください（管理者が確認します）。');
-      return;
-    }
+    if (isPublished && !adminMode && wantsReview && !editNote.trim()) {
+       setError('変更内容を入力してください（管理者が確認します）。');
+       return;
+     }
 
     setSaving(true);
     setError('');
@@ -363,17 +365,43 @@ export function ListingForm({
     try {
       const filterData = buildFilterData();
 
-      if (isPublished && listing) {
-        // ★ published は pendingEdit に保存
+      if (adminMode && listing) {
+        // 管理者代理編集：ステータスを保ったまま直接反映
+        await updateDoc(doc(db, 'listings', listing.id), {
+          ...filterData,
+          pendingEdit: null,
+          pendingEditSubmitted: false,
+          updatedAt: serverTimestamp(),
+　       });
+      } else if (isPublished && listing) {
+        // 公開中の募集者編集 → pendingEdit に保存
         await updateDoc(doc(db, 'listings', listing.id), {
           pendingEdit: {
             data: filterData,
-            submittedAt: wantsReview ? serverTimestamp() : null,
-            note: editNote.trim() || null,
-          },
-          pendingEditSubmitted: wantsReview,
-          updatedAt: serverTimestamp(),
-        });
+             submittedAt: wantsReview ? serverTimestamp() : null,
+             note: editNote.trim() || null,
+           },
+           pendingEditSubmitted: wantsReview,
+           updatedAt: serverTimestamp(),
+         });
+       } else if (listing) {
+         // 通常編集
+         await updateDoc(doc(db, 'listings', listing.id), {
+           ...filterData,
+　          status: wantsReview ? 'reviewing' : 'draft',
+           updatedAt: serverTimestamp(),
+         });
+       } else {
+         // 新規
+         await addDoc(collection(db, 'listings'), {
+           ...filterData,
+           advertiserId: advertiser.uid,
+           status: wantsReview ? 'reviewing' : 'draft',
+           publishedAt: null,
+           createdAt: serverTimestamp(),
+           updatedAt: serverTimestamp(),
+         });
+　　　　　　　　　　　　}
       } else if (listing) {
         // 通常編集
         await updateDoc(doc(db, 'listings', listing.id), {
@@ -658,6 +686,25 @@ export function ListingForm({
                   </label>
                 ))}
               </div>
+                      {adminMode ? (
+          <div className="rounded-2xl border-2 border-orange-200 bg-orange-50 p-4">
+            <p className="mb-3 text-xs text-orange-800">
+              管理者として保存します。審査を経由せず、即座にサイトへ反映されます。
+            </p>
+            <Button type="submit" value="admin-save" loading={saving}>
+              保存する
+            </Button>
+          </div>
+        ) : (
+          <div className="flex gap-3">
+            <Button type="submit" value="draft" variant="outline" disabled={saving}>
+              {isPublished ? '変更を保存' : '下書き保存'}
+            </Button>
+            <Button type="submit" value="reviewing" loading={saving}>
+              {isPublished ? '審査に提出' : '審査申請'}
+            </Button>
+          </div>
+        )}
               {revenueMode === 'amount' && (
                 <div className="flex items-center gap-2">
                   <Input
@@ -1022,7 +1069,7 @@ export function ListingForm({
         </section>
 
         {/* 変更内容コメント（published のみ） */}
-        {isPublished && (
+        {isPublished && !adminMode && (
           <section className="space-y-3 rounded-2xl border-2 border-emerald-200 bg-emerald-50 p-6">
             <h2 className="font-bold text-emerald-800">変更内容（管理者へのメモ）</h2>
             <p className="text-xs text-emerald-700">
