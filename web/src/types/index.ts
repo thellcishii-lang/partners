@@ -187,6 +187,9 @@ export interface Listing {
     submittedAt: { seconds: number; nanoseconds: number } | null;
     note?: string;
   } | null;
+
+  // 編集審査中かどうかのフラグ（admin 検索用）
+  pendingEditSubmitted?: boolean;
 }
 
 // ============================================================
