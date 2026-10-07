@@ -114,7 +114,7 @@ service cloud.firestore {
                       || (resource.data.status == 'published'
                           && request.resource.data.status == 'published'
                           && request.resource.data.diff(resource.data)
-                               .affectedKeys().hasOnly(['pendingEdit', 'updatedAt']))
+                               .affectedKeys().hasOnly(['pendingEdit', 'pendingEditSubmitted', 'updatedAt']))
                       // ③ 非公開化：published → paused
                       || (resource.data.status == 'published'
                           && request.resource.data.status == 'paused'
