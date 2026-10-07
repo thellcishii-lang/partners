@@ -170,19 +170,19 @@ export const STOCK_TYPES = [
   { slug: 'buyback',   label: '買取あり' },
 ] as const;
 
-// 売上推定
+// 売上推定（4段階）
 export const REVENUE_AMOUNTS = [
   { slug: 'under50',  label: '〜50万円/月' },
   { slug: 'under100', label: '〜100万円/月' },
   { slug: 'under300', label: '〜300万円/月' },
-  { slug: 'over100',  label: '300万円以上' },
+  { slug: 'over300',  label: '300万円以上' },   // ✅ slug を label に合わせる
 ] as const;
 
-// 利益推定
+// 利益推定（3段階）
 export const PROFIT_AMOUNTS = [
   { slug: 'under50',  label: '〜50万円/月' },
   { slug: 'over50',   label: '50万円以上' },
-  { slug: 'over50',   label: '100万円以上' },
+  { slug: 'over100',  label: '100万円以上' },   // ✅ slug を一意に
 ] as const;
 
 // 収益タイプ
