@@ -60,10 +60,17 @@ export default function AdminAdvertiserDetailPage() {
         <Link href="/admin/advertisers" className="text-xs text-gray-500 hover:underline">
           ← 掲載主一覧
         </Link>
-        <h2 className="mt-2 text-lg font-bold">
-          {advertiser.companyName || '（会社名未設定）'}
-        </h2>
-        <p className="text-xs text-gray-500">{advertiser.email}</p>
+        <div className="mt-2 flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <h2 className="text-lg font-bold">
+              {advertiser.companyName || '（会社名未設定）'}
+            </h2>
+            <p className="text-xs text-gray-500">{advertiser.email}</p>
+          </div>
+          <Link href={`/admin/advertisers/${uid}/edit`}>
+            <Button size="sm" variant="outline">プロフィール編集</Button>
+          </Link>
+        </div>
       </div>
 
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
@@ -71,6 +78,44 @@ export default function AdminAdvertiserDetailPage() {
         <Stat label="保留" value={advertiser.pendingCount ?? 0} unit="件" />
         <Stat label="案件数" value={listings.length} unit="件" />
       </div>
+
+      {(advertiser.representativeName || advertiser.phone || advertiser.website || advertiser.description) && (
+        <div className="rounded-xl bg-white p-5 shadow-sm">
+          <h3 className="mb-3 text-sm font-bold">プロフィール</h3>
+          <table className="w-full border-collapse text-sm">
+            <tbody>
+              {advertiser.representativeName && (
+                <tr className="border-b border-gray-100">
+                  <th className="w-24 py-2 text-left align-top text-xs font-bold text-gray-500">代表者</th>
+                  <td className="py-2 text-gray-900">{advertiser.representativeName}</td>
+                </tr>
+              )}
+              {advertiser.phone && (
+                <tr className="border-b border-gray-100">
+                  <th className="w-24 py-2 text-left align-top text-xs font-bold text-gray-500">電話</th>
+                  <td className="py-2 text-gray-900">{advertiser.phone}</td>
+                </tr>
+              )}
+              {advertiser.website && (
+                <tr className="border-b border-gray-100">
+                  <th className="w-24 py-2 text-left align-top text-xs font-bold text-gray-500">Web</th>
+                  <td className="py-2 text-gray-900">
+                    <a href={advertiser.website} target="_blank" rel="noopener noreferrer" className="text-brand-700 underline">
+                      {advertiser.website}
+                    </a>
+                  </td>
+                </tr>
+              )}
+              {advertiser.description && (
+                <tr>
+                  <th className="w-24 py-2 text-left align-top text-xs font-bold text-gray-500">事業内容</th>
+                  <td className="py-2 whitespace-pre-wrap text-gray-900">{advertiser.description}</td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      )}
 
       <section className="space-y-3">
         <h3 className="text-base font-bold">案件一覧</h3>
