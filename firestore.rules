@@ -91,7 +91,7 @@ service cloud.firestore {
     // ============================================================
     // listings : 案件
     // ============================================================
-        match /listings/{listingId} {
+            match /listings/{listingId} {
       // 公開中は誰でも読める。draft 等は本人とadminのみ
       allow read: if resource.data.status == 'published'
                   || isAdmin()
@@ -106,15 +106,21 @@ service cloud.firestore {
 
       allow update: if isAdmin()
                     || (isAuth() && resource.data.advertiserId == uid() && (
-                      // ① 通常編集：draft / reviewing / paused / closed へ
-                      (request.resource.data.status in ['draft', 'reviewing', 'paused', 'closed']
+                      // ① 通常編集：published 以外は内容変更OK
+                      (resource.data.status in ['draft', 'reviewing', 'paused', 'closed']
+                       && request.resource.data.status in ['draft', 'reviewing', 'paused', 'closed']
                        && request.resource.data.advertiserId == resource.data.advertiserId)
-                      // ② 非公開化：published → paused（status と updatedAt のみ）
+                      // ② published 中の編集 → pendingEdit に保存
+                      || (resource.data.status == 'published'
+                          && request.resource.data.status == 'published'
+                          && request.resource.data.diff(resource.data)
+                               .affectedKeys().hasOnly(['pendingEdit', 'updatedAt']))
+                      // ③ 非公開化：published → paused
                       || (resource.data.status == 'published'
                           && request.resource.data.status == 'paused'
                           && request.resource.data.diff(resource.data)
                                .affectedKeys().hasOnly(['status', 'updatedAt']))
-                      // ③ 再公開：paused → published（status と updatedAt のみ）
+                      // ④ 再公開：paused → published
                       || (resource.data.status == 'paused'
                           && request.resource.data.status == 'published'
                           && request.resource.data.diff(resource.data)
