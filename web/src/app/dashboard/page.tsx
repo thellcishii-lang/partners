@@ -163,3 +163,4 @@ function Card({ label, value, unit, highlight }: { label: string; value: number;
     </div>
   );
 }
+
