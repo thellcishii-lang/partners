@@ -50,25 +50,20 @@ export function ListingForm({
 
   const isPublished = !adminMode && listing?.status === 'published';
 
-  // pendingEdit があればその内容を、なければ本体を編集元にする
   const source: Partial<Listing> = listing?.pendingEdit?.data
     ? { ...listing, ...listing.pendingEdit.data }
     : listing ?? {};
 
-  // 基本情報
   const [title, setTitle] = useState(source.title ?? '');
   const [category, setCategory] = useState<ListingCategory>(source.category ?? '代理店');
   const [description, setDescription] = useState(source.description ?? '');
 
-  // 3軸
   const [targetSlugs, setTargetSlugs] = useState<string[]>(source.targetSlugs ?? []);
   const [productSlugs, setProductSlugs] = useState<string[]>(source.productSlugs ?? []);
   const [modelSlugs, setModelSlugs] = useState<string[]>(source.modelSlugs ?? []);
 
-  // 地域
   const [prefectureSlug, setPrefectureSlug] = useState(source.prefectureSlug ?? '');
 
-  // 初期費用
   type CostMode = 'free' | 'amount' | 'unknown';
   const [initialCostMode, setInitialCostMode] = useState<CostMode>(
     source.initialCostRange === 'initial-free' ? 'free'
@@ -79,7 +74,6 @@ export function ListingForm({
     source.initialCostYen ? String(source.initialCostYen) : ''
   );
 
-  // 想定年商
   type RevenueMode = 'amount' | 'unknown';
   const [revenueMode, setRevenueMode] = useState<RevenueMode>(
     source.expectedRevenueRange === 'revenue-unknown' || source.expectedRevenueYen == null ? 'unknown' : 'amount'
@@ -88,7 +82,6 @@ export function ListingForm({
     source.expectedRevenueYen ? String(source.expectedRevenueYen) : ''
   );
 
-  // 加盟金
   type FeeMode = 'amount' | 'unknown';
   const [franchiseFeeMode, setFranchiseFeeMode] = useState<FeeMode>(
     source.franchiseFeeYen != null ? 'amount' : 'unknown'
@@ -97,10 +90,8 @@ export function ListingForm({
     source.franchiseFeeYen != null ? String(source.franchiseFeeYen) : ''
   );
 
-  // 仕入れ
   const [stockType, setStockType] = useState(source.stockType ?? '');
 
-  // 想定月商
   type ProfitMode = 'amount' | 'unknown';
   const [profitMode, setProfitMode] = useState<ProfitMode>(
     source.expectedProfitYen != null ? 'amount' : 'unknown'
@@ -109,11 +100,9 @@ export function ListingForm({
     source.expectedProfitYen != null ? String(source.expectedProfitYen) : ''
   );
 
-  // 収益タイプ / 組織拡大
   const [revenueType, setRevenueType] = useState(source.revenueType ?? '');
   const [organizationType, setOrganizationType] = useState(source.organizationType ?? '');
 
-  // その他
   const [fields, setFields] = useState({
     requirements: source.requirements ?? '',
     reward: source.reward ?? '',
@@ -127,7 +116,6 @@ export function ListingForm({
   const [images, setImages] = useState<string[]>(source.images ?? []);
   const [editNote, setEditNote] = useState(listing?.pendingEdit?.note ?? '');
 
-  // 会社情報
   const [companyInfo, setCompanyInfo] = useState({
     companyAddress: source.companyAddress ?? '',
     companyRepresentative: source.companyRepresentative ?? '',
@@ -135,12 +123,10 @@ export function ListingForm({
     companyBusiness: source.companyBusiness ?? '',
   });
 
-  // こんな方におすすめ
   const [recommendedFor, setRecommendedFor] = useState<string[]>(
     source.recommendedFor ?? ['']
   );
 
-  // ビジネスの説明（固定5個）
   const [businessPoints, setBusinessPoints] = useState<
     { title: string; body: string }[]
   >(() => {
@@ -148,7 +134,6 @@ export function ListingForm({
     return Array.from({ length: 5 }, (_, i) => existing[i] ?? { title: '', body: '' });
   });
 
-  // 詳細情報
   const [detailInfo, setDetailInfo] = useState({
     salesTarget: source.salesTarget ?? '',
     salesMethod: source.salesMethod ?? '',
@@ -158,9 +143,6 @@ export function ListingForm({
     source.agentFit ?? ['']
   );
 
-  // ============================================================
-  // マスタの絞り込み
-  // ============================================================
   const targetCategories = categories.filter((c) => c.axis === 'target');
   const productParents = categories.filter((c) => c.axis === 'product' && !c.parentSlug);
   const productSubs = categories.filter((c) => c.axis === 'product' && c.parentSlug);
@@ -189,9 +171,6 @@ export function ListingForm({
     }
   };
 
-  // ============================================================
-  // フィルタ用のdenormalize（保存とプレビューで共通）
-  // ============================================================
   const buildFilterData = () => {
     const targetLabels = targetSlugs
       .map((s) => categories.find((c) => c.slug === s)?.label ?? '')
@@ -306,9 +285,6 @@ export function ListingForm({
     };
   };
 
-  // ============================================================
-  // プレビュー用オブジェクト（published で pendingEdit 保存中は「審査中」表示）
-  // ============================================================
   const previewStatus = listing?.pendingEdit?.submittedAt
     ? 'reviewing'
     : (listing?.status ?? 'draft');
@@ -324,9 +300,6 @@ export function ListingForm({
     pendingEdit: null,
   };
 
-  // ============================================================
-  // 保存
-  // ============================================================
   const save = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (saving) return;
@@ -355,9 +328,9 @@ export function ListingForm({
       return;
     }
     if (isPublished && !adminMode && wantsReview && !editNote.trim()) {
-       setError('変更内容を入力してください（管理者が確認します）。');
-       return;
-     }
+      setError('変更内容を入力してください（管理者が確認します）。');
+      return;
+    }
 
     setSaving(true);
     setError('');
@@ -372,38 +345,19 @@ export function ListingForm({
           pendingEdit: null,
           pendingEditSubmitted: false,
           updatedAt: serverTimestamp(),
-　       });
+        });
       } else if (isPublished && listing) {
         // 公開中の募集者編集 → pendingEdit に保存
         await updateDoc(doc(db, 'listings', listing.id), {
           pendingEdit: {
             data: filterData,
-             submittedAt: wantsReview ? serverTimestamp() : null,
-             note: editNote.trim() || null,
-           },
-           pendingEditSubmitted: wantsReview,
-           updatedAt: serverTimestamp(),
-         });
-       } else if (listing) {
-         // 通常編集
-         await updateDoc(doc(db, 'listings', listing.id), {
-           ...filterData,
-　          status: wantsReview ? 'reviewing' : 'draft',
-           updatedAt: serverTimestamp(),
-         });
-       } else {
-         // 新規
-         await addDoc(collection(db, 'listings'), {
-           ...filterData,
-           advertiserId: advertiser.uid,
-           status: wantsReview ? 'reviewing' : 'draft',
-           publishedAt: null,
-           createdAt: serverTimestamp(),
-           updatedAt: serverTimestamp(),
-         });
-      }
-      
-      else if (listing) {
+            submittedAt: wantsReview ? serverTimestamp() : null,
+            note: editNote.trim() || null,
+          },
+          pendingEditSubmitted: wantsReview,
+          updatedAt: serverTimestamp(),
+        });
+      } else if (listing) {
         // 通常編集
         await updateDoc(doc(db, 'listings', listing.id), {
           ...filterData,
@@ -421,7 +375,7 @@ export function ListingForm({
           updatedAt: serverTimestamp(),
         });
       }
-      router.push('/dashboard');
+      router.push(adminMode ? `/admin/advertisers/${advertiser.uid}` : '/dashboard');
     } catch (error) {
       setError(error instanceof Error ? error.message : '案件の保存に失敗しました。');
       setSaving(false);
@@ -435,16 +389,17 @@ export function ListingForm({
   return (
     <>
       <form onSubmit={save} className="space-y-6">
-        {/* 上部バー */}
         <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-white p-4 shadow-sm">
           <div>
             <p className="text-sm font-bold">
-              {listing ? '案件を編集' : '新規案件作成'}
+              {adminMode ? '管理者：代理編集' : listing ? '案件を編集' : '新規案件作成'}
             </p>
             <p className="text-xs text-gray-500">
-              {isPublished
-                ? '公開中の内容はそのまま。保存しても審査に出すまでサイトは変わりません。'
-                : '入力内容はプレビューで確認できます'}
+              {adminMode
+                ? '保存すると審査を経由せず即座にサイトへ反映されます'
+                : isPublished
+                  ? '公開中の内容はそのまま。保存しても審査に出すまでサイトは変わりません。'
+                  : '入力内容はプレビューで確認できます'}
             </p>
           </div>
           <Button
@@ -456,7 +411,6 @@ export function ListingForm({
           </Button>
         </div>
 
-        {/* pendingEdit ステータス表示 */}
         {isPublished && listing?.pendingEdit?.submittedAt && (
           <div className="rounded-xl border border-orange-200 bg-orange-50 p-4 text-sm text-orange-800">
             この案件は<b>編集審査中</b>です。承認されるまでサイトには旧内容が表示されます。
@@ -468,7 +422,6 @@ export function ListingForm({
           </div>
         )}
 
-        {/* 基本情報 */}
         <section className="space-y-5 rounded-2xl bg-white p-6 shadow-sm">
           <h2 className="font-bold">基本情報</h2>
           <Field label="案件タイトル" required>
@@ -506,7 +459,6 @@ export function ListingForm({
           </Field>
         </section>
 
-        {/* 画像 */}
         <section className="space-y-5 rounded-2xl bg-white p-6 shadow-sm">
           <h2 className="font-bold">画像</h2>
           <p className="text-xs text-gray-500">
@@ -520,7 +472,6 @@ export function ListingForm({
           />
         </section>
 
-        {/* ターゲット */}
         <section className="space-y-5 rounded-2xl bg-white p-6 shadow-sm">
           <h2 className="font-bold">
             ターゲット（誰向けか）<span className="ml-2 text-xs text-red-500">必須</span>
@@ -546,7 +497,6 @@ export function ListingForm({
           </div>
         </section>
 
-        {/* 商材 */}
         <section className="space-y-5 rounded-2xl bg-white p-6 shadow-sm">
           <h2 className="font-bold">
             商材（何を扱うか）<span className="ml-2 text-xs text-red-500">必須</span>
@@ -592,7 +542,6 @@ export function ListingForm({
           </div>
         </section>
 
-        {/* ビジネスモデル */}
         <section className="space-y-5 rounded-2xl bg-white p-6 shadow-sm">
           <h2 className="font-bold">ビジネスモデル / 探し方</h2>
           <p className="text-xs text-gray-500">該当するものを複数選択できます。</p>
@@ -616,7 +565,6 @@ export function ListingForm({
           </div>
         </section>
 
-        {/* 地域・費用 */}
         <section className="space-y-5 rounded-2xl bg-white p-6 shadow-sm">
           <h2 className="font-bold">募集エリア・費用</h2>
           <Field label="都道府県" required>
@@ -687,25 +635,6 @@ export function ListingForm({
                   </label>
                 ))}
               </div>
-                      {adminMode ? (
-          <div className="rounded-2xl border-2 border-orange-200 bg-orange-50 p-4">
-            <p className="mb-3 text-xs text-orange-800">
-              管理者として保存します。審査を経由せず、即座にサイトへ反映されます。
-            </p>
-            <Button type="submit" value="admin-save" loading={saving}>
-              保存する
-            </Button>
-          </div>
-        ) : (
-          <div className="flex gap-3">
-            <Button type="submit" value="draft" variant="outline" disabled={saving}>
-              {isPublished ? '変更を保存' : '下書き保存'}
-            </Button>
-            <Button type="submit" value="reviewing" loading={saving}>
-              {isPublished ? '審査に提出' : '審査申請'}
-            </Button>
-          </div>
-        )}
               {revenueMode === 'amount' && (
                 <div className="flex items-center gap-2">
                   <Input
@@ -857,7 +786,6 @@ export function ListingForm({
           </Field>
         </section>
 
-        {/* 会社情報 */}
         <section className="space-y-5 rounded-2xl bg-white p-6 shadow-sm">
           <h2 className="font-bold">会社情報</h2>
           <p className="text-xs text-gray-500">
@@ -866,27 +794,21 @@ export function ListingForm({
           <Field label="所在地">
             <Input
               value={companyInfo.companyAddress}
-              onChange={(e) =>
-                setCompanyInfo({ ...companyInfo, companyAddress: e.target.value })
-              }
+              onChange={(e) => setCompanyInfo({ ...companyInfo, companyAddress: e.target.value })}
               placeholder="〒100-0001 東京都千代田区..."
             />
           </Field>
           <Field label="代表者">
             <Input
               value={companyInfo.companyRepresentative}
-              onChange={(e) =>
-                setCompanyInfo({ ...companyInfo, companyRepresentative: e.target.value })
-              }
+              onChange={(e) => setCompanyInfo({ ...companyInfo, companyRepresentative: e.target.value })}
               placeholder="代表取締役 山田 太郎"
             />
           </Field>
           <Field label="設立">
             <Input
               value={companyInfo.companyEstablished}
-              onChange={(e) =>
-                setCompanyInfo({ ...companyInfo, companyEstablished: e.target.value })
-              }
+              onChange={(e) => setCompanyInfo({ ...companyInfo, companyEstablished: e.target.value })}
               placeholder="2010年4月"
             />
           </Field>
@@ -894,15 +816,12 @@ export function ListingForm({
             <Textarea
               rows={2}
               value={companyInfo.companyBusiness}
-              onChange={(e) =>
-                setCompanyInfo({ ...companyInfo, companyBusiness: e.target.value })
-              }
+              onChange={(e) => setCompanyInfo({ ...companyInfo, companyBusiness: e.target.value })}
               placeholder="電気通信事業、情報処理サービス業..."
             />
           </Field>
         </section>
 
-        {/* ビジネスの説明 */}
         <section className="space-y-5 rounded-2xl bg-white p-6 shadow-sm">
           <h2 className="font-bold">ビジネスの説明</h2>
           <p className="text-xs text-gray-500">
@@ -938,7 +857,6 @@ export function ListingForm({
           ))}
         </section>
 
-        {/* こんな方におすすめ */}
         <section className="space-y-5 rounded-2xl bg-white p-6 shadow-sm">
           <h2 className="font-bold">こんな方におすすめ</h2>
           <p className="text-xs text-gray-500">
@@ -958,9 +876,7 @@ export function ListingForm({
               {recommendedFor.length > 1 && (
                 <button
                   type="button"
-                  onClick={() =>
-                    setRecommendedFor(recommendedFor.filter((_, j) => j !== i))
-                  }
+                  onClick={() => setRecommendedFor(recommendedFor.filter((_, j) => j !== i))}
                   className="shrink-0 rounded-lg border border-gray-300 px-3 text-sm text-gray-500 hover:bg-gray-50"
                 >
                   削除
@@ -979,7 +895,6 @@ export function ListingForm({
           )}
         </section>
 
-        {/* 詳細情報 */}
         <section className="space-y-5 rounded-2xl bg-white p-6 shadow-sm">
           <h2 className="font-bold">詳細情報</h2>
           <p className="text-xs text-gray-500">
@@ -988,27 +903,21 @@ export function ListingForm({
           <Field label="販売先">
             <Input
               value={detailInfo.salesTarget}
-              onChange={(e) =>
-                setDetailInfo({ ...detailInfo, salesTarget: e.target.value })
-              }
+              onChange={(e) => setDetailInfo({ ...detailInfo, salesTarget: e.target.value })}
               placeholder="法人、個人ほか"
             />
           </Field>
           <Field label="販売方法">
             <Input
               value={detailInfo.salesMethod}
-              onChange={(e) =>
-                setDetailInfo({ ...detailInfo, salesMethod: e.target.value })
-              }
+              onChange={(e) => setDetailInfo({ ...detailInfo, salesMethod: e.target.value })}
               placeholder="訪問販売、テレアポ、既存顧客への紹介ほか"
             />
           </Field>
           <Field label="収益">
             <Input
               value={detailInfo.earnings}
-              onChange={(e) =>
-                setDetailInfo({ ...detailInfo, earnings: e.target.value })
-              }
+              onChange={(e) => setDetailInfo({ ...detailInfo, earnings: e.target.value })}
               placeholder="卸価格と貴社販売価格の差益（ストック収益）"
             />
           </Field>
@@ -1048,7 +957,6 @@ export function ListingForm({
           </div>
         </section>
 
-        {/* その他 */}
         <section className="space-y-5 rounded-2xl bg-white p-6 shadow-sm">
           <h2 className="font-bold">その他</h2>
           {([
@@ -1069,7 +977,6 @@ export function ListingForm({
           ))}
         </section>
 
-        {/* 変更内容コメント（published のみ） */}
         {isPublished && !adminMode && (
           <section className="space-y-3 rounded-2xl border-2 border-emerald-200 bg-emerald-50 p-6">
             <h2 className="font-bold text-emerald-800">変更内容（管理者へのメモ）</h2>
@@ -1089,14 +996,25 @@ export function ListingForm({
 
         {error && <p role="alert" className="text-sm text-red-600">{error}</p>}
 
-        <div className="flex gap-3">
-          <Button type="submit" value="draft" variant="outline" disabled={saving}>
-            {isPublished ? '変更を保存' : '下書き保存'}
-          </Button>
-          <Button type="submit" value="reviewing" loading={saving}>
-            {isPublished ? '審査に提出' : '審査申請'}
-          </Button>
-        </div>
+        {adminMode ? (
+          <div className="rounded-2xl border-2 border-orange-200 bg-orange-50 p-4">
+            <p className="mb-3 text-xs text-orange-800">
+              管理者として保存します。審査を経由せず、即座にサイトへ反映されます。
+            </p>
+            <Button type="submit" value="admin-save" loading={saving}>
+              保存する
+            </Button>
+          </div>
+        ) : (
+          <div className="flex gap-3">
+            <Button type="submit" value="draft" variant="outline" disabled={saving}>
+              {isPublished ? '変更を保存' : '下書き保存'}
+            </Button>
+            <Button type="submit" value="reviewing" loading={saving}>
+              {isPublished ? '審査に提出' : '審査申請'}
+            </Button>
+          </div>
+        )}
       </form>
 
       {previewOpen && (
