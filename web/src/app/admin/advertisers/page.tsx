@@ -8,8 +8,12 @@ import {
 import { db } from '@/lib/firebase';
 import type { Advertiser } from '@/types';
 
+ // advertisers ドキュメントには email が入っているが、
+ // Advertiser 型に無いため管理画面用に拡張する
+type AdminAdvertiser = Advertiser & { email?: string };
+
 export default function AdminAdvertisersPage() {
-  const [advertisers, setAdvertisers] = useState<Advertiser[]>([]);
+  const [advertisers, setAdvertisers] = useState<AdminAdvertiser[]>([]);
   const [listingsCount, setListingsCount] = useState<Record<string, number>>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -22,7 +26,7 @@ export default function AdminAdvertisersPage() {
         // get() を含む list ルールでは limit() が必須
         const snap = await getDocs(query(collection(db, 'advertisers'), limit(200)));
         if (!active) return;
-        const items = snap.docs.map((d) => ({ ...d.data(), uid: d.id } as Advertiser));
+        const items = snap.docs.map((d) => ({ ...d.data(), uid: d.id } as AdminAdvertiser));
         items.sort((a, b) => (a.companyName ?? '').localeCompare(b.companyName ?? '', 'ja'));
         setAdvertisers(items);
 
