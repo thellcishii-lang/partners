@@ -16,10 +16,14 @@ import {
   getExpectedRevenueRange,
   getRegionSlug,
   getRegionLabel,
-  FRANCHISE_FEE_RANGES,
   getFranchiseFeeRange,
+  getFranchiseFeeLabel,
+  getStockLabel,
+  getProfitAmountRange,
+  getProfitAmountLabel,
+  getRevenueTypeLabel,
+  getOrganizationTypeLabel,
   STOCK_TYPES,
-  PROFIT_AMOUNTS,
   REVENUE_TYPES,
   ORGANIZATION_TYPES,
 } from '@/lib/listingFilters';
@@ -54,7 +58,7 @@ export function ListingForm({
   // 地域
   const [prefectureSlug, setPrefectureSlug] = useState(listing?.prefectureSlug ?? '');
 
-  // 費用
+  // 初期費用
   type CostMode = 'free' | 'amount' | 'unknown';
   const [initialCostMode, setInitialCostMode] = useState<CostMode>(
     listing?.initialCostRange === 'initial-free' ? 'free'
@@ -64,6 +68,8 @@ export function ListingForm({
   const [initialCostAmount, setInitialCostAmount] = useState<string>(
     listing?.initialCostYen ? String(listing.initialCostYen) : ''
   );
+
+  // 想定年商
   type RevenueMode = 'amount' | 'unknown';
   const [revenueMode, setRevenueMode] = useState<RevenueMode>(
     listing?.expectedRevenueRange === 'revenue-unknown' || !listing ? 'unknown' : 'amount'
@@ -71,6 +77,31 @@ export function ListingForm({
   const [revenueAmount, setRevenueAmount] = useState<string>(
     listing?.expectedRevenueYen ? String(listing.expectedRevenueYen) : ''
   );
+
+  // 加盟金
+  type FeeMode = 'amount' | 'unknown';
+  const [franchiseFeeMode, setFranchiseFeeMode] = useState<FeeMode>(
+    listing?.franchiseFeeYen != null ? 'amount' : 'unknown'
+  );
+  const [franchiseFeeAmount, setFranchiseFeeAmount] = useState<string>(
+    listing?.franchiseFeeYen != null ? String(listing.franchiseFeeYen) : ''
+  );
+
+  // 仕入れ
+  const [stockType, setStockType] = useState(listing?.stockType ?? '');
+
+  // 想定月商
+  type ProfitMode = 'amount' | 'unknown';
+  const [profitMode, setProfitMode] = useState<ProfitMode>(
+    listing?.expectedProfitYen != null ? 'amount' : 'unknown'
+  );
+  const [profitAmount, setProfitAmount] = useState<string>(
+    listing?.expectedProfitYen != null ? String(listing.expectedProfitYen) : ''
+  );
+
+  // 収益タイプ / 組織拡大
+  const [revenueType, setRevenueType] = useState(listing?.revenueType ?? '');
+  const [organizationType, setOrganizationType] = useState(listing?.organizationType ?? '');
 
   // その他
   const [fields, setFields] = useState({
@@ -84,7 +115,7 @@ export function ListingForm({
   const [error, setError] = useState('');
   // 画像（最大6枚）
   const [images, setImages] = useState<string[]>(listing?.images ?? []);
-  
+
   // 会社情報（詳細ページのサイドバー）
   const [companyInfo, setCompanyInfo] = useState({
     companyAddress: listing?.companyAddress ?? '',
@@ -206,6 +237,7 @@ export function ListingForm({
       const regionSlug = getRegionSlug(prefectureSlug);
       const regionLabel = getRegionLabel(prefectureSlug);
 
+      // 初期費用
       const initialCostYen =
         initialCostMode === 'free' ? 0
           : initialCostMode === 'unknown' ? null
@@ -213,10 +245,23 @@ export function ListingForm({
       const initialCostRange = getInitialCostRange(initialCostYen);
       const initialCostLabel = getInitialCostLabel(initialCostRange);
 
+      // 想定年商
       const expectedRevenueYen =
         revenueMode === 'unknown' ? null : Number(revenueAmount) || null;
       const expectedRevenueRange = getExpectedRevenueRange(expectedRevenueYen);
       const expectedRevenueLabel = getExpectedRevenueLabel(expectedRevenueRange);
+
+      // 加盟金
+      const franchiseFeeYen =
+        franchiseFeeMode === 'unknown' ? null : Number(franchiseFeeAmount) || null;
+      const franchiseFeeRange = getFranchiseFeeRange(franchiseFeeYen);
+      const franchiseFeeLabel = getFranchiseFeeLabel(franchiseFeeYen);
+
+      // 想定月商（利益）
+      const expectedProfitYen =
+        profitMode === 'unknown' ? null : Number(profitAmount) || null;
+      const expectedProfitRange = getProfitAmountRange(expectedProfitYen);
+      const expectedProfitLabel = getProfitAmountLabel(expectedProfitYen);
 
       const searchText = buildSearchText({
         title: title.trim(),
@@ -259,8 +304,25 @@ export function ListingForm({
         expectedRevenueRange,
         expectedRevenueLabel,
 
-                searchText,
-                images,
+        franchiseFeeYen,
+        franchiseFeeRange,
+        franchiseFeeLabel,
+
+        stockType,
+        stockLabel: getStockLabel(stockType),
+
+        expectedProfitYen,
+        expectedProfitRange,
+        expectedProfitLabel,
+
+        revenueType,
+        revenueTypeLabel: getRevenueTypeLabel(revenueType),
+
+        organizationType,
+        organizationTypeLabel: getOrganizationTypeLabel(organizationType),
+
+        searchText,
+        images,
 
         // 会社情報
         ...companyInfo,
@@ -344,7 +406,7 @@ export function ListingForm({
         </Field>
       </section>
 
-            {/* ============================================================
+      {/* ============================================================
           画像（最大6枚）
       ============================================================ */}
       <section className="space-y-5 rounded-2xl bg-white p-6 shadow-sm">
@@ -544,9 +606,149 @@ export function ListingForm({
             )}
           </div>
         </Field>
+
+        <Field label="加盟金（任意）">
+          <div className="space-y-2">
+            <div className="flex flex-wrap gap-3">
+              {([
+                ['amount', '金額を入力'],
+                ['unknown', '応相談'],
+              ] as const).map(([mode, label]) => (
+                <label key={mode} className="flex items-center gap-1 text-sm">
+                  <input
+                    type="radio"
+                    name="franchiseFeeMode"
+                    checked={franchiseFeeMode === mode}
+                    onChange={() => setFranchiseFeeMode(mode)}
+                  />
+                  {label}
+                </label>
+              ))}
+            </div>
+            {franchiseFeeMode === 'amount' && (
+              <div className="flex items-center gap-2">
+                <Input
+                  type="number"
+                  inputMode="numeric"
+                  min={0}
+                  value={franchiseFeeAmount}
+                  onChange={(e) => setFranchiseFeeAmount(e.target.value)}
+                  placeholder="例：0（無料）"
+                />
+                <span className="text-sm">円</span>
+              </div>
+            )}
+          </div>
+        </Field>
+
+        <Field label="仕入れ">
+          <div className="flex flex-wrap gap-2">
+            {STOCK_TYPES.map((t) => (
+              <label
+                key={t.slug}
+                className={cn(
+                  'flex cursor-pointer items-center gap-1 rounded-lg border px-3 py-2 text-sm',
+                  stockType === t.slug
+                    ? 'border-brand-600 bg-brand-50'
+                    : 'border-gray-200'
+                )}
+              >
+                <input
+                  type="radio"
+                  name="stockType"
+                  checked={stockType === t.slug}
+                  onChange={() => setStockType(t.slug)}
+                />
+                {t.label}
+              </label>
+            ))}
+          </div>
+        </Field>
+
+        <Field label="想定月商（任意）">
+          <div className="space-y-2">
+            <div className="flex gap-3">
+              {([
+                ['amount', '金額を入力'],
+                ['unknown', '応相談'],
+              ] as const).map(([mode, label]) => (
+                <label key={mode} className="flex items-center gap-1 text-sm">
+                  <input
+                    type="radio"
+                    name="profitMode"
+                    checked={profitMode === mode}
+                    onChange={() => setProfitMode(mode)}
+                  />
+                  {label}
+                </label>
+              ))}
+            </div>
+            {profitMode === 'amount' && (
+              <div className="flex items-center gap-2">
+                <Input
+                  type="number"
+                  inputMode="numeric"
+                  min={1}
+                  value={profitAmount}
+                  onChange={(e) => setProfitAmount(e.target.value)}
+                  placeholder="例：500000"
+                />
+                <span className="text-sm">円</span>
+              </div>
+            )}
+          </div>
+        </Field>
+
+        <Field label="収益タイプ">
+          <div className="flex flex-wrap gap-2">
+            {REVENUE_TYPES.map((t) => (
+              <label
+                key={t.slug}
+                className={cn(
+                  'flex cursor-pointer items-center gap-1 rounded-lg border px-3 py-2 text-sm',
+                  revenueType === t.slug
+                    ? 'border-brand-600 bg-brand-50'
+                    : 'border-gray-200'
+                )}
+              >
+                <input
+                  type="radio"
+                  name="revenueType"
+                  checked={revenueType === t.slug}
+                  onChange={() => setRevenueType(t.slug)}
+                />
+                {t.label}
+              </label>
+            ))}
+          </div>
+        </Field>
+
+        <Field label="組織拡大">
+          <div className="flex flex-wrap gap-2">
+            {ORGANIZATION_TYPES.map((t) => (
+              <label
+                key={t.slug}
+                className={cn(
+                  'flex cursor-pointer items-center gap-1 rounded-lg border px-3 py-2 text-sm',
+                  organizationType === t.slug
+                    ? 'border-brand-600 bg-brand-50'
+                    : 'border-gray-200'
+                )}
+              >
+                <input
+                  type="radio"
+                  name="organizationType"
+                  checked={organizationType === t.slug}
+                  onChange={() => setOrganizationType(t.slug)}
+                />
+                {t.label}
+              </label>
+            ))}
+          </div>
+        </Field>
       </section>
 
-            {/* ============================================================
+      {/* ============================================================
           会社情報（詳細ページのサイドバー）
       ============================================================ */}
       <section className="space-y-5 rounded-2xl bg-white p-6 shadow-sm">
@@ -745,7 +947,6 @@ export function ListingForm({
         </div>
       </section>
 
-
       {/* ============================================================
           その他
       ============================================================ */}
@@ -769,7 +970,6 @@ export function ListingForm({
         ))}
       </section>
 
-      <p className="text-sm text-gray-500">画像アップロードは今後対応予定です。</p>
       {listing && (
         <p className="text-sm text-gray-600">
           保存すると下書き、または審査中になります。再公開には審査が必要です。
