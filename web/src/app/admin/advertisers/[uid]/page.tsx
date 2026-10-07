@@ -67,9 +67,14 @@ export default function AdminAdvertiserDetailPage() {
             </h2>
             <p className="text-xs text-gray-500">{advertiser.email}</p>
           </div>
-          <Link href={`/admin/advertisers/${uid}/edit`}>
-            <Button size="sm" variant="outline">プロフィール編集</Button>
-          </Link>
+          <div className="flex flex-wrap gap-2">
+            <Link href={`/admin/advertisers/${uid}/deposits`}>
+              <Button size="sm" variant="outline">デポジット履歴</Button>
+            </Link>
+            <Link href={`/admin/advertisers/${uid}/edit`}>
+              <Button size="sm" variant="outline">プロフィール編集</Button>
+            </Link>
+          </div>
         </div>
       </div>
 
