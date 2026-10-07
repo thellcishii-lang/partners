@@ -52,9 +52,6 @@ export default function DashboardPage() {
     return () => { active = false; };
   }, [user]);
 
-  // ============================================================
-  // 公開 / 非公開トグル
-  // ============================================================
   const togglePublish = async (listing: Listing) => {
     if (listing.status !== 'published' && listing.status !== 'paused') return;
     const next: ListingStatus = listing.status === 'published' ? 'paused' : 'published';
@@ -77,9 +74,6 @@ export default function DashboardPage() {
     }
   };
 
-  // ============================================================
-  // 削除
-  // ============================================================
   const removeListing = async (listing: Listing) => {
     if (listing.status === 'published') {
       window.alert('公開中の案件は削除できません。先に「非公開にする」を押してください。');
@@ -105,11 +99,16 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-2">
         <h1 className="text-xl font-bold">マイページ</h1>
-        <Link href="/listings/new">
-          <Button>案件を作成</Button>
-        </Link>
+        <div className="flex flex-wrap gap-2">
+          <Link href="/dashboard/deposits">
+            <Button variant="outline">デポジット履歴</Button>
+          </Link>
+          <Link href="/listings/new">
+            <Button>案件を作成</Button>
+          </Link>
+        </div>
       </div>
 
       {!adv.onboardingCompleted && (
@@ -171,12 +170,12 @@ export default function DashboardPage() {
                   <span className="rounded-full bg-gray-100 px-3 py-1">
                     {LISTING_STATUS_LABELS[listing.status]}
                   </span>
-                  {listing.pendingEdit?.submittedAt && (
+                  {listing.pendingEditSubmitted && (
                     <span className="rounded-full bg-orange-100 px-3 py-1 text-orange-800">
                       編集審査中
                     </span>
                   )}
-                  {listing.pendingEdit && !listing.pendingEdit.submittedAt && (
+                  {listing.pendingEdit && !listing.pendingEditSubmitted && (
                     <span className="rounded-full bg-yellow-100 px-3 py-1 text-yellow-800">
                       未提出の変更あり
                     </span>
