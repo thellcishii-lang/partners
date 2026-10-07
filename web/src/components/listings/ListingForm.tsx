@@ -401,8 +401,9 @@ export function ListingForm({
            createdAt: serverTimestamp(),
            updatedAt: serverTimestamp(),
          });
-　　　　　　　　　　　　}
-      } else if (listing) {
+      }
+      
+      else if (listing) {
         // 通常編集
         await updateDoc(doc(db, 'listings', listing.id), {
           ...filterData,
