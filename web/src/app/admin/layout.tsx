@@ -23,13 +23,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     { href: '/admin', label: 'ダッシュボード' },
     { href: '/admin/listings', label: '案件審査' },
     { href: '/admin/advertisers', label: '掲載主' },
+    { href: '/admin/inquiries', label: '応募' },
   ];
 
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3 border-b pb-3">
         <h1 className="text-lg font-bold">管理画面</h1>
-        <nav className="flex gap-4 text-sm">
+        <nav className="flex flex-wrap gap-4 text-sm">
           {nav.map((item) => {
             const active =
               item.href === '/admin'
