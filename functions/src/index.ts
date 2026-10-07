@@ -7,3 +7,4 @@ export { approveListing } from './admin/approveListing';
 export { rejectListing } from './admin/rejectListing';
 export { approvePendingEdit } from './admin/approvePendingEdit';
 export { rejectPendingEdit } from './admin/rejectPendingEdit';
+export { setSmsVerified } from './auth/setSmsVerified';
