@@ -8,6 +8,12 @@ import { Button } from '@/components/ui/Button';
 export function Header() {
   const { user, profile, loading } = useAuth();
 
+  const role = profile?.role;
+  const mypageHref =
+    role === 'admin' ? '/admin'
+      : role === 'applicant' ? '/applicant'
+        : '/dashboard';
+
   return (
     <header className="border-b bg-white">
       <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4">
@@ -17,7 +23,14 @@ export function Header() {
         <nav className="flex items-center gap-3 text-sm">
           {loading ? null : user ? (
             <>
-              <Link href="/dashboard" className="hover:text-emerald-700">マイページ</Link>
+              <Link href={mypageHref} className="hover:text-emerald-700">
+                マイページ
+              </Link>
+              {role !== 'applicant' && (
+                <Link href="/applicant" className="hidden text-gray-500 hover:text-emerald-700 sm:inline">
+                  応募履歴
+                </Link>
+              )}
               <span className="hidden text-gray-400 sm:inline">
                 {profile?.displayName ?? user.email}
               </span>
