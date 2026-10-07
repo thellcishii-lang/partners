@@ -281,7 +281,6 @@ export function ListingForm({
         await addDoc(collection(db, 'listings'), {
           ...data,
           advertiserId: advertiser.uid,
-          images: [],
           publishedAt: null,
           createdAt: serverTimestamp(),
         });
