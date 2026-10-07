@@ -1,5 +1,6 @@
 export { onInquiryCreated } from './triggers/onInquiryCreated';
 export { onDepositOrderPaid } from './triggers/onDepositOrderPaid';
+export { onMailQueued } from './triggers/onMailQueued';
 export { createInquiry } from './applications/createInquiry';
 export { createDepositCheckout } from './payments/createDepositCheckout';
 export { stripeWebhook } from './payments/stripeWebhook';
