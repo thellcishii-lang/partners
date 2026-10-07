@@ -91,7 +91,7 @@ service cloud.firestore {
     // ============================================================
     // listings : 案件
     // ============================================================
-    match /listings/{listingId} {
+        match /listings/{listingId} {
       // 公開中は誰でも読める。draft 等は本人とadminのみ
       allow read: if resource.data.status == 'published'
                   || isAdmin()
@@ -104,15 +104,26 @@ service cloud.firestore {
                     && request.resource.data.title.size() > 0
                     && request.resource.data.title.size() <= 120;
 
-      allow update: if (isAuth() && resource.data.advertiserId == uid()
-                        // 本人は published へ直接はできない（審査経由）
-                        && request.resource.data.status in ['draft', 'reviewing', 'paused', 'closed']
-                        && request.resource.data.advertiserId == resource.data.advertiserId)
-                    || isAdmin();
+      allow update: if isAdmin()
+                    || (isAuth() && resource.data.advertiserId == uid() && (
+                      // ① 通常編集：draft / reviewing / paused / closed へ
+                      (request.resource.data.status in ['draft', 'reviewing', 'paused', 'closed']
+                       && request.resource.data.advertiserId == resource.data.advertiserId)
+                      // ② 非公開化：published → paused（status と updatedAt のみ）
+                      || (resource.data.status == 'published'
+                          && request.resource.data.status == 'paused'
+                          && request.resource.data.diff(resource.data)
+                               .affectedKeys().hasOnly(['status', 'updatedAt']))
+                      // ③ 再公開：paused → published（status と updatedAt のみ）
+                      || (resource.data.status == 'paused'
+                          && request.resource.data.status == 'published'
+                          && request.resource.data.diff(resource.data)
+                               .affectedKeys().hasOnly(['status', 'updatedAt']))
+                    ));
 
       allow delete: if isAdmin()
                     || (isAuth() && resource.data.advertiserId == uid()
-                        && resource.data.status == 'draft');
+                        && resource.data.status in ['draft', 'reviewing', 'paused', 'closed']);
     }
 
     // ============================================================
