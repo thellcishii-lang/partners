@@ -6,15 +6,18 @@ import { collection, doc } from 'firebase/firestore';
 import { httpsCallable } from 'firebase/functions';
 import { db, functions } from '@/lib/firebase';
 import { useRequireAuth } from '@/hooks/useRequireAuth';
+import { useAuth } from '@/providers/AuthProvider';
 import { useListing } from '@/hooks/useListing';
 import { Button } from '@/components/ui/Button';
 import { Field, Input, Textarea } from '@/components/ui/Input';
+import { SmsVerificationBlock } from '@/components/auth/SmsVerificationBlock';
 import type { ApplicationInput } from '@/types';
 
 export default function ApplyPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
   const { user, loading } = useRequireAuth();
+  const { smsVerified } = useAuth();
   const state = useListing(id);
   const inquiryId = useRef('');
   const [fields, setFields] = useState({ fullName: '', kana: '', email: '', phone: '', lineId: '', message: '' });
@@ -25,6 +28,10 @@ export default function ApplyPage() {
   const submit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!user || sending) return;
+    if (!smsVerified) {
+      setError('SMS認証を完了してください。');
+      return;
+    }
     if (!fields.fullName.trim() || !fields.message.trim() || !(fields.email || user.email)?.trim()) {
       setError('氏名・メールアドレス・応募動機は必須です。');
       return;
@@ -96,9 +103,16 @@ export default function ApplyPage() {
           </label>
           <p className="text-xs text-gray-500">個人を特定できる情報はここに入力しないでください。</p>
         </fieldset>
+
+        {!smsVerified && (
+          <SmsVerificationBlock description="資料請求にはSMS認証が必要です。" />
+        )}
+
         <p className="text-sm text-gray-600">氏名・連絡先・応募動機は、募集者のデポジット消費後に開示されます。</p>
         {error && <p role="alert" className="text-sm text-red-600">{error}</p>}
-        <Button type="submit" loading={sending}>応募を送信</Button>
+        <Button type="submit" loading={sending} disabled={!smsVerified}>
+          {smsVerified ? '応募を送信' : 'SMS認証を完了してください'}
+        </Button>
       </form>
     </div>
   );
