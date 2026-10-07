@@ -13,7 +13,9 @@ export type MailTemplate =
   | 'APPLICATION_RECEIVED'
   | 'APPLICATION_EXPIRED'
   | 'LISTING_APPROVED'
-  | 'LISTING_REJECTED';
+  | 'LISTING_REJECTED'
+　　　　| 'LISTING_EDIT_APPROVED'   
+  | 'LISTING_EDIT_REJECTED'; 
 
 export async function enqueueMail(
   template: MailTemplate,
