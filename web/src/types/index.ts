@@ -182,6 +182,11 @@ export interface Listing {
   salesMethod?: string;
   earnings?: string;
   agentFit?: string[];
+  pendingEdit?: {
+    data: Partial<Listing>;
+    submittedAt: { seconds: number; nanoseconds: number } | null;
+    note?: string;
+  } | null;
 }
 
 // ============================================================
