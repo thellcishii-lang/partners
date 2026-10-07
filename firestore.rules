@@ -64,13 +64,19 @@ service cloud.firestore {
     // ============================================================
     match /advertisers/{advId} {
       allow read: if isAuth() && (advId == uid() || isAdmin());
+
       allow create: if isAuth() && advId == uid()
                     && !request.resource.data.keys().hasAny(protectedAdvFields());
-      allow update: if isAuth() && advId == uid()
-                    && noProtectedFields()
-                    && request.resource.data.companyName is string
-                    && request.resource.data.companyName.size() > 0
-                    && request.resource.data.companyName.size() <= 100;
+
+      // 本人または admin が更新可能。ただし保護フィールドは誰も書けない
+      allow update: if isAuth() && noProtectedFields() && (
+        (advId == uid()
+         && request.resource.data.companyName is string
+         && request.resource.data.companyName.size() > 0
+         && request.resource.data.companyName.size() <= 100)
+        || isAdmin()
+      );
+
       allow delete: if isAdmin();
     }
 
