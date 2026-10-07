@@ -8,8 +8,10 @@ import { useAuth } from '@/providers/AuthProvider';
 
 export function SmsVerificationBlock({
   description = 'この操作にはSMS認証が必要です。',
+  onVerified,
 }: {
   description?: string;
+  onVerified?: () => void;
 }) {
   const reactId = useId();
   const containerId = `recaptcha-${reactId.replace(/:/g, '')}`;
@@ -28,13 +30,13 @@ export function SmsVerificationBlock({
     const ok = await verifyCode(code.trim());
     if (ok) {
       await refreshClaims();
+      onVerified?.();
     }
   };
 
   return (
     <div className="space-y-3 rounded-xl border-2 border-emerald-200 bg-emerald-50 p-4">
       <p className="text-sm font-medium text-emerald-900">{description}</p>
-      {/* reCAPTCHA 用の非表示コンテナ */}
       <div id={containerId} />
 
       {stage === 'phone' && (
