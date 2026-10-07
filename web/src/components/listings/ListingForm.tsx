@@ -9,6 +9,8 @@ import { Field, Input, Textarea } from '@/components/ui/Input';
 import { useMasters } from '@/hooks/useMasters';
 import { ImageUploader } from './ImageUploader';
 import { PreviewModal } from './PreviewModal';
+import { SmsVerificationBlock } from '@/components/auth/SmsVerificationBlock';
+import { useAuth } from '@/providers/AuthProvider';
 import {
   buildSearchText,
   getInitialCostLabel,
@@ -47,6 +49,7 @@ export function ListingForm({
 }) {
   const router = useRouter();
   const { categories, areas, loading: mastersLoading } = useMasters();
+  const { smsVerified } = useAuth();
 
   const isPublished = !adminMode && listing?.status === 'published';
 
@@ -1006,14 +1009,24 @@ export function ListingForm({
             </Button>
           </div>
         ) : (
-          <div className="flex gap-3">
-            <Button type="submit" value="draft" variant="outline" disabled={saving}>
-              {isPublished ? '変更を保存' : '下書き保存'}
-            </Button>
-            <Button type="submit" value="reviewing" loading={saving}>
-              {isPublished ? '審査に提出' : '審査申請'}
-            </Button>
-          </div>
+          <>
+            {!smsVerified && (
+              <SmsVerificationBlock description="審査申請にはSMS認証が必要です。下書き保存は認証なしで可能です。" />
+            )}
+            <div className="flex gap-3">
+              <Button type="submit" value="draft" variant="outline" disabled={saving}>
+                {isPublished ? '変更を保存' : '下書き保存'}
+              </Button>
+              <Button
+                type="submit"
+                value="reviewing"
+                loading={saving}
+                disabled={!smsVerified}
+              >
+                {isPublished ? '審査に提出' : '審査申請'}
+              </Button>
+            </div>
+          </>
         )}
       </form>
 
