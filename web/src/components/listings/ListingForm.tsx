@@ -33,7 +33,6 @@ import {
   type Advertiser,
   type Listing,
   type ListingCategory,
-  type ListingStatus,
 } from '@/types';
 import { cn } from '@/lib/cn';
 
@@ -47,107 +46,114 @@ export function ListingForm({
   const router = useRouter();
   const { categories, areas, loading: mastersLoading } = useMasters();
 
+  const isPublished = listing?.status === 'published';
+
+  // pendingEdit があればその内容を、なければ本体を編集元にする
+  const source: Partial<Listing> = listing?.pendingEdit?.data
+    ? { ...listing, ...listing.pendingEdit.data }
+    : listing ?? {};
+
   // 基本情報
-  const [title, setTitle] = useState(listing?.title ?? '');
-  const [category, setCategory] = useState<ListingCategory>(listing?.category ?? '代理店');
-  const [description, setDescription] = useState(listing?.description ?? '');
+  const [title, setTitle] = useState(source.title ?? '');
+  const [category, setCategory] = useState<ListingCategory>(source.category ?? '代理店');
+  const [description, setDescription] = useState(source.description ?? '');
 
   // 3軸
-  const [targetSlugs, setTargetSlugs] = useState<string[]>(listing?.targetSlugs ?? []);
-  const [productSlugs, setProductSlugs] = useState<string[]>(listing?.productSlugs ?? []);
-  const [modelSlugs, setModelSlugs] = useState<string[]>(listing?.modelSlugs ?? []);
+  const [targetSlugs, setTargetSlugs] = useState<string[]>(source.targetSlugs ?? []);
+  const [productSlugs, setProductSlugs] = useState<string[]>(source.productSlugs ?? []);
+  const [modelSlugs, setModelSlugs] = useState<string[]>(source.modelSlugs ?? []);
 
   // 地域
-  const [prefectureSlug, setPrefectureSlug] = useState(listing?.prefectureSlug ?? '');
+  const [prefectureSlug, setPrefectureSlug] = useState(source.prefectureSlug ?? '');
 
   // 初期費用
   type CostMode = 'free' | 'amount' | 'unknown';
   const [initialCostMode, setInitialCostMode] = useState<CostMode>(
-    listing?.initialCostRange === 'initial-free' ? 'free'
-      : listing?.initialCostRange === 'initial-unknown' || !listing ? 'unknown'
+    source.initialCostRange === 'initial-free' ? 'free'
+      : source.initialCostRange === 'initial-unknown' || source.initialCostRange == null ? 'unknown'
         : 'amount'
   );
   const [initialCostAmount, setInitialCostAmount] = useState<string>(
-    listing?.initialCostYen ? String(listing.initialCostYen) : ''
+    source.initialCostYen ? String(source.initialCostYen) : ''
   );
 
   // 想定年商
   type RevenueMode = 'amount' | 'unknown';
   const [revenueMode, setRevenueMode] = useState<RevenueMode>(
-    listing?.expectedRevenueRange === 'revenue-unknown' || !listing ? 'unknown' : 'amount'
+    source.expectedRevenueRange === 'revenue-unknown' || source.expectedRevenueYen == null ? 'unknown' : 'amount'
   );
   const [revenueAmount, setRevenueAmount] = useState<string>(
-    listing?.expectedRevenueYen ? String(listing.expectedRevenueYen) : ''
+    source.expectedRevenueYen ? String(source.expectedRevenueYen) : ''
   );
 
   // 加盟金
   type FeeMode = 'amount' | 'unknown';
   const [franchiseFeeMode, setFranchiseFeeMode] = useState<FeeMode>(
-    listing?.franchiseFeeYen != null ? 'amount' : 'unknown'
+    source.franchiseFeeYen != null ? 'amount' : 'unknown'
   );
   const [franchiseFeeAmount, setFranchiseFeeAmount] = useState<string>(
-    listing?.franchiseFeeYen != null ? String(listing.franchiseFeeYen) : ''
+    source.franchiseFeeYen != null ? String(source.franchiseFeeYen) : ''
   );
 
   // 仕入れ
-  const [stockType, setStockType] = useState(listing?.stockType ?? '');
+  const [stockType, setStockType] = useState(source.stockType ?? '');
 
   // 想定月商
   type ProfitMode = 'amount' | 'unknown';
   const [profitMode, setProfitMode] = useState<ProfitMode>(
-    listing?.expectedProfitYen != null ? 'amount' : 'unknown'
+    source.expectedProfitYen != null ? 'amount' : 'unknown'
   );
   const [profitAmount, setProfitAmount] = useState<string>(
-    listing?.expectedProfitYen != null ? String(listing.expectedProfitYen) : ''
+    source.expectedProfitYen != null ? String(source.expectedProfitYen) : ''
   );
 
   // 収益タイプ / 組織拡大
-  const [revenueType, setRevenueType] = useState(listing?.revenueType ?? '');
-  const [organizationType, setOrganizationType] = useState(listing?.organizationType ?? '');
+  const [revenueType, setRevenueType] = useState(source.revenueType ?? '');
+  const [organizationType, setOrganizationType] = useState(source.organizationType ?? '');
 
   // その他
   const [fields, setFields] = useState({
-    requirements: listing?.requirements ?? '',
-    reward: listing?.reward ?? '',
-    initialCost: listing?.initialCost ?? '',
-    royalty: listing?.royalty ?? '',
-    area: listing?.area ?? '',
+    requirements: source.requirements ?? '',
+    reward: source.reward ?? '',
+    initialCost: source.initialCost ?? '',
+    royalty: source.royalty ?? '',
+    area: source.area ?? '',
   });
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
   const [previewOpen, setPreviewOpen] = useState(false);
-  // 画像（最大6枚）
-  const [images, setImages] = useState<string[]>(listing?.images ?? []);
+  const [images, setImages] = useState<string[]>(source.images ?? []);
+  const [editNote, setEditNote] = useState(listing?.pendingEdit?.note ?? '');
 
-  // 会社情報（詳細ページのサイドバー）
+  // 会社情報
   const [companyInfo, setCompanyInfo] = useState({
-    companyAddress: listing?.companyAddress ?? '',
-    companyRepresentative: listing?.companyRepresentative ?? '',
-    companyEstablished: listing?.companyEstablished ?? '',
-    companyBusiness: listing?.companyBusiness ?? '',
+    companyAddress: source.companyAddress ?? '',
+    companyRepresentative: source.companyRepresentative ?? '',
+    companyEstablished: source.companyEstablished ?? '',
+    companyBusiness: source.companyBusiness ?? '',
   });
 
-  // こんな方におすすめ（最大5個）
+  // こんな方におすすめ
   const [recommendedFor, setRecommendedFor] = useState<string[]>(
-    listing?.recommendedFor ?? ['']
+    source.recommendedFor ?? ['']
   );
 
   // ビジネスの説明（固定5個）
   const [businessPoints, setBusinessPoints] = useState<
     { title: string; body: string }[]
   >(() => {
-    const existing = listing?.businessPoints ?? [];
+    const existing = source.businessPoints ?? [];
     return Array.from({ length: 5 }, (_, i) => existing[i] ?? { title: '', body: '' });
   });
 
-  // 詳細情報（サイドバー）
+  // 詳細情報
   const [detailInfo, setDetailInfo] = useState({
-    salesTarget: listing?.salesTarget ?? '',
-    salesMethod: listing?.salesMethod ?? '',
-    earnings: listing?.earnings ?? '',
+    salesTarget: source.salesTarget ?? '',
+    salesMethod: source.salesMethod ?? '',
+    earnings: source.earnings ?? '',
   });
   const [agentFit, setAgentFit] = useState<string[]>(
-    listing?.agentFit ?? ['']
+    source.agentFit ?? ['']
   );
 
   // ============================================================
@@ -299,17 +305,21 @@ export function ListingForm({
   };
 
   // ============================================================
-  // プレビュー用オブジェクト
+  // プレビュー用オブジェクト（published で pendingEdit 保存中は「審査中」表示）
   // ============================================================
+  const previewStatus = listing?.pendingEdit?.submittedAt
+    ? 'reviewing'
+    : (listing?.status ?? 'draft');
+
   const previewListing: Listing = {
     id: listing?.id ?? 'preview',
     advertiserId: advertiser.uid,
     ...buildFilterData(),
-    status: listing?.status ?? 'draft',
+    status: previewStatus,
     publishedAt: listing?.publishedAt ?? null,
     createdAt: listing?.createdAt,
     updatedAt: listing?.updatedAt,
-    pendingEdit: listing?.pendingEdit ?? null,
+    pendingEdit: null,
   };
 
   // ============================================================
@@ -319,10 +329,8 @@ export function ListingForm({
     event.preventDefault();
     if (saving) return;
     const submitter = (event.nativeEvent as SubmitEvent).submitter;
-    const status: ListingStatus =
-      submitter instanceof HTMLButtonElement && submitter.value === 'reviewing'
-        ? 'reviewing'
-        : 'draft';
+    const wantsReview =
+      submitter instanceof HTMLButtonElement && submitter.value === 'reviewing';
 
     if (!title.trim() || title.trim().length > 120 || !description.trim()) {
       setError('タイトルは1〜120字、募集内容は必須です。');
@@ -344,25 +352,43 @@ export function ListingForm({
       setError('募集者プロフィールに会社名を登録してから案件を保存してください。');
       return;
     }
+    if (isPublished && wantsReview && !editNote.trim()) {
+      setError('変更内容を入力してください（管理者が確認します）。');
+      return;
+    }
 
     setSaving(true);
     setError('');
 
     try {
-      const data = {
-        ...buildFilterData(),
-        status,
-        updatedAt: serverTimestamp(),
-      };
+      const filterData = buildFilterData();
 
-      if (listing) {
-        await updateDoc(doc(db, 'listings', listing.id), data);
+      if (isPublished && listing) {
+        // ★ published は pendingEdit に保存
+        await updateDoc(doc(db, 'listings', listing.id), {
+          pendingEdit: {
+            data: filterData,
+            submittedAt: wantsReview ? serverTimestamp() : null,
+            note: editNote.trim() || null,
+          },
+          updatedAt: serverTimestamp(),
+        });
+      } else if (listing) {
+        // 通常編集
+        await updateDoc(doc(db, 'listings', listing.id), {
+          ...filterData,
+          status: wantsReview ? 'reviewing' : 'draft',
+          updatedAt: serverTimestamp(),
+        });
       } else {
+        // 新規
         await addDoc(collection(db, 'listings'), {
-          ...data,
+          ...filterData,
           advertiserId: advertiser.uid,
+          status: wantsReview ? 'reviewing' : 'draft',
           publishedAt: null,
           createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp(),
         });
       }
       router.push('/dashboard');
@@ -379,14 +405,16 @@ export function ListingForm({
   return (
     <>
       <form onSubmit={save} className="space-y-6">
-        {/* 上部バー：プレビューボタン */}
-        <div className="flex items-center justify-between rounded-2xl bg-white p-4 shadow-sm">
+        {/* 上部バー */}
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-white p-4 shadow-sm">
           <div>
             <p className="text-sm font-bold">
               {listing ? '案件を編集' : '新規案件作成'}
             </p>
             <p className="text-xs text-gray-500">
-              入力内容はプレビューで確認できます
+              {isPublished
+                ? '公開中の内容はそのまま。保存しても審査に出すまでサイトは変わりません。'
+                : '入力内容はプレビューで確認できます'}
             </p>
           </div>
           <Button
@@ -397,6 +425,18 @@ export function ListingForm({
             プレビュー
           </Button>
         </div>
+
+        {/* pendingEdit ステータス表示 */}
+        {isPublished && listing?.pendingEdit?.submittedAt && (
+          <div className="rounded-xl border border-orange-200 bg-orange-50 p-4 text-sm text-orange-800">
+            この案件は<b>編集審査中</b>です。承認されるまでサイトには旧内容が表示されます。
+          </div>
+        )}
+        {isPublished && listing?.pendingEdit && !listing.pendingEdit.submittedAt && (
+          <div className="rounded-xl border border-yellow-200 bg-yellow-50 p-4 text-sm text-yellow-800">
+            未提出の変更があります。「審査に提出」を押すと管理者にレビューされます。
+          </div>
+        )}
 
         {/* 基本情報 */}
         <section className="space-y-5 rounded-2xl bg-white p-6 shadow-sm">
@@ -980,19 +1020,32 @@ export function ListingForm({
           ))}
         </section>
 
-        {listing && (
-          <p className="text-sm text-gray-600">
-            保存すると下書き、または審査中になります。再公開には審査が必要です。
-          </p>
+        {/* 変更内容コメント（published のみ） */}
+        {isPublished && (
+          <section className="space-y-3 rounded-2xl border-2 border-emerald-200 bg-emerald-50 p-6">
+            <h2 className="font-bold text-emerald-800">変更内容（管理者へのメモ）</h2>
+            <p className="text-xs text-emerald-700">
+              何を変更したか簡単に書いてください。審査がスムーズになります。
+            </p>
+            <Textarea
+              aria-label="変更内容"
+              rows={3}
+              maxLength={1000}
+              value={editNote}
+              onChange={(e) => setEditNote(e.target.value)}
+              placeholder="例：報酬金額を改定しました。初期費用を無料に変更しました。"
+            />
+          </section>
         )}
+
         {error && <p role="alert" className="text-sm text-red-600">{error}</p>}
 
         <div className="flex gap-3">
           <Button type="submit" value="draft" variant="outline" disabled={saving}>
-            下書き保存
+            {isPublished ? '変更を保存' : '下書き保存'}
           </Button>
           <Button type="submit" value="reviewing" loading={saving}>
-            審査申請
+            {isPublished ? '審査に提出' : '審査申請'}
           </Button>
         </div>
       </form>
