@@ -6,13 +6,16 @@ export type FilterKey =
   | 'targetSlugs'
   | 'productSlugs'
   | 'modelSlugs'
-  | 'prefectureSlug'
-  | 'regionSlug'
+  | 'area'
   | 'initialCostRange'
   | 'expectedRevenueRange';
 
 const ARRAY_FIELDS: FilterKey[] = ['targetSlugs', 'productSlugs', 'modelSlugs'];
-const AREA_FIELDS: FilterKey[] = ['prefectureSlug', 'regionSlug'];
+
+// 地域slug / 都道府県slug を区別
+const REGION_SLUG_SET = new Set([
+  'hokkaido', 'tohoku', 'kanto', 'chubu', 'kansai', 'chugoku', 'shikoku', 'kyushu',
+]);
 
 export async function getServerListings(
   filterKey: FilterKey,
@@ -25,11 +28,13 @@ export async function getServerListings(
   let withFilter;
   if (ARRAY_FIELDS.includes(filterKey)) {
     withFilter = base.where(filterKey, 'array-contains', filterValue);
-  } else if (AREA_FIELDS.includes(filterKey)) {
+  } else if (filterKey === 'area') {
     if (filterValue === 'all') {
-      withFilter = base.where(filterKey, '==', 'all');
+      withFilter = base.where('areaMode', '==', 'nationwide');
+    } else if (REGION_SLUG_SET.has(filterValue)) {
+      withFilter = base.where('areaSearchRegionSlugs', 'array-contains', filterValue);
     } else {
-      withFilter = base.where(filterKey, 'in', [filterValue, 'all']);
+      withFilter = base.where('areaSearchPrefectureSlugs', 'array-contains', filterValue);
     }
   } else {
     withFilter = base.where(filterKey, '==', filterValue);
