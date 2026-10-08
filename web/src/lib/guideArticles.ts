@@ -63,6 +63,47 @@ export const GUIDE_ARTICLES: GuideArticle[] = [
     publishedAt: '2026-10-08',
     readingMinutes: 12,
   },
+  {
+    slug: 'why-startups-fail',
+    title: '起業で失敗する人の、共通点',
+    description:
+      '起業の失敗には、明確なパターンがあります。勢いだけ、1から作ろうとする、市場を見ない——5つの共通点と、その避け方を解説します。',
+    category: 'startup',
+    tags: ['起業', '失敗', '失敗パターン', '独立'],
+    publishedAt: '2026-10-08',
+    readingMinutes: 9,
+  },
+  {
+    slug: 'pre-startup-checklist',
+    title: '起業前に、絶対に確認しておくべき5つのこと',
+    description:
+      '起業は勢いだけでは続きません。生活費、家族の同意、就業規則、適性、選択肢——始める前に必ず確認したい5つのポイントを解説します。',
+    category: 'startup',
+    tags: ['起業', '準備', 'チェックリスト'],
+    publishedAt: '2026-10-08',
+    readingMinutes: 9,
+  },
+  {
+    slug: 'startup-not-just-passion',
+    title: '起業は、勢いだけでは続かない',
+    description:
+      '「好きなことを仕事にしたい」——その思いは大切。でも、思いだけでは続かないのが現実です。長く続けるための「仕組み」について考えます。',
+    category: 'startup',
+    tags: ['起業', 'マインド', '心構え'],
+    publishedAt: '2026-10-08',
+    readingMinutes: 8,
+  },
+  {
+    slug: 'stock-business-basics',
+    title: 'ストックビジネスとは？サブスク時代に注目される仕組み',
+    description:
+      '毎月、安定した収入が入るストックビジネス。サブスクの広がりとともに、あらゆる業界に広がっています。種類・メリット・注意点を中立に解説します。',
+    category: 'know-how',
+    tags: ['ストックビジネス', 'サブスク', '継続収益'],
+    publishedAt: '2026-10-08',
+    readingMinutes: 11,
+    featured: true,
+  },
 ];
 
 export function getArticleBySlug(slug: string): GuideArticle | undefined {
