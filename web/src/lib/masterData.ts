@@ -123,6 +123,12 @@ const PREFECTURE_DEFS: [string, string, string][] = [
 ];
 
 export const AREAS: Area[] = [
+  // 全国（特殊）
+  {
+    slug: 'all', label: '全国', type: 'region', parentSlug: null,
+    prefectures: [], order: 0,
+    seoTitle: '', seoDescription: '', isActive: true,
+  },
   ...REGION_DEFS.map(([slug, label, prefs], i) => ({
     slug, label, type: 'region' as const, parentSlug: null,
     prefectures: prefs, order: (i + 1) * 10,
