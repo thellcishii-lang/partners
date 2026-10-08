@@ -26,6 +26,7 @@ export const PREFECTURE_TO_REGION: Record<string, string> = {
 };
 
 export const REGION_LABELS: Record<string, string> = {
+  all: '全国',
   hokkaido: '北海道',
   tohoku: '東北',
   kanto: '関東',
@@ -103,10 +104,12 @@ export function getExpectedRevenueLabel(slug: string): string {
 // 地域
 // ============================================================
 export function getRegionSlug(prefectureSlug: string): string {
+  if (prefectureSlug === 'all') return 'all';
   return PREFECTURE_TO_REGION[prefectureSlug] ?? 'other';
 }
 
 export function getRegionLabel(prefectureSlug: string): string {
+  if (prefectureSlug === 'all') return '全国';
   const region = getRegionSlug(prefectureSlug);
   return REGION_LABELS[region] ?? 'その他';
 }
