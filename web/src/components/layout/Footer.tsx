@@ -3,52 +3,36 @@ import { PRODUCT_LABELS, TARGET_LABELS, MODEL_LABELS, INITIAL_COST_LABELS, AREA_
 import { COMPANY_INFO, SITE_NAME } from '@/lib/companyInfo';
 
 export function Footer() {
-  // 商材（大分類のみ）
   const productParents = Object.entries(PRODUCT_LABELS).filter(([slug]) =>
-    !slug.includes('-') || !slug.match(/^product-[a-z]+-[a-z]+$/)
+    !slug.match(/^product-[a-z]+-[a-z]+$/)
   );
-
-  // ターゲット
   const targets = Object.entries(TARGET_LABELS);
-
-  // 探し方
   const models = Object.entries(MODEL_LABELS);
-
-  // 初期費用
   const costs = Object.entries(INITIAL_COST_LABELS);
 
-  // 地域（主要8地域）
   const regionSlugs = ['hokkaido', 'tohoku', 'kanto', 'chubu', 'kansai', 'chugoku', 'shikoku', 'kyushu'];
   const regions = regionSlugs
     .map((slug) => [slug, AREA_LABELS[slug]?.label])
     .filter(([, label]) => !!label) as [string, string][];
 
-  // 主要都道府県
   const mainPrefectures = ['tokyo', 'kanagawa', 'osaka', 'aichi', 'fukuoka', 'hokkaido'];
   const prefectures = mainPrefectures
     .map((slug) => [slug, AREA_LABELS[slug]?.label])
     .filter(([, label]) => !!label) as [string, string][];
 
-  const today = new Date();
-  const year = today.getFullYear();
+  const year = new Date().getFullYear();
 
   return (
     <footer className="mt-16 border-t border-gray-200 bg-gray-50">
-      {/* ============================================================
-          SEO リンク集
-      ============================================================ */}
+      {/* SEO リンク集 */}
       <div className="mx-auto max-w-6xl px-4 py-12">
         <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
-          {/* 商材から探す */}
           <div>
             <h3 className="mb-3 text-xs font-bold tracking-wide text-gray-900">商材から探す</h3>
             <ul className="space-y-2 text-xs">
               {productParents.slice(0, 8).map(([slug, label]) => (
                 <li key={slug}>
-                  <Link
-                    href={`/product/${slug}`}
-                    className="text-gray-600 transition hover:text-emerald-700 hover:underline"
-                  >
+                  <Link href={`/product/${slug}`} className="text-gray-600 transition hover:text-emerald-700 hover:underline">
                     {label}
                   </Link>
                 </li>
@@ -56,16 +40,12 @@ export function Footer() {
             </ul>
           </div>
 
-          {/* ターゲットから探す */}
           <div>
             <h3 className="mb-3 text-xs font-bold tracking-wide text-gray-900">ターゲットから探す</h3>
             <ul className="space-y-2 text-xs">
               {targets.slice(0, 8).map(([slug, label]) => (
                 <li key={slug}>
-                  <Link
-                    href={`/target/${slug}`}
-                    className="text-gray-600 transition hover:text-emerald-700 hover:underline"
-                  >
+                  <Link href={`/target/${slug}`} className="text-gray-600 transition hover:text-emerald-700 hover:underline">
                     {label}
                   </Link>
                 </li>
@@ -73,16 +53,12 @@ export function Footer() {
             </ul>
           </div>
 
-          {/* 探し方 */}
           <div>
             <h3 className="mb-3 text-xs font-bold tracking-wide text-gray-900">探し方から探す</h3>
             <ul className="space-y-2 text-xs">
               {models.slice(0, 8).map(([slug, label]) => (
                 <li key={slug}>
-                  <Link
-                    href={`/model/${slug}`}
-                    className="text-gray-600 transition hover:text-emerald-700 hover:underline"
-                  >
+                  <Link href={`/model/${slug}`} className="text-gray-600 transition hover:text-emerald-700 hover:underline">
                     {label}
                   </Link>
                 </li>
@@ -90,16 +66,12 @@ export function Footer() {
             </ul>
           </div>
 
-          {/* 初期費用 */}
           <div>
             <h3 className="mb-3 text-xs font-bold tracking-wide text-gray-900">初期費用から探す</h3>
             <ul className="space-y-2 text-xs">
               {costs.map(([slug, label]) => (
                 <li key={slug}>
-                  <Link
-                    href={`/cost/initial/${slug}`}
-                    className="text-gray-600 transition hover:text-emerald-700 hover:underline"
-                  >
+                  <Link href={`/cost/initial/${slug}`} className="text-gray-600 transition hover:text-emerald-700 hover:underline">
                     {label}
                   </Link>
                 </li>
@@ -108,7 +80,6 @@ export function Footer() {
           </div>
         </div>
 
-        {/* エリア */}
         <div className="mt-10 border-t border-gray-200 pt-8">
           <div className="grid gap-8 sm:grid-cols-2">
             <div>
@@ -116,10 +87,7 @@ export function Footer() {
               <ul className="flex flex-wrap gap-x-4 gap-y-2 text-xs">
                 {regions.map(([slug, label]) => (
                   <li key={slug}>
-                    <Link
-                      href={`/area/${slug}`}
-                      className="text-gray-600 transition hover:text-emerald-700 hover:underline"
-                    >
+                    <Link href={`/area/${slug}`} className="text-gray-600 transition hover:text-emerald-700 hover:underline">
                       {label}
                     </Link>
                   </li>
@@ -131,10 +99,7 @@ export function Footer() {
               <ul className="flex flex-wrap gap-x-4 gap-y-2 text-xs">
                 {prefectures.map(([slug, label]) => (
                   <li key={slug}>
-                    <Link
-                      href={`/area/${slug}`}
-                      className="text-gray-600 transition hover:text-emerald-700 hover:underline"
-                    >
+                    <Link href={`/area/${slug}`} className="text-gray-600 transition hover:text-emerald-700 hover:underline">
                       {label}
                     </Link>
                   </li>
@@ -145,13 +110,10 @@ export function Footer() {
         </div>
       </div>
 
-      {/* ============================================================
-          会社情報・法務
-      ============================================================ */}
+      {/* 会社情報 */}
       <div className="border-t border-gray-200 bg-white">
         <div className="mx-auto max-w-6xl px-4 py-8">
           <div className="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
-            {/* 左：サイト名 + 会社情報 */}
             <div>
               <Link href="/" className="font-bold text-emerald-700">
                 {SITE_NAME}
@@ -165,13 +127,15 @@ export function Footer() {
               </p>
             </div>
 
-            {/* 右：ナビ */}
             <nav className="flex flex-wrap gap-x-6 gap-y-2 text-xs">
               <Link href="/for-advertisers" className="text-gray-600 hover:text-emerald-700 hover:underline">
                 掲載をご検討の方
               </Link>
               <Link href="/listings" className="text-gray-600 hover:text-emerald-700 hover:underline">
                 案件を探す
+              </Link>
+              <Link href="/guide" className="text-gray-600 hover:text-emerald-700 hover:underline">
+                ガイド
               </Link>
               <Link href="/legal/terms" className="text-gray-600 hover:text-emerald-700 hover:underline">
                 利用規約
