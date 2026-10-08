@@ -54,14 +54,15 @@ export default function GuideClient() {
               📖 Guide
             </span>
             <h1>
-              代理店で起業する、<br />
-              <span className="accent">実践ガイド。</span>
-            </h1>
-            <p>
-              1から全てを作り上げるのは、費用も時間もかかる。
-              既存のプラットフォームに乗ることで、
-              少ないリスクで、確実に事業を始められます。
-            </p>
+  1から始めない、<br />
+  <span className="accent">起業の実践ガイド。</span>
+</h1>
+<p>
+  1から全てを作り上げるのは、費用も時間もかかる。
+  代理店・フランチャイズ・加盟店などの
+  既存のプラットフォームに乗ることで、
+  少ないリスクで、確実に事業を始められます。
+</p>
             <div className="guide-hero-stats">
               <div>
                 <div className="guide-hero-stat-num">
