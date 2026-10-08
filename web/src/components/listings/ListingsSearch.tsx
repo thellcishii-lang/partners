@@ -25,6 +25,8 @@ import {
   PROFIT_AMOUNTS,
   REVENUE_TYPES,
   ORGANIZATION_TYPES,
+  REGION_LABELS,
+  REGION_SLUGS,
 } from '@/lib/listingFilters';
 import { cn } from '@/lib/cn';
 import type { Listing } from '@/types';
@@ -39,7 +41,6 @@ export function ListingsSearch() {
 
 type SortKey = 'newest' | 'initialCost';
 
-// 上部8項目の定義
 type TopFilterKey =
   | 'fee'
   | 'initial'
@@ -61,7 +62,6 @@ const TOP_FILTERS: { key: TopFilterKey; label: string; options: { slug: string; 
   { key: 'area',        label: '対応エリア',   options: [] },
 ];
 
-// 各項目のアイコン
 const FILTER_ICONS: Record<TopFilterKey, LucideIcon> = {
   fee: Wallet,
   initial: Coins,
@@ -71,6 +71,17 @@ const FILTER_ICONS: Record<TopFilterKey, LucideIcon> = {
   revenueType: Repeat,
   org: Users,
   area: MapPin,
+};
+
+const REGION_GROUP_LABELS: Record<string, string> = {
+  hokkaido: '北海道',
+  tohoku: '東北',
+  kanto: '関東',
+  chubu: '中部',
+  kansai: '関西',
+  chugoku: '中国',
+  shikoku: '四国',
+  kyushu: '九州・沖縄',
 };
 
 function SearchContent() {
@@ -102,7 +113,7 @@ function SearchContent() {
     () => searchParams.get('cost')?.split(',').filter(Boolean) ?? [],
     [searchParams]
   );
-  const selectedPref = searchParams.get('pref') ?? '';
+  const selectedArea = searchParams.get('area') ?? '';
   const keyword = searchParams.get('q') ?? '';
 
   const selectedFee = searchParams.get('fee') ?? '';
@@ -172,13 +183,18 @@ function SearchContent() {
       if (selectedTargets.length > 0 && !selectedTargets.some((t) => l.targetSlugs?.includes(t))) return false;
       if (selectedProducts.length > 0 && !selectedProducts.some((p) => l.productSlugs?.includes(p))) return false;
       if (selectedModels.length > 0 && !selectedModels.some((m) => l.modelSlugs?.includes(m))) return false;
-      if (selectedPref) {
-  if (selectedPref === 'all') {
-    if (l.prefectureSlug !== 'all') return false;
-  } else {
-    if (l.prefectureSlug !== selectedPref && l.prefectureSlug !== 'all') return false;
-  }
-}
+
+      // エリア
+      if (selectedArea) {
+        if (selectedArea === 'all') {
+          if (l.areaMode !== 'nationwide') return false;
+        } else if (REGION_SLUGS.includes(selectedArea as typeof REGION_SLUGS[number])) {
+          if (!l.areaSearchRegionSlugs?.includes(selectedArea)) return false;
+        } else {
+          if (!l.areaSearchPrefectureSlugs?.includes(selectedArea)) return false;
+        }
+      }
+
       if (selectedCosts.length > 0 && !selectedCosts.includes(l.initialCostRange)) return false;
       if (selectedFee && l.franchiseFeeRange !== selectedFee) return false;
       if (selectedStock && l.stockType !== selectedStock) return false;
@@ -199,8 +215,9 @@ function SearchContent() {
       return bT - aT;
     });
     return result;
-  }, [listings, keyword, selectedTargets, selectedProducts, selectedModels, selectedCosts, selectedPref,
-      selectedFee, selectedStock, selectedRevenue, selectedProfit, selectedRevenueType, selectedOrg, sortKey]);
+  }, [listings, keyword, selectedTargets, selectedProducts, selectedModels, selectedCosts,
+      selectedArea, selectedFee, selectedStock, selectedRevenue, selectedProfit,
+      selectedRevenueType, selectedOrg, sortKey]);
 
   const targetCategories = categories.filter((c) => c.axis === 'target');
   const productParents = categories.filter((c) => c.axis === 'product' && !c.parentSlug);
@@ -214,7 +231,7 @@ function SearchContent() {
     selectedProducts.length > 0 ||
     selectedModels.length > 0 ||
     selectedCosts.length > 0 ||
-    !!selectedPref ||
+    !!selectedArea ||
     !!selectedFee ||
     !!selectedStock ||
     !!selectedRevenue ||
@@ -231,7 +248,7 @@ function SearchContent() {
       case 'profit': return selectedProfit;
       case 'revenueType': return selectedRevenueType;
       case 'org': return selectedOrg;
-      case 'area': return selectedPref;
+      case 'area': return selectedArea;
       default: return '';
     }
   };
@@ -240,6 +257,10 @@ function SearchContent() {
     const value = getTopValue(key);
     if (!value) return null;
     if (key === 'area') {
+      if (value === 'all') return '全国';
+      if (REGION_SLUGS.includes(value as typeof REGION_SLUGS[number])) {
+        return REGION_LABELS[value] ?? value;
+      }
       return prefectures.find((p) => p.slug === value)?.label ?? null;
     }
     const filter = TOP_FILTERS.find((f) => f.key === key);
@@ -255,7 +276,7 @@ function SearchContent() {
       case 'profit': updateSingle('profit', value); break;
       case 'revenueType': updateSingle('revenueType', value); break;
       case 'org': updateSingle('org', value); break;
-      case 'area': updateSingle('pref', value); break;
+      case 'area': updateSingle('area', value); break;
     }
     setOpenTopFilter(null);
   };
@@ -263,9 +284,7 @@ function SearchContent() {
   return (
     <div className="space-y-4">
 
-      {/* ============================================================
-          上位8項目のタイル検索
-      ============================================================ */}
+      {/* 上部タイル */}
       <div className="rounded-2xl bg-white p-4 shadow-sm">
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
           {TOP_FILTERS.map((f) => {
@@ -330,16 +349,23 @@ function SearchContent() {
             <div className="flex flex-wrap gap-2">
               {openTopFilter === 'area' ? (
                 <select
-  className="h-9 w-full max-w-xs rounded-lg border border-gray-300 px-3 text-sm"
-  value={selectedPref}
-  onChange={(e) => setTopValue('area', e.target.value)}
->
-  <option value="">すべて</option>
-  <option value="all">全国</option>
-  {prefectures.map((p) => (
-    <option key={p.slug} value={p.slug}>{p.label}</option>
-  ))}
-</select>
+                  className="h-9 w-full max-w-xs rounded-lg border border-gray-300 px-3 text-sm"
+                  value={selectedArea}
+                  onChange={(e) => setTopValue('area', e.target.value)}
+                >
+                  <option value="">すべて</option>
+                  <option value="all">全国</option>
+                  <optgroup label="地域">
+                    {REGION_SLUGS.map((slug) => (
+                      <option key={slug} value={slug}>{REGION_LABELS[slug]}</option>
+                    ))}
+                  </optgroup>
+                  <optgroup label="都道府県">
+                    {prefectures.map((p) => (
+                      <option key={p.slug} value={p.slug}>{p.label}</option>
+                    ))}
+                  </optgroup>
+                </select>
               ) : (
                 TOP_FILTERS.find((f) => f.key === openTopFilter)?.options.map((o) => {
                   const isSelected = getTopValue(openTopFilter) === o.slug;
@@ -364,7 +390,6 @@ function SearchContent() {
           </div>
         )}
 
-        {/* 検索ボタン */}
         <div className="mt-4 flex flex-wrap items-center gap-3">
           <button
             type="button"
@@ -403,7 +428,7 @@ function SearchContent() {
       </div>
 
       <div className="flex gap-6">
-        {/* ─── 左サイドバー ─── */}
+        {/* 左サイドバー */}
         <aside
           className={cn(
             'shrink-0 lg:block lg:w-64',
@@ -539,21 +564,28 @@ function SearchContent() {
                 </FilterGroup>
 
                 <FilterGroup title="エリア">
-  <select
-    aria-label="都道府県"
-    className="h-10 w-full rounded-lg border border-gray-300 px-3 text-sm"
-    value={selectedPref}
-    onChange={(e) => updateSingle('pref', e.target.value)}
-  >
-    <option value="">すべて</option>
-    <option value="all">全国</option>
-    {prefectures.map((p) => (
-      <option key={p.slug} value={p.slug}>
-        {p.label}
-      </option>
-    ))}
-  </select>
-</FilterGroup>
+                  <select
+                    aria-label="エリア"
+                    className="h-10 w-full rounded-lg border border-gray-300 px-3 text-sm"
+                    value={selectedArea}
+                    onChange={(e) => updateSingle('area', e.target.value)}
+                  >
+                    <option value="">すべて</option>
+                    <option value="all">全国</option>
+                    <optgroup label="地域">
+                      {REGION_SLUGS.map((slug) => (
+                        <option key={slug} value={slug}>{REGION_LABELS[slug]}</option>
+                      ))}
+                    </optgroup>
+                    <optgroup label="都道府県">
+                      {prefectures.map((p) => (
+                        <option key={p.slug} value={p.slug}>
+                          {p.label}
+                        </option>
+                      ))}
+                    </optgroup>
+                  </select>
+                </FilterGroup>
 
                 <FilterGroup title="初期費用">
                   {INITIAL_COST_RANGES.map((r) => (
@@ -620,7 +652,7 @@ function SearchContent() {
           </div>
         </aside>
 
-        {/* ─── 右（結果） ─── */}
+        {/* 右（結果） */}
         <main className="min-w-0 flex-1">
           <div className="mb-4 hidden flex-wrap items-center justify-between gap-2 lg:flex">
             <p className="text-sm text-gray-600">
@@ -673,6 +705,10 @@ function SearchContent() {
 }
 
 function ListingCard({ listing }: { listing: Listing }) {
+  const areaText = listing.areaLabels?.length
+    ? listing.areaLabels.slice(0, 2).join('・')
+    : '全国';
+
   return (
     <Link
       href={`/listings/${listing.id}`}
@@ -698,7 +734,7 @@ function ListingCard({ listing }: { listing: Listing }) {
       <h2 className="mt-2 text-lg font-bold">{listing.title}</h2>
       <p className="text-sm text-gray-600">{listing.companyName || '会社名未設定'}</p>
       <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-sm text-gray-700">
-        <span>📍 {listing.prefectureLabel || listing.area || '全国'}</span>
+        <span>📍 {areaText}</span>
         {listing.franchiseFeeLabel && <span>💰 加盟金 {listing.franchiseFeeLabel}</span>}
         {listing.initialCostLabel && <span>💵 初期費用 {listing.initialCostLabel}</span>}
         {listing.revenueTypeLabel && <span>📈 {listing.revenueTypeLabel}</span>}
