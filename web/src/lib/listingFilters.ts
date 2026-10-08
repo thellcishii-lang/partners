@@ -256,3 +256,67 @@ export const ORGANIZATION_TYPES = [
 export function getOrganizationTypeLabel(slug: string): string {
   return ORGANIZATION_TYPES.find((t) => t.slug === slug)?.label ?? '';
 }
+
+// ============================================================
+// エリア展開（3モード）
+// ============================================================
+export type AreaMode = 'nationwide' | 'region' | 'prefecture';
+
+const ALL_REGION_SLUGS = [
+  'hokkaido', 'tohoku', 'kanto', 'chubu', 'kansai', 'chugoku', 'shikoku', 'kyushu',
+];
+
+const ALL_PREFECTURE_SLUGS = [
+  'hokkaido',
+  'aomori', 'iwate', 'miyagi', 'akita', 'yamagata', 'fukushima',
+  'tokyo', 'kanagawa', 'saitama', 'chiba', 'ibaraki', 'tochigi', 'gunma',
+  'niigata', 'toyama', 'ishikawa', 'fukui', 'yamanashi', 'nagano',
+  'gifu', 'shizuoka', 'aichi',
+  'mie', 'shiga', 'kyoto', 'osaka', 'hyogo', 'nara', 'wakayama',
+  'tottori', 'shimane', 'okayama', 'hiroshima', 'yamaguchi',
+  'tokushima', 'kagawa', 'ehime', 'kochi',
+  'fukuoka', 'saga', 'nagasaki', 'kumamoto', 'oita', 'miyazaki', 'kagoshima', 'okinawa',
+];
+
+export function expandAreaSlugs(
+  mode: AreaMode,
+  slugs: string[],
+): { prefectureSlugs: string[]; regionSlugs: string[] } {
+  if (mode === 'nationwide') {
+    return {
+      prefectureSlugs: ALL_PREFECTURE_SLUGS,
+      regionSlugs: ALL_REGION_SLUGS,
+    };
+  }
+  if (mode === 'region') {
+    // 地域に含まれる都道府県を全部展開
+    const prefectures: string[] = [];
+    slugs.forEach((regionSlug) => {
+      Object.entries(PREFECTURE_TO_REGION).forEach(([prefSlug, region]) => {
+        if (region === regionSlug) prefectures.push(prefSlug);
+      });
+    });
+    return {
+      prefectureSlugs: Array.from(new Set(prefectures)),
+      regionSlugs: slugs,
+    };
+  }
+  // prefecture
+  return {
+    prefectureSlugs: slugs,
+    regionSlugs: [],
+  };
+}
+
+// 地域（関東など）の slug 一覧
+export const REGION_SLUGS = ALL_REGION_SLUGS;
+
+// 都道府県の slug 一覧
+export const PREFECTURE_SLUGS = ALL_PREFECTURE_SLUGS;
+
+// 地域 → その地域に含まれる都道府県
+export function getPrefecturesInRegion(regionSlug: string): string[] {
+  return Object.entries(PREFECTURE_TO_REGION)
+    .filter(([, region]) => region === regionSlug)
+    .map(([prefSlug]) => prefSlug);
+}
