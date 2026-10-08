@@ -172,7 +172,13 @@ function SearchContent() {
       if (selectedTargets.length > 0 && !selectedTargets.some((t) => l.targetSlugs?.includes(t))) return false;
       if (selectedProducts.length > 0 && !selectedProducts.some((p) => l.productSlugs?.includes(p))) return false;
       if (selectedModels.length > 0 && !selectedModels.some((m) => l.modelSlugs?.includes(m))) return false;
-      if (selectedPref && l.prefectureSlug !== selectedPref) return false;
+      if (selectedPref) {
+  if (selectedPref === 'all') {
+    if (l.prefectureSlug !== 'all') return false;
+  } else {
+    if (l.prefectureSlug !== selectedPref && l.prefectureSlug !== 'all') return false;
+  }
+}
       if (selectedCosts.length > 0 && !selectedCosts.includes(l.initialCostRange)) return false;
       if (selectedFee && l.franchiseFeeRange !== selectedFee) return false;
       if (selectedStock && l.stockType !== selectedStock) return false;
@@ -324,15 +330,16 @@ function SearchContent() {
             <div className="flex flex-wrap gap-2">
               {openTopFilter === 'area' ? (
                 <select
-                  className="h-9 w-full max-w-xs rounded-lg border border-gray-300 px-3 text-sm"
-                  value={selectedPref}
-                  onChange={(e) => setTopValue('area', e.target.value)}
-                >
-                  <option value="">すべて</option>
-                  {prefectures.map((p) => (
-                    <option key={p.slug} value={p.slug}>{p.label}</option>
-                  ))}
-                </select>
+  className="h-9 w-full max-w-xs rounded-lg border border-gray-300 px-3 text-sm"
+  value={selectedPref}
+  onChange={(e) => setTopValue('area', e.target.value)}
+>
+  <option value="">すべて</option>
+  <option value="all">全国</option>
+  {prefectures.map((p) => (
+    <option key={p.slug} value={p.slug}>{p.label}</option>
+  ))}
+</select>
               ) : (
                 TOP_FILTERS.find((f) => f.key === openTopFilter)?.options.map((o) => {
                   const isSelected = getTopValue(openTopFilter) === o.slug;
@@ -532,20 +539,21 @@ function SearchContent() {
                 </FilterGroup>
 
                 <FilterGroup title="エリア">
-                  <select
-                    aria-label="都道府県"
-                    className="h-10 w-full rounded-lg border border-gray-300 px-3 text-sm"
-                    value={selectedPref}
-                    onChange={(e) => updateSingle('pref', e.target.value)}
-                  >
-                    <option value="">すべて</option>
-                    {prefectures.map((p) => (
-                      <option key={p.slug} value={p.slug}>
-                        {p.label}
-                      </option>
-                    ))}
-                  </select>
-                </FilterGroup>
+  <select
+    aria-label="都道府県"
+    className="h-10 w-full rounded-lg border border-gray-300 px-3 text-sm"
+    value={selectedPref}
+    onChange={(e) => updateSingle('pref', e.target.value)}
+  >
+    <option value="">すべて</option>
+    <option value="all">全国</option>
+    {prefectures.map((p) => (
+      <option key={p.slug} value={p.slug}>
+        {p.label}
+      </option>
+    ))}
+  </select>
+</FilterGroup>
 
                 <FilterGroup title="初期費用">
                   {INITIAL_COST_RANGES.map((r) => (
