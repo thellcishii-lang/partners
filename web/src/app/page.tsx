@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { ListingsSearch } from '@/components/listings/ListingsSearch';
+import { GuidePromoSection } from '@/components/guide/GuidePromoSection';
 import { Button } from '@/components/ui/Button';
 
 export default function HomePage() {
@@ -28,7 +29,7 @@ export default function HomePage() {
                 案件を探す
               </Button>
             </Link>
-            <Link href="/signup">
+            <Link href="/for-advertisers">
               <Button
                 size="lg"
                 variant="outline"
@@ -42,7 +43,8 @@ export default function HomePage() {
       </section>
 
       <ListingsSearch />
+
+      <GuidePromoSection />
     </div>
   );
 }
-     
