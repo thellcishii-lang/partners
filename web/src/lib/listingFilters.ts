@@ -27,8 +27,8 @@ export const PREFECTURE_TO_REGION: Record<string, string> = {
 
 export const REGION_LABELS: Record<string, string> = {
   all: '全国',
-  hokkaido: '北海道',
-  tohoku: '東北',
+  hokkaido: '北海道・東北',
+  tohoku: '北海道・東北',
   kanto: '関東',
   chubu: '中部',
   kansai: '関西',
@@ -36,6 +36,59 @@ export const REGION_LABELS: Record<string, string> = {
   shikoku: '四国',
   kyushu: '九州・沖縄',
 };
+
+// ============================================================
+// エリア（3モード）
+// ============================================================
+export type AreaMode = 'nationwide' | 'region' | 'prefecture';
+
+export const REGION_SLUGS = [
+  'hokkaido', 'tohoku', 'kanto', 'chubu', 'kansai', 'chugoku', 'shikoku', 'kyushu',
+] as const;
+
+export const PREFECTURE_SLUGS = [
+  'hokkaido',
+  'aomori', 'iwate', 'miyagi', 'akita', 'yamagata', 'fukushima',
+  'tokyo', 'kanagawa', 'saitama', 'chiba', 'ibaraki', 'tochigi', 'gunma',
+  'niigata', 'toyama', 'ishikawa', 'fukui', 'yamanashi', 'nagano',
+  'gifu', 'shizuoka', 'aichi',
+  'mie', 'shiga', 'kyoto', 'osaka', 'hyogo', 'nara', 'wakayama',
+  'tottori', 'shimane', 'okayama', 'hiroshima', 'yamaguchi',
+  'tokushima', 'kagawa', 'ehime', 'kochi',
+  'fukuoka', 'saga', 'nagasaki', 'kumamoto', 'oita', 'miyazaki', 'kagoshima', 'okinawa',
+] as const;
+
+export function getPrefecturesInRegion(regionSlug: string): string[] {
+  return Object.entries(PREFECTURE_TO_REGION)
+    .filter(([, region]) => region === regionSlug)
+    .map(([prefSlug]) => prefSlug);
+}
+
+export function expandAreaSlugs(
+  mode: AreaMode,
+  slugs: string[],
+): { prefectureSlugs: string[]; regionSlugs: string[] } {
+  if (mode === 'nationwide') {
+    return {
+      prefectureSlugs: [...PREFECTURE_SLUGS],
+      regionSlugs: [...REGION_SLUGS],
+    };
+  }
+  if (mode === 'region') {
+    const prefectures: string[] = [];
+    slugs.forEach((regionSlug) => {
+      prefectures.push(...getPrefecturesInRegion(regionSlug));
+    });
+    return {
+      prefectureSlugs: Array.from(new Set(prefectures)),
+      regionSlugs: slugs,
+    };
+  }
+  return {
+    prefectureSlugs: slugs,
+    regionSlugs: [],
+  };
+}
 
 // ============================================================
 // 初期費用レンジ
@@ -47,10 +100,7 @@ export type InitialCostRangeSlug =
   | 'initial-over300'
   | 'initial-unknown';
 
-export const INITIAL_COST_RANGES: {
-  slug: InitialCostRangeSlug;
-  label: string;
-}[] = [
+export const INITIAL_COST_RANGES: { slug: InitialCostRangeSlug; label: string }[] = [
   { slug: 'initial-free',     label: '初期費用無料' },
   { slug: 'initial-under100', label: '100万円以下' },
   { slug: 'initial-under300', label: '300万円以下' },
@@ -79,10 +129,7 @@ export type ExpectedRevenueRangeSlug =
   | 'revenue-over1000'
   | 'revenue-unknown';
 
-export const EXPECTED_REVENUE_RANGES: {
-  slug: ExpectedRevenueRangeSlug;
-  label: string;
-}[] = [
+export const EXPECTED_REVENUE_RANGES: { slug: ExpectedRevenueRangeSlug; label: string }[] = [
   { slug: 'revenue-under500',  label: '年商500万円以下' },
   { slug: 'revenue-under1000', label: '年商1000万円以下' },
   { slug: 'revenue-over1000',  label: '年商1000万円以上' },
@@ -101,20 +148,6 @@ export function getExpectedRevenueLabel(slug: string): string {
 }
 
 // ============================================================
-// 地域
-// ============================================================
-export function getRegionSlug(prefectureSlug: string): string {
-  if (prefectureSlug === 'all') return 'all';
-  return PREFECTURE_TO_REGION[prefectureSlug] ?? 'other';
-}
-
-export function getRegionLabel(prefectureSlug: string): string {
-  if (prefectureSlug === 'all') return '全国';
-  const region = getRegionSlug(prefectureSlug);
-  return REGION_LABELS[region] ?? 'その他';
-}
-
-// ============================================================
 // 検索用テキスト生成
 // ============================================================
 export function buildSearchText(input: {
@@ -123,8 +156,7 @@ export function buildSearchText(input: {
   targetLabels: string[];
   productLabels: string[];
   modelLabels: string[];
-  prefectureLabel: string;
-  regionLabel: string;
+  areaLabels: string[];
   category: string;
   companyName: string;
 }): string {
@@ -136,8 +168,7 @@ export function buildSearchText(input: {
     ...input.targetLabels,
     ...input.productLabels,
     ...input.modelLabels,
-    input.prefectureLabel,
-    input.regionLabel,
+    ...input.areaLabels,
   ]
     .filter(Boolean)
     .join(' ')
@@ -145,7 +176,7 @@ export function buildSearchText(input: {
 }
 
 // ============================================================
-// 加盟金（0円〜）
+// 加盟金
 // ============================================================
 export const FRANCHISE_FEE_RANGES = [
   { slug: 'free',     label: '無料' },
@@ -180,14 +211,12 @@ export const STOCK_TYPES = [
   { slug: 'buyback',   label: '買取あり' },
 ] as const;
 
-export type StockTypeSlug = (typeof STOCK_TYPES)[number]['slug'];
-
 export function getStockLabel(slug: string): string {
   return STOCK_TYPES.find((t) => t.slug === slug)?.label ?? '';
 }
 
 // ============================================================
-// 売上推定：月商レンジ（4段階）
+// 売上推定
 // ============================================================
 export const REVENUE_AMOUNTS = [
   { slug: 'under50',  label: '〜50万円/月' },
@@ -210,7 +239,7 @@ export function getRevenueAmountLabel(yen: number | null): string {
 }
 
 // ============================================================
-// 利益推定：月利益レンジ（3段階）。売上とは別指標
+// 利益推定
 // ============================================================
 export const PROFIT_AMOUNTS = [
   { slug: 'under50',  label: '〜50万円/月' },
@@ -255,68 +284,4 @@ export const ORGANIZATION_TYPES = [
 
 export function getOrganizationTypeLabel(slug: string): string {
   return ORGANIZATION_TYPES.find((t) => t.slug === slug)?.label ?? '';
-}
-
-// ============================================================
-// エリア展開（3モード）
-// ============================================================
-export type AreaMode = 'nationwide' | 'region' | 'prefecture';
-
-const ALL_REGION_SLUGS = [
-  'hokkaido', 'tohoku', 'kanto', 'chubu', 'kansai', 'chugoku', 'shikoku', 'kyushu',
-];
-
-const ALL_PREFECTURE_SLUGS = [
-  'hokkaido',
-  'aomori', 'iwate', 'miyagi', 'akita', 'yamagata', 'fukushima',
-  'tokyo', 'kanagawa', 'saitama', 'chiba', 'ibaraki', 'tochigi', 'gunma',
-  'niigata', 'toyama', 'ishikawa', 'fukui', 'yamanashi', 'nagano',
-  'gifu', 'shizuoka', 'aichi',
-  'mie', 'shiga', 'kyoto', 'osaka', 'hyogo', 'nara', 'wakayama',
-  'tottori', 'shimane', 'okayama', 'hiroshima', 'yamaguchi',
-  'tokushima', 'kagawa', 'ehime', 'kochi',
-  'fukuoka', 'saga', 'nagasaki', 'kumamoto', 'oita', 'miyazaki', 'kagoshima', 'okinawa',
-];
-
-export function expandAreaSlugs(
-  mode: AreaMode,
-  slugs: string[],
-): { prefectureSlugs: string[]; regionSlugs: string[] } {
-  if (mode === 'nationwide') {
-    return {
-      prefectureSlugs: ALL_PREFECTURE_SLUGS,
-      regionSlugs: ALL_REGION_SLUGS,
-    };
-  }
-  if (mode === 'region') {
-    // 地域に含まれる都道府県を全部展開
-    const prefectures: string[] = [];
-    slugs.forEach((regionSlug) => {
-      Object.entries(PREFECTURE_TO_REGION).forEach(([prefSlug, region]) => {
-        if (region === regionSlug) prefectures.push(prefSlug);
-      });
-    });
-    return {
-      prefectureSlugs: Array.from(new Set(prefectures)),
-      regionSlugs: slugs,
-    };
-  }
-  // prefecture
-  return {
-    prefectureSlugs: slugs,
-    regionSlugs: [],
-  };
-}
-
-// 地域（関東など）の slug 一覧
-export const REGION_SLUGS = ALL_REGION_SLUGS;
-
-// 都道府県の slug 一覧
-export const PREFECTURE_SLUGS = ALL_PREFECTURE_SLUGS;
-
-// 地域 → その地域に含まれる都道府県
-export function getPrefecturesInRegion(regionSlug: string): string[] {
-  return Object.entries(PREFECTURE_TO_REGION)
-    .filter(([, region]) => region === regionSlug)
-    .map(([prefSlug]) => prefSlug);
 }
