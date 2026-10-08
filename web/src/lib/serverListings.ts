@@ -12,6 +12,7 @@ export type FilterKey =
   | 'expectedRevenueRange';
 
 const ARRAY_FIELDS: FilterKey[] = ['targetSlugs', 'productSlugs', 'modelSlugs'];
+const AREA_FIELDS: FilterKey[] = ['prefectureSlug', 'regionSlug'];
 
 export async function getServerListings(
   filterKey: FilterKey,
@@ -21,14 +22,19 @@ export async function getServerListings(
   const db = getAdminDb();
   const base = db.collection('listings').where('status', '==', 'published');
 
-  const withFilter = ARRAY_FIELDS.includes(filterKey)
-    ? base.where(filterKey, 'array-contains', filterValue)
-    : base.where(filterKey, '==', filterValue);
+  let withFilter;
+  if (ARRAY_FIELDS.includes(filterKey)) {
+    withFilter = base.where(filterKey, 'array-contains', filterValue);
+  } else if (AREA_FIELDS.includes(filterKey)) {
+    if (filterValue === 'all') {
+      withFilter = base.where(filterKey, '==', 'all');
+    } else {
+      withFilter = base.where(filterKey, 'in', [filterValue, 'all']);
+    }
+  } else {
+    withFilter = base.where(filterKey, '==', filterValue);
+  }
 
-  const snap = await withFilter
-    .orderBy('publishedAt', 'desc')
-    .limit(limit)
-    .get();
-
+  const snap = await withFilter.orderBy('publishedAt', 'desc').limit(limit).get();
   return snap.docs.map((d) => ({ ...d.data(), id: d.id } as Listing));
 }
