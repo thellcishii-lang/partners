@@ -12,7 +12,6 @@ export type FilterKey =
 
 const ARRAY_FIELDS: FilterKey[] = ['targetSlugs', 'productSlugs', 'modelSlugs'];
 
-// 地域slug / 都道府県slug を区別
 const REGION_SLUG_SET = new Set([
   'hokkaido', 'tohoku', 'kanto', 'chubu', 'kansai', 'chugoku', 'shikoku', 'kyushu',
 ]);
