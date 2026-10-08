@@ -37,7 +37,7 @@ export function ListingDetail({
     { label: '利益推定', value: listing.expectedProfitLabel || '—' },
     { label: '収益タイプ', value: listing.revenueTypeLabel || '—' },
     { label: '組織拡大', value: listing.organizationTypeLabel || '—' },
-    { label: '対応エリア', value: listing.prefectureLabel || listing.regionLabel || '全国' },
+    { label: '対応エリア', value: listing.areaLabels?.length ? listing.areaLabels.slice(0, 3).join('・') : '全国' },
   ];
 
   const allTags = [
@@ -407,11 +407,14 @@ export function ListingDetail({
                     {kw}
                   </span>
                 ))}
-                {listing.prefectureLabel && (
-                  <span className="rounded-md border border-gray-200 bg-white px-3 py-1 text-xs text-gray-700">
-                    {listing.prefectureLabel}
-                  </span>
-                )}
+                {listing.areaLabels?.map((label) => (
+  <span
+    key={label}
+    className="rounded-md border border-gray-200 bg-white px-3 py-1 text-xs text-gray-700"
+  >
+    {label}
+  </span>
+))}
                 {listing.initialCostLabel && (
                   <span className="rounded-md border border-gray-200 bg-white px-3 py-1 text-xs text-gray-700">
                     {listing.initialCostLabel}
