@@ -2,6 +2,10 @@ import type { NextConfig } from 'next';
 
 const config: NextConfig = {
   reactStrictMode: true,
+  serverExternalPackages: ['firebase-admin'],
+  outputFileTracingIncludes: {
+    '/guide/[slug]': ['./src/content/guide/**/*'],
+  },
   images: {
     remotePatterns: [
       { protocol: 'https', hostname: 'firebasestorage.googleapis.com' },
@@ -11,7 +15,6 @@ const config: NextConfig = {
     if (process.env.CODESPACES !== 'true' || process.env.NEXT_PUBLIC_USE_EMULATOR !== 'true') {
       return [];
     }
-
     return [
       {
         source: '/identitytoolkit.googleapis.com/:path*',
