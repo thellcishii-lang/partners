@@ -189,7 +189,7 @@ export default function AdminListingsPage() {
                     <span className="rounded-full bg-gray-100 px-3 py-1">
                       {LISTING_STATUS_LABELS[l.status]}
                     </span>
-                    <span>📍 {l.prefectureLabel || '未設定'}</span>
+                    <span>📍 {l.areaLabels?.length ? l.areaLabels.slice(0, 2).join('・') : '未設定'}</span>
                     {l.productLabels?.length ? <span>🏷 {l.productLabels.join(', ')}</span> : null}
                     {l.initialCostLabel ? <span>💵 {l.initialCostLabel}</span> : null}
                   </div>
