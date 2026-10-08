@@ -7,10 +7,10 @@ import { db } from '@/lib/firebase';
 import { Button } from '@/components/ui/Button';
 import { Field, Input, Textarea } from '@/components/ui/Input';
 import { useMasters } from '@/hooks/useMasters';
+import { useAuth } from '@/providers/AuthProvider';
 import { ImageUploader } from './ImageUploader';
 import { PreviewModal } from './PreviewModal';
 import { SmsVerificationBlock } from '@/components/auth/SmsVerificationBlock';
-import { useAuth } from '@/providers/AuthProvider';
 import {
   buildSearchText,
   getInitialCostLabel,
@@ -57,16 +57,20 @@ export function ListingForm({
     ? { ...listing, ...listing.pendingEdit.data }
     : listing ?? {};
 
+  // 基本情報
   const [title, setTitle] = useState(source.title ?? '');
   const [category, setCategory] = useState<ListingCategory>(source.category ?? '代理店');
   const [description, setDescription] = useState(source.description ?? '');
 
+  // 3軸
   const [targetSlugs, setTargetSlugs] = useState<string[]>(source.targetSlugs ?? []);
   const [productSlugs, setProductSlugs] = useState<string[]>(source.productSlugs ?? []);
   const [modelSlugs, setModelSlugs] = useState<string[]>(source.modelSlugs ?? []);
 
+  // 地域
   const [prefectureSlug, setPrefectureSlug] = useState(source.prefectureSlug ?? '');
 
+  // 初期費用
   type CostMode = 'free' | 'amount' | 'unknown';
   const [initialCostMode, setInitialCostMode] = useState<CostMode>(
     source.initialCostRange === 'initial-free' ? 'free'
@@ -77,6 +81,7 @@ export function ListingForm({
     source.initialCostYen ? String(source.initialCostYen) : ''
   );
 
+  // 想定年商
   type RevenueMode = 'amount' | 'unknown';
   const [revenueMode, setRevenueMode] = useState<RevenueMode>(
     source.expectedRevenueRange === 'revenue-unknown' || source.expectedRevenueYen == null ? 'unknown' : 'amount'
@@ -85,6 +90,7 @@ export function ListingForm({
     source.expectedRevenueYen ? String(source.expectedRevenueYen) : ''
   );
 
+  // 加盟金
   type FeeMode = 'amount' | 'unknown';
   const [franchiseFeeMode, setFranchiseFeeMode] = useState<FeeMode>(
     source.franchiseFeeYen != null ? 'amount' : 'unknown'
@@ -93,8 +99,10 @@ export function ListingForm({
     source.franchiseFeeYen != null ? String(source.franchiseFeeYen) : ''
   );
 
+  // 仕入れ
   const [stockType, setStockType] = useState(source.stockType ?? '');
 
+  // 想定月商
   type ProfitMode = 'amount' | 'unknown';
   const [profitMode, setProfitMode] = useState<ProfitMode>(
     source.expectedProfitYen != null ? 'amount' : 'unknown'
@@ -103,9 +111,11 @@ export function ListingForm({
     source.expectedProfitYen != null ? String(source.expectedProfitYen) : ''
   );
 
+  // 収益タイプ / 組織拡大
   const [revenueType, setRevenueType] = useState(source.revenueType ?? '');
   const [organizationType, setOrganizationType] = useState(source.organizationType ?? '');
 
+  // その他
   const [fields, setFields] = useState({
     requirements: source.requirements ?? '',
     reward: source.reward ?? '',
@@ -119,6 +129,7 @@ export function ListingForm({
   const [images, setImages] = useState<string[]>(source.images ?? []);
   const [editNote, setEditNote] = useState(listing?.pendingEdit?.note ?? '');
 
+  // 会社情報
   const [companyInfo, setCompanyInfo] = useState({
     companyAddress: source.companyAddress ?? '',
     companyRepresentative: source.companyRepresentative ?? '',
@@ -126,10 +137,12 @@ export function ListingForm({
     companyBusiness: source.companyBusiness ?? '',
   });
 
+  // こんな方におすすめ
   const [recommendedFor, setRecommendedFor] = useState<string[]>(
     source.recommendedFor ?? ['']
   );
 
+  // ビジネスの説明（固定5個）
   const [businessPoints, setBusinessPoints] = useState<
     { title: string; body: string }[]
   >(() => {
@@ -137,6 +150,7 @@ export function ListingForm({
     return Array.from({ length: 5 }, (_, i) => existing[i] ?? { title: '', body: '' });
   });
 
+  // 詳細情報
   const [detailInfo, setDetailInfo] = useState({
     salesTarget: source.salesTarget ?? '',
     salesMethod: source.salesMethod ?? '',
@@ -146,6 +160,9 @@ export function ListingForm({
     source.agentFit ?? ['']
   );
 
+  // ============================================================
+  // マスタの絞り込み
+  // ============================================================
   const targetCategories = categories.filter((c) => c.axis === 'target');
   const productParents = categories.filter((c) => c.axis === 'product' && !c.parentSlug);
   const productSubs = categories.filter((c) => c.axis === 'product' && c.parentSlug);
@@ -174,6 +191,9 @@ export function ListingForm({
     }
   };
 
+  // ============================================================
+  // フィルタ用のdenormalize
+  // ============================================================
   const buildFilterData = () => {
     const targetLabels = targetSlugs
       .map((s) => categories.find((c) => c.slug === s)?.label ?? '')
@@ -288,6 +308,9 @@ export function ListingForm({
     };
   };
 
+  // ============================================================
+  // プレビュー用オブジェクト
+  // ============================================================
   const previewStatus = listing?.pendingEdit?.submittedAt
     ? 'reviewing'
     : (listing?.status ?? 'draft');
@@ -303,6 +326,9 @@ export function ListingForm({
     pendingEdit: null,
   };
 
+  // ============================================================
+  // 保存
+  // ============================================================
   const save = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (saving) return;
@@ -323,7 +349,7 @@ export function ListingForm({
       return;
     }
     if (!prefectureSlug) {
-      setError('都道府県を選択してください。');
+      setError('都道府県（または全国）を選択してください。');
       return;
     }
     if (!advertiser.companyName?.trim()) {
@@ -342,7 +368,6 @@ export function ListingForm({
       const filterData = buildFilterData();
 
       if (adminMode && listing) {
-        // 管理者代理編集：ステータスを保ったまま直接反映
         await updateDoc(doc(db, 'listings', listing.id), {
           ...filterData,
           pendingEdit: null,
@@ -350,7 +375,6 @@ export function ListingForm({
           updatedAt: serverTimestamp(),
         });
       } else if (isPublished && listing) {
-        // 公開中の募集者編集 → pendingEdit に保存
         await updateDoc(doc(db, 'listings', listing.id), {
           pendingEdit: {
             data: filterData,
@@ -361,14 +385,12 @@ export function ListingForm({
           updatedAt: serverTimestamp(),
         });
       } else if (listing) {
-        // 通常編集
         await updateDoc(doc(db, 'listings', listing.id), {
           ...filterData,
           status: wantsReview ? 'reviewing' : 'draft',
           updatedAt: serverTimestamp(),
         });
       } else {
-        // 新規
         await addDoc(collection(db, 'listings'), {
           ...filterData,
           advertiserId: advertiser.uid,
@@ -392,6 +414,7 @@ export function ListingForm({
   return (
     <>
       <form onSubmit={save} className="space-y-6">
+        {/* 上部バー */}
         <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-white p-4 shadow-sm">
           <div>
             <p className="text-sm font-bold">
@@ -414,6 +437,7 @@ export function ListingForm({
           </Button>
         </div>
 
+        {/* pendingEdit ステータス */}
         {isPublished && listing?.pendingEdit?.submittedAt && (
           <div className="rounded-xl border border-orange-200 bg-orange-50 p-4 text-sm text-orange-800">
             この案件は<b>編集審査中</b>です。承認されるまでサイトには旧内容が表示されます。
@@ -425,6 +449,7 @@ export function ListingForm({
           </div>
         )}
 
+        {/* 基本情報 */}
         <section className="space-y-5 rounded-2xl bg-white p-6 shadow-sm">
           <h2 className="font-bold">基本情報</h2>
           <Field label="案件タイトル" required>
@@ -462,6 +487,7 @@ export function ListingForm({
           </Field>
         </section>
 
+        {/* 画像 */}
         <section className="space-y-5 rounded-2xl bg-white p-6 shadow-sm">
           <h2 className="font-bold">画像</h2>
           <p className="text-xs text-gray-500">
@@ -475,6 +501,7 @@ export function ListingForm({
           />
         </section>
 
+        {/* ターゲット */}
         <section className="space-y-5 rounded-2xl bg-white p-6 shadow-sm">
           <h2 className="font-bold">
             ターゲット（誰向けか）<span className="ml-2 text-xs text-red-500">必須</span>
@@ -500,6 +527,7 @@ export function ListingForm({
           </div>
         </section>
 
+        {/* 商材 */}
         <section className="space-y-5 rounded-2xl bg-white p-6 shadow-sm">
           <h2 className="font-bold">
             商材（何を扱うか）<span className="ml-2 text-xs text-red-500">必須</span>
@@ -545,6 +573,7 @@ export function ListingForm({
           </div>
         </section>
 
+        {/* ビジネスモデル */}
         <section className="space-y-5 rounded-2xl bg-white p-6 shadow-sm">
           <h2 className="font-bold">ビジネスモデル / 探し方</h2>
           <p className="text-xs text-gray-500">該当するものを複数選択できます。</p>
@@ -568,23 +597,45 @@ export function ListingForm({
           </div>
         </section>
 
+        {/* 募集エリア・費用 */}
         <section className="space-y-5 rounded-2xl bg-white p-6 shadow-sm">
           <h2 className="font-bold">募集エリア・費用</h2>
-          <Field label="都道府県" required>
-            <select
-              aria-label="都道府県"
-              className="h-11 w-full rounded-lg border border-gray-300 px-3 text-sm"
-              value={prefectureSlug}
-              onChange={(e) => setPrefectureSlug(e.target.value)}
-              required
-            >
-              <option value="">選択してください</option>
-              {prefectures.map((p) => (
-                <option key={p.slug} value={p.slug}>{p.label}</option>
-              ))}
-            </select>
-          </Field>
 
+          {/* 全国チェックボックス */}
+          <label className="flex cursor-pointer items-center gap-2 rounded-lg border-2 border-emerald-200 bg-emerald-50 p-3">
+            <input
+              type="checkbox"
+              checked={prefectureSlug === 'all'}
+              onChange={(e) => {
+                setPrefectureSlug(e.target.checked ? 'all' : '');
+              }}
+            />
+            <span className="text-sm font-bold text-emerald-800">全国で募集する</span>
+            <span className="text-xs text-emerald-700">
+              （チェックすると都道府県の指定は不要です）
+            </span>
+          </label>
+
+          {/* 都道府県セレクト */}
+          <div className={prefectureSlug === 'all' ? 'pointer-events-none opacity-40' : ''}>
+            <Field label="都道府県" required={prefectureSlug !== 'all'}>
+              <select
+                aria-label="都道府県"
+                className="h-11 w-full rounded-lg border border-gray-300 px-3 text-sm"
+                value={prefectureSlug === 'all' ? '' : prefectureSlug}
+                onChange={(e) => setPrefectureSlug(e.target.value)}
+                required={prefectureSlug !== 'all'}
+                disabled={prefectureSlug === 'all'}
+              >
+                <option value="">選択してください</option>
+                {prefectures.map((p) => (
+                  <option key={p.slug} value={p.slug}>{p.label}</option>
+                ))}
+              </select>
+            </Field>
+          </div>
+
+          {/* 初期費用 */}
           <Field label="初期費用" required>
             <div className="space-y-2">
               <div className="flex flex-wrap gap-3">
@@ -620,6 +671,7 @@ export function ListingForm({
             </div>
           </Field>
 
+          {/* 想定年商 */}
           <Field label="想定年商（任意）">
             <div className="space-y-2">
               <div className="flex gap-3">
@@ -654,6 +706,7 @@ export function ListingForm({
             </div>
           </Field>
 
+          {/* 加盟金 */}
           <Field label="加盟金（任意）">
             <div className="space-y-2">
               <div className="flex flex-wrap gap-3">
@@ -688,6 +741,7 @@ export function ListingForm({
             </div>
           </Field>
 
+          {/* 仕入れ */}
           <Field label="仕入れ">
             <div className="flex flex-wrap gap-2">
               {STOCK_TYPES.map((t) => (
@@ -710,6 +764,7 @@ export function ListingForm({
             </div>
           </Field>
 
+          {/* 想定月商 */}
           <Field label="想定月商（任意）">
             <div className="space-y-2">
               <div className="flex gap-3">
@@ -744,6 +799,7 @@ export function ListingForm({
             </div>
           </Field>
 
+          {/* 収益タイプ */}
           <Field label="収益タイプ">
             <div className="flex flex-wrap gap-2">
               {REVENUE_TYPES.map((t) => (
@@ -766,6 +822,7 @@ export function ListingForm({
             </div>
           </Field>
 
+          {/* 組織拡大 */}
           <Field label="組織拡大">
             <div className="flex flex-wrap gap-2">
               {ORGANIZATION_TYPES.map((t) => (
@@ -789,6 +846,7 @@ export function ListingForm({
           </Field>
         </section>
 
+        {/* 会社情報 */}
         <section className="space-y-5 rounded-2xl bg-white p-6 shadow-sm">
           <h2 className="font-bold">会社情報</h2>
           <p className="text-xs text-gray-500">
@@ -825,6 +883,7 @@ export function ListingForm({
           </Field>
         </section>
 
+        {/* ビジネスの説明 */}
         <section className="space-y-5 rounded-2xl bg-white p-6 shadow-sm">
           <h2 className="font-bold">ビジネスの説明</h2>
           <p className="text-xs text-gray-500">
@@ -860,6 +919,7 @@ export function ListingForm({
           ))}
         </section>
 
+        {/* こんな方におすすめ */}
         <section className="space-y-5 rounded-2xl bg-white p-6 shadow-sm">
           <h2 className="font-bold">こんな方におすすめ</h2>
           <p className="text-xs text-gray-500">
@@ -898,6 +958,7 @@ export function ListingForm({
           )}
         </section>
 
+        {/* 詳細情報 */}
         <section className="space-y-5 rounded-2xl bg-white p-6 shadow-sm">
           <h2 className="font-bold">詳細情報</h2>
           <p className="text-xs text-gray-500">
@@ -960,6 +1021,7 @@ export function ListingForm({
           </div>
         </section>
 
+        {/* その他 */}
         <section className="space-y-5 rounded-2xl bg-white p-6 shadow-sm">
           <h2 className="font-bold">その他</h2>
           {([
@@ -980,6 +1042,7 @@ export function ListingForm({
           ))}
         </section>
 
+        {/* 変更内容コメント */}
         {isPublished && !adminMode && (
           <section className="space-y-3 rounded-2xl border-2 border-emerald-200 bg-emerald-50 p-6">
             <h2 className="font-bold text-emerald-800">変更内容（管理者へのメモ）</h2>
