@@ -120,10 +120,13 @@ export interface Listing {
   modelSlugs: string[];         // ['model-low-risk']
   modelLabels: string[];        // ['簡単・低リスクで始める']
 
-  prefectureSlug: string;       // 'tokyo'
-  prefectureLabel: string;      // '東京都'
-  regionSlug: string;           // 'kanto'
-  regionLabel: string;          // '関東'
+   areaMode: 'nationwide' | 'region' | 'prefecture';
+  areaSlugs: string[];
+  areaLabels: string[];
+
+  // 検索用（保存時に自動展開）
+  areaSearchPrefectureSlugs: string[];
+  areaSearchRegionSlugs: string[];          // '関東'
 
   initialCostYen: number | null;    // 数値（円）。不明は null
   initialCostRange: string;         // 'initial-free' など
