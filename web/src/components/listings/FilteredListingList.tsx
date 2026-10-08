@@ -56,29 +56,35 @@ export async function FilteredListingList({
           )}
 
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {listings.map((listing) => (
-              <Link
-                key={listing.id}
-                href={`/listings/${listing.id}`}
-                className="space-y-3 rounded-2xl bg-white p-6 shadow-sm hover:ring-2 hover:ring-brand-500"
-              >
-                <div className="flex flex-wrap gap-1">
-                  {listing.productLabels?.slice(0, 2).map((label) => (
-                    <span
-                      key={label}
-                      className="rounded-full bg-brand-50 px-2 py-0.5 text-xs text-brand-700"
-                    >
-                      {label}
-                    </span>
-                  ))}
-                </div>
-                <h2 className="text-lg font-bold">{listing.title}</h2>
-                <p className="text-sm text-gray-600">会社名：{listing.companyName || '未設定'}</p>
-                <p className="text-sm">エリア：{listing.prefectureLabel || listing.area || '応相談'}</p>
-                <p className="text-sm">初期費用：{listing.initialCostLabel || '応相談'}</p>
-                <p className="whitespace-pre-wrap text-sm">報酬：{listing.reward || '応相談'}</p>
-              </Link>
-            ))}
+            {listings.map((listing) => {
+              const areaText = listing.areaLabels?.length
+                ? listing.areaLabels.slice(0, 2).join('・')
+                : '全国';
+
+              return (
+                <Link
+                  key={listing.id}
+                  href={`/listings/${listing.id}`}
+                  className="space-y-3 rounded-2xl bg-white p-6 shadow-sm hover:ring-2 hover:ring-brand-500"
+                >
+                  <div className="flex flex-wrap gap-1">
+                    {listing.productLabels?.slice(0, 2).map((label) => (
+                      <span
+                        key={label}
+                        className="rounded-full bg-brand-50 px-2 py-0.5 text-xs text-brand-700"
+                      >
+                        {label}
+                      </span>
+                    ))}
+                  </div>
+                  <h2 className="text-lg font-bold">{listing.title}</h2>
+                  <p className="text-sm text-gray-600">会社名：{listing.companyName || '未設定'}</p>
+                  <p className="text-sm">エリア：{areaText}</p>
+                  <p className="text-sm">初期費用：{listing.initialCostLabel || '応相談'}</p>
+                  <p className="whitespace-pre-wrap text-sm">報酬：{listing.reward || '応相談'}</p>
+                </Link>
+              );
+            })}
           </div>
         </>
       )}
