@@ -36,11 +36,9 @@ export default async function AreaPage({
   const info = AREA_LABELS[slug];
   if (!info) notFound();
 
-  const filterKey = info.type === 'region' ? 'regionSlug' : 'prefectureSlug';
-
   return (
     <FilteredListingList
-      filterKey={filterKey}
+      filterKey="area"
       filterValue={slug}
       heading={`${info.label}の代理店募集・加盟店募集`}
       description={`${info.label}エリアの代理店・加盟店を募集している企業の一覧です。`}
