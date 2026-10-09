@@ -1,5 +1,6 @@
 import { onDocumentCreated } from 'firebase-functions/v2/firestore';
-import { db, REGION } from '../lib/admin';
+import { logger } from 'firebase-functions';
+import { db, FV, REGION } from '../lib/admin';
 import { COLLECTIONS } from '../lib/constants';
 import { consumeOne } from '../deposit';
 import { enqueueMail } from '../lib/mail';
@@ -17,14 +18,81 @@ export const onInquiryCreated = onDocumentCreated(
     if (!snap) return;
 
     const inq = snap.data();
-    const { advertiserId, applicantId, maskedPreview } = inq;
+    const { advertiserId, applicantId, maskedPreview, isRepeat } = inq;
 
-    // ▼ 消費トランザクション
+    // ─── 2回目の応募（重複）の場合 ───
+    // デポジット消費なし、資料送信は onInquiryDelivered 側で処理
+    if (isRepeat === true) {
+      try {
+        await db.runTransaction(async (tx) => {
+          const inqRef = db.collection(COLLECTIONS.INQUIRIES).doc(inquiryId);
+          const advRef = db.collection(COLLECTIONS.ADVERTISERS).doc(advertiserId);
+
+          const [inqSnap, advSnap] = await Promise.all([tx.get(inqRef), tx.get(advRef)]);
+          if (!inqSnap.exists || !advSnap.exists) return;
+
+          const status = inqSnap.get('status');
+          if (status !== 'pending') return;
+
+          const now = FV.serverTimestamp();
+
+          tx.update(inqRef, {
+            status: 'delivered',
+            deliveredAt: now,
+            depositTransactionId: null,
+            freeTrial: false,
+            isRepeat: true,
+            updatedAt: now,
+          });
+
+          tx.update(advRef, {
+            pendingCount: FV.increment(-1),
+            updatedAt: now,
+          });
+        });
+
+        // 募集者に「2回目の応募」メール
+        const advSnap = await db.collection(COLLECTIONS.ADVERTISERS).doc(advertiserId).get();
+        const advEmail = advSnap.data()?.email;
+        const listingSnap = await db.collection(COLLECTIONS.LISTINGS).doc(inq.listingId).get();
+        const listingTitle = listingSnap.data()?.title ?? '';
+        const advName = advSnap.data()?.companyName ?? '';
+
+        if (typeof advEmail === 'string' && advEmail) {
+          await enqueueMail('INQUIRY_REPEAT', advEmail, {
+            inquiryId,
+            advertiserId,
+            listingTitle,
+            advertiserName: advName,
+          });
+        }
+
+        // 応募者に受付完了メール
+        const detailSnap = await db.collection(COLLECTIONS.INQUIRY_DETAILS).doc(inquiryId).get();
+        const applicantEmail = detailSnap.data()?.email;
+        if (typeof applicantEmail === 'string' && applicantEmail) {
+          await enqueueMail('APPLICATION_RECEIVED', applicantEmail, { inquiryId });
+        }
+
+        logger.info('onInquiryCreated: repeat inquiry delivered without consuming', {
+          inquiryId,
+          advertiserId,
+        });
+        return;
+      } catch (error) {
+        logger.error('onInquiryCreated: repeat handling failed', {
+          inquiryId,
+          error: error instanceof Error ? error.message : String(error),
+        });
+        return;
+      }
+    }
+
+    // ─── 通常の応募（1回目） ───
     const result = await consumeOne(advertiserId, inquiryId, {
       reason: `inquiry:${inquiryId}`,
     });
 
-    // ▼ 募集者へ
     const advSnap = await db.collection(COLLECTIONS.ADVERTISERS).doc(advertiserId).get();
     const adv = advSnap.data()!;
 
@@ -33,6 +101,7 @@ export const onInquiryCreated = onDocumentCreated(
         inquiryId,
         advertiserId,
         balanceAfter: result.balanceAfter,
+        freeTrial: result.freeTrial,
       });
       if (result.notifyLow) {
         await enqueueMail('DEPOSIT_LOW', adv.email, {
@@ -41,14 +110,12 @@ export const onInquiryCreated = onDocumentCreated(
         });
       }
     } else {
-      // 残高0 or 既処理 → 保留 or 何もしない
       if (result.reason === 'no_balance') {
         await enqueueMail('INQUIRY_HELD_NO_DEPOSIT', adv.email, {
           inquiryId,
           advertiserId,
           masked: maskedPreview,
         });
-        // 残高0到達通知（初回のみ）
         if (adv.lowDepositNotified !== 0) {
           await db.collection(COLLECTIONS.ADVERTISERS).doc(advertiserId).update({
             lowDepositNotified: 0,
@@ -58,7 +125,6 @@ export const onInquiryCreated = onDocumentCreated(
       }
     }
 
-    // ▼ 応募者へ（受付完了）
     const appSnap = await db.collection(COLLECTIONS.APPLICANTS).doc(applicantId).get();
     const appEmail = appSnap.data()?.email;
     if (appEmail) {
