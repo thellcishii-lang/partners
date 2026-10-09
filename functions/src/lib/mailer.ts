@@ -21,3 +21,15 @@ export function createTransporter() {
     },
   });
 }
+
+// ============================================================
+// 添付ファイル
+// ============================================================
+export interface MailAttachment {
+  /** ファイル名（受信者に見える名前） */
+  filename: string;
+  /** ファイルの中身（Buffer） */
+  content: Buffer;
+  /** MIMEタイプ */
+  contentType: string;
+}
