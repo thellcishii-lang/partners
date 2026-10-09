@@ -31,7 +31,7 @@ function hash(value: string): string {
 }
 
 export const createInquiry = onCall({ region: REGION }, async (request) => {
-  if (!request.auth) throw new HttpsError('unauthenticated', 'ログインしてください。');
+  if (!request.auth) throw new HttpsError('unauthenticated', 'SMS認証を行ってください。');
   const auth = request.auth;
   const data = object(request.data);
   const inquiryId = text(data, 'inquiryId', 20, true);
@@ -44,7 +44,11 @@ export const createInquiry = onCall({ region: REGION }, async (request) => {
     kana: text(data, 'kana', 120),
     email: text(data, 'email', 254, true),
     phone: text(data, 'phone', 50, true),
-    lineId: text(data, 'lineId', 100),
+    postalCode: text(data, 'postalCode', 10),
+    prefecture: text(data, 'prefecture', 20, true),
+    city: text(data, 'city', 50, true),
+    address: text(data, 'address', 100, true),
+    building: text(data, 'building', 100),
     message: text(data, 'message', 5000, true),
   };
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(details.email)) {
@@ -74,7 +78,6 @@ export const createInquiry = onCall({ region: REGION }, async (request) => {
       tx.get(inqRef), tx.get(listingRef), tx.get(applicantRef),
     ]);
 
-    // 冪等：同じ inquiryId での再送
     if (existing.exists) {
       if (existing.get('applicantId') !== applicantId || existing.get('listingId') !== listingId) {
         throw new HttpsError('already-exists', '応募IDは既に使用されています。');
@@ -92,8 +95,6 @@ export const createInquiry = onCall({ region: REGION }, async (request) => {
       throw new HttpsError('failed-precondition', '自分の案件には応募できません。');
     }
 
-    // ─── 重複応募チェック（同じ案件 × 電話 or メール一致）───
-    // 電話ハッシュ・メールハッシュで個別に検索
     const [byPhone, byEmail] = await Promise.all([
       tx.get(
         db.collection(COLLECTIONS.INQUIRIES)
@@ -109,7 +110,6 @@ export const createInquiry = onCall({ region: REGION }, async (request) => {
       ),
     ]);
 
-    // 重複を除外して既存応募の ID セットを作る
     const existingIds = new Set<string>();
     byPhone.docs.forEach((d) => existingIds.add(d.id));
     byEmail.docs.forEach((d) => existingIds.add(d.id));
@@ -135,10 +135,8 @@ export const createInquiry = onCall({ region: REGION }, async (request) => {
       maskedPreview,
       depositTransactionId: null,
       deliveredAt: null,
-      // 重複チェック用ハッシュ（PII は含まない）
       applicantPhoneHash: phoneHash,
       applicantEmailHash: emailHash,
-      // 2回目の応募フラグ
       isRepeat,
       createdAt: FV.serverTimestamp(),
     });
@@ -150,7 +148,7 @@ export const createInquiry = onCall({ region: REGION }, async (request) => {
       ...details,
       snapshot: applicantSnap.exists ? applicantSnap.data() : {
         displayName: details.fullName,
-        email: auth.token.email ?? details.email,
+        email: details.email,
       },
       createdAt: FV.serverTimestamp(),
     });
