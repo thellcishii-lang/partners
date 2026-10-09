@@ -12,6 +12,14 @@ import { Button } from '@/components/ui/Button';
 import { PreviewModal } from '@/components/listings/PreviewModal';
 import { LISTING_STATUS_LABELS, type Advertiser, type Listing, type ListingStatus } from '@/types';
 
+function isInFreeTrial(freeUntil: unknown): boolean {
+  if (!freeUntil) return false;
+  if (typeof freeUntil === 'object' && freeUntil !== null && 'seconds' in freeUntil) {
+    return (freeUntil as { seconds: number }).seconds * 1000 > Date.now();
+  }
+  return false;
+}
+
 export default function DashboardPage() {
   const { user, loading } = useRequireAuth();
   const [adv, setAdv] = useState<Advertiser | null>(null);
@@ -54,9 +62,25 @@ export default function DashboardPage() {
 
   const togglePublish = async (listing: Listing) => {
     if (listing.status !== 'published' && listing.status !== 'paused') return;
+
+    const goingPublic = listing.status === 'paused';
+
+    // ─── 公開する時：無料期間 or デポジット残高をチェック ───
+    if (goingPublic && adv) {
+      const inFree = isInFreeTrial(adv.freeUntil);
+      const balance = adv.depositBalance ?? 0;
+      if (!inFree && balance <= 0) {
+        window.alert(
+          '無料期間が終了しているため、デポジットを追加しないと公開できません。\n\n「デポジットを追加」から購入してください。'
+        );
+        return;
+      }
+    }
+
     const next: ListingStatus = listing.status === 'published' ? 'paused' : 'published';
     const label = next === 'paused' ? '非公開に' : '公開';
     if (!window.confirm(`この案件を${label}しますか？`)) return;
+
     setBusy(listing.id);
     setError('');
     try {
@@ -96,6 +120,13 @@ export default function DashboardPage() {
   if (error || !adv) return <p role="alert" className="text-red-600">{error}</p>;
 
   const balance = adv.depositBalance ?? 0;
+  const inFreeTrial = isInFreeTrial(adv.freeUntil);
+  const freeUntilDate = adv.freeUntil && typeof adv.freeUntil === 'object' && 'seconds' in adv.freeUntil
+    ? new Date((adv.freeUntil as { seconds: number }).seconds * 1000)
+    : null;
+  const daysLeft = freeUntilDate
+    ? Math.max(0, Math.ceil((freeUntilDate.getTime() - Date.now()) / (24 * 60 * 60 * 1000)))
+    : 0;
 
   return (
     <div className="space-y-6">
@@ -120,22 +151,25 @@ export default function DashboardPage() {
         </div>
       )}
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <Card label="残りデポジット" value={balance} unit="件" highlight={balance <= 3} />
-        <Card label="未開示（保留）" value={pendingCount} unit="件" highlight={pendingCount > 0} />
-        <Card label="開示済み" value={deliveredCount} unit="件" />
-      </div>
-
-      {balance > 0 && (
-        <div className="text-right">
-          <Link href="/deposit" className="text-sm text-brand-700 underline">デポジットを追加</Link>
+      {/* 無料期間の案内 */}
+      {inFreeTrial && (
+        <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-900">
+          <strong>無料期間中</strong>：あと <strong>{daysLeft}日</strong>
+          （{freeUntilDate?.toLocaleDateString('ja-JP')} まで）
+          <p className="mt-1 text-xs text-emerald-800">
+            期間中は、デポジットなしで応募者の情報を確認できます。
+          </p>
         </div>
       )}
-
-      {balance <= 0 && (
+      {!inFreeTrial && balance > 0 && (
+        <div className="rounded-xl border border-gray-200 bg-gray-50 p-4 text-sm text-gray-700">
+          無料期間は終了しました。デポジット残高 <strong>{balance}件</strong> で公開中です。
+        </div>
+      )}
+      {!inFreeTrial && balance <= 0 && (
         <div className="rounded-xl border border-red-200 bg-red-50 p-4">
           <p className="text-sm font-medium text-red-800">
-            デポジットが不足しています。追加すると、保留中の問い合わせ内容が確認できます。
+            無料期間が終了し、デポジット残高が0です。デポジットを追加するまで、新規の公開はできません。
           </p>
           <Link href="/deposit">
             <Button className="mt-3" variant="primary">デポジットを追加</Button>
@@ -143,9 +177,15 @@ export default function DashboardPage() {
         </div>
       )}
 
-      {balance > 0 && balance <= 3 && (
-        <div className="rounded-xl border border-orange-200 bg-orange-50 p-4 text-sm text-orange-800">
-          残り{balance}件です。お早めに追加をご検討ください。
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <Card label="残りデポジット" value={balance} unit="件" highlight={!inFreeTrial && balance <= 3} />
+        <Card label="未開示（保留）" value={pendingCount} unit="件" highlight={pendingCount > 0} />
+        <Card label="開示済み" value={deliveredCount} unit="件" />
+      </div>
+
+      {balance > 0 && (
+        <div className="text-right">
+          <Link href="/deposit" className="text-sm text-brand-700 underline">デポジットを追加</Link>
         </div>
       )}
 
