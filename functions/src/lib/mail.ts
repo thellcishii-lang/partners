@@ -15,7 +15,8 @@ export type MailTemplate =
   | 'LISTING_APPROVED'
   | 'LISTING_REJECTED'
   | 'LISTING_EDIT_APPROVED'
-  | 'LISTING_EDIT_REJECTED';
+  | 'LISTING_EDIT_REJECTED'
+  | 'APPLICANT_RESOURCES';   // ★ 追加
 
 export async function enqueueMail(
   template: MailTemplate,
@@ -40,8 +41,6 @@ export async function enqueueMail(
   const ref = db.collection(COLLECTIONS.MAIL_LOGS).doc(docId);
 
   try {
-    // create は既存ドキュメントがあると ALREADY_EXISTS で失敗する。
-    // 事前クエリ不要で、同時実行でも片方だけが成功する（冪等）。
     await ref.create({
       template,
       to,
@@ -52,7 +51,6 @@ export async function enqueueMail(
       createdAt: TS.now(),
     });
   } catch (e) {
-    // 既に同じ idempotencyKey のログが存在 → 何もしない
     const code = (e as { code?: number | string })?.code;
     if (code === 6 || code === 'already-exists' || code === 'ALREADY_EXISTS') {
       return;
