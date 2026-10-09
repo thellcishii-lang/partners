@@ -162,6 +162,26 @@ ${footer}`,
 ${footer}`,
       };
 
+          case 'APPLICANT_RESOURCES':
+      return {
+        subject: `【${SITE_NAME}】${p('listingTitle')} の資料をお送りします`,
+        text: `${p('applicantName')} 様
+
+ご応募ありがとうございます。
+${p('advertiserName')} より、資料をお送りします。
+
+─────────────
+案件：${p('listingTitle')}
+募集企業：${p('advertiserName')}
+─────────────
+
+資料は本メールに添付しています。
+ご不明な点がございましたら、本メールにご返信ください。
+
+${footer}`,
+      };
+
+
     default:
       return {
         subject: `【${SITE_NAME}】お知らせ`,
