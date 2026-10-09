@@ -54,16 +54,7 @@ export const createInquiry = onCall({ region: REGION }, async (request) => {
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(details.email)) {
     throw new HttpsError('invalid-argument', 'メールアドレスを確認してください。');
   }
-  const preview = object(data.maskedPreview);
-  if (typeof preview.hasExperience !== 'boolean') {
-    throw new HttpsError('invalid-argument', '経験の有無を選択してください。');
-  }
-  const maskedPreview = {
-    prefecture: text(preview, 'prefecture', 50),
-    ageRange: text(preview, 'ageRange', 50),
-    budget: text(preview, 'budget', 100),
-    hasExperience: preview.hasExperience,
-  };
+
   const applicantId = auth.uid;
   const inqRef = db.collection(COLLECTIONS.INQUIRIES).doc(inquiryId);
   const detailRef = db.collection(COLLECTIONS.INQUIRY_DETAILS).doc(inquiryId);
@@ -132,7 +123,6 @@ export const createInquiry = onCall({ region: REGION }, async (request) => {
       advertiserId,
       applicantId,
       status: 'pending',
-      maskedPreview,
       depositTransactionId: null,
       deliveredAt: null,
       applicantPhoneHash: phoneHash,
