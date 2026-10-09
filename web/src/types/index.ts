@@ -289,4 +289,3 @@ export interface ApplicationInput {
     hasExperience: boolean;
   };
 }
-}
