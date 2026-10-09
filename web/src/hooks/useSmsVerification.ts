@@ -58,6 +58,13 @@ const result = await linkWithPhoneNumber(
       setConfirmation(result);
       return true;
     } catch (e) {
+      try {
+        verifierRef.current?.clear();
+      } catch {
+        // Keep the original SMS error visible if cleanup also fails.
+      }
+      verifierRef.current = null;
+
       const msg = e instanceof Error ? e.message : 'SMS送信に失敗しました。';
       setError(
         msg.includes('invalid-phone-number') ? '電話番号の形式が正しくありません。'
