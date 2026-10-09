@@ -285,3 +285,18 @@ export const ORGANIZATION_TYPES = [
 export function getOrganizationTypeLabel(slug: string): string {
   return ORGANIZATION_TYPES.find((t) => t.slug === slug)?.label ?? '';
 }
+
+
+// ============================================================
+// 地域（単一都道府県版）
+// ============================================================
+export function getRegionSlug(prefectureSlug: string): string {
+  if (prefectureSlug === 'all') return 'all';
+  return PREFECTURE_TO_REGION[prefectureSlug] ?? 'other';
+}
+
+export function getRegionLabel(prefectureSlug: string): string {
+  if (prefectureSlug === 'all') return '全国';
+  const region = getRegionSlug(prefectureSlug);
+  return REGION_LABELS[region] ?? 'その他';
+}
