@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   RecaptchaVerifier,
   signInWithPhoneNumber,
+  signOut,
   type ConfirmationResult,
 } from 'firebase/auth';
 import { httpsCallable } from 'firebase/functions';
@@ -39,6 +40,11 @@ export function useSmsVerification(containerId: string) {
     setLoading(true);
     setError('');
     try {
+      // ★ 既存セッションをクリア（provider-already-linked 対策）
+      if (auth.currentUser) {
+        try { await signOut(auth); } catch { /* noop */ }
+      }
+
       if (!verifierRef.current) {
         verifierRef.current = new RecaptchaVerifier(auth, containerId, {
           size: 'invisible',
@@ -72,12 +78,11 @@ export function useSmsVerification(containerId: string) {
     setError('');
     try {
       await confirmation.confirm(code);
-      // サーバー側で smsVerified カスタムクレームを付与
       try {
         const fn = httpsCallable<unknown, { ok: boolean }>(functions, 'setSmsVerified');
         await fn({});
       } catch {
-        // カスタムクレーム設定に失敗しても、認証自体は成功
+        // カスタムクレーム設定失敗は無視
       }
       return true;
     } catch (e) {
