@@ -276,7 +276,11 @@ export interface ApplicationInput {
   kana: string;
   email: string;
   phone: string;
-  lineId: string;
+  postalCode: string;
+  prefecture: string;
+  city: string;
+  address: string;
+  building: string;
   message: string;
   maskedPreview: {
     prefecture: string;
@@ -284,4 +288,5 @@ export interface ApplicationInput {
     budget: string;
     hasExperience: boolean;
   };
+}
 }
