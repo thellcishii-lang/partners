@@ -708,40 +708,98 @@ function ListingCard({ listing }: { listing: Listing }) {
   const areaText = listing.areaLabels?.length
     ? listing.areaLabels.slice(0, 2).join('・')
     : '全国';
+  const mainImage = listing.images?.[0];
 
   return (
     <Link
       href={`/listings/${listing.id}`}
-      className="block rounded-2xl bg-white p-5 shadow-sm transition hover:ring-2 hover:ring-emerald-500"
+      className="block rounded-2xl bg-white shadow-sm transition hover:shadow-md hover:ring-2 hover:ring-emerald-500"
     >
-      <div className="flex flex-wrap gap-1">
-        {listing.productLabels?.slice(0, 2).map((label) => (
-          <span key={label} className="rounded-full bg-emerald-50 px-2 py-0.5 text-xs text-emerald-700">
-            {label}
-          </span>
-        ))}
-        {listing.targetLabels?.slice(0, 1).map((label) => (
-          <span key={label} className="rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-700">
-            {label}
-          </span>
-        ))}
-        {listing.modelLabels?.slice(0, 1).map((label) => (
-          <span key={label} className="rounded-full bg-green-50 px-2 py-0.5 text-xs text-green-700">
-            {label}
-          </span>
-        ))}
+      <div className="flex gap-5 p-5">
+        {/* 左：メイン画像 */}
+        <div className="h-44 w-44 shrink-0 overflow-hidden rounded-xl bg-gray-100 sm:h-48 sm:w-48">
+          {mainImage ? (
+            /* eslint-disable-next-line @next/next/no-img-element */
+            <img
+              src={mainImage}
+              alt={listing.title}
+              className="h-full w-full object-cover"
+            />
+          ) : (
+            <div className="flex h-full w-full items-center justify-center text-gray-300">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} className="h-14 w-14">
+                <rect x="3" y="3" width="18" height="18" rx="2" />
+                <circle cx="8.5" cy="8.5" r="1.5" />
+                <path d="M21 15l-5-5L5 21" />
+              </svg>
+            </div>
+          )}
+        </div>
+
+        {/* 右：情報 */}
+        <div className="flex min-w-0 flex-1 flex-col">
+          {/* タグ行 */}
+          <div className="mb-2 flex flex-wrap gap-1.5">
+            {listing.targetLabels?.slice(0, 2).map((label) => (
+              <span
+                key={label}
+                className="rounded-md bg-gray-100 px-2 py-0.5 text-[11px] font-bold text-gray-700"
+              >
+                {label}
+              </span>
+            ))}
+            <span className="rounded-md bg-blue-50 px-2 py-0.5 text-[11px] font-bold text-blue-700">
+              {areaText}
+            </span>
+            {listing.productLabels?.slice(0, 2).map((label) => (
+              <span
+                key={label}
+                className="rounded-md bg-emerald-50 px-2 py-0.5 text-[11px] font-bold text-emerald-700"
+              >
+                {label}
+              </span>
+            ))}
+            {listing.modelLabels?.slice(0, 1).map((label) => (
+              <span
+                key={label}
+                className="rounded-md bg-green-50 px-2 py-0.5 text-[11px] font-bold text-green-700"
+              >
+                {label}
+              </span>
+            ))}
+          </div>
+
+          {/* タイトル */}
+          <h2 className="line-clamp-2 text-lg font-bold leading-snug text-gray-900">
+            {listing.title}
+          </h2>
+
+          {/* 掲載企業 */}
+          <p className="mt-1 text-xs text-gray-500">
+            掲載企業：{listing.companyName || '未設定'}
+          </p>
+
+          {/* 説明 */}
+          {listing.description && (
+            <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-gray-600">
+              {listing.description}
+            </p>
+          )}
+
+          {/* 下部：条件 */}
+          <div className="mt-auto flex flex-wrap gap-x-4 gap-y-1 pt-3 text-xs text-gray-600">
+            {listing.initialCostLabel && (
+              <span>💵 初期費用：{listing.initialCostLabel}</span>
+            )}
+            {listing.franchiseFeeLabel && (
+              <span>💰 加盟金：{listing.franchiseFeeLabel}</span>
+            )}
+            {listing.revenueTypeLabel && (
+              <span>📈 {listing.revenueTypeLabel}</span>
+            )}
+          </div>
+        </div>
       </div>
-      <h2 className="mt-2 text-lg font-bold">{listing.title}</h2>
-      <p className="text-sm text-gray-600">{listing.companyName || '会社名未設定'}</p>
-      <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-sm text-gray-700">
-        <span>📍 {areaText}</span>
-        {listing.franchiseFeeLabel && <span>💰 加盟金 {listing.franchiseFeeLabel}</span>}
-        {listing.initialCostLabel && <span>💵 初期費用 {listing.initialCostLabel}</span>}
-        {listing.revenueTypeLabel && <span>📈 {listing.revenueTypeLabel}</span>}
-      </div>
-      <p className="mt-2 text-sm font-medium text-gray-900">
-        報酬：{listing.reward || '応相談'}
-      </p>
     </Link>
   );
 }
