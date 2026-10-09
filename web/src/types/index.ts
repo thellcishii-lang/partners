@@ -126,7 +126,10 @@ export interface Listing {
 
   // 検索用（保存時に自動展開）
   areaSearchPrefectureSlugs: string[];
-  areaSearchRegionSlugs: string[];          // '関東'
+  areaSearchRegionSlugs: string[];        // '関東'
+
+   // 資料（PDF・PPT・画像）
+  documents?: ListingDocument[];
 
   initialCostYen: number | null;    // 数値（円）。不明は null
   initialCostRange: string;         // 'initial-free' など
@@ -193,6 +196,23 @@ export interface Listing {
 
   // 編集審査中かどうかのフラグ（admin 検索用）
   pendingEditSubmitted?: boolean;
+}
+
+
+// ============================================================
+// 案件資料
+// ============================================================
+export interface ListingDocument {
+  /** 元のファイル名（メール添付時の名前） */
+  name: string;
+  /** ダウンロードURL */
+  url: string;
+  /** Storage パス（削除用） */
+  path: string;
+  /** バイトサイズ */
+  size: number;
+  /** MIMEタイプ */
+  type: string;
 }
 
 // ============================================================
