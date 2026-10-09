@@ -1,4 +1,5 @@
 import { onCall, HttpsError } from 'firebase-functions/v2/https';
+import { createHash } from 'crypto';
 import { db, FV, REGION } from '../lib/admin';
 import { COLLECTIONS } from '../lib/constants';
 
@@ -17,6 +18,18 @@ function text(data: Record<string, unknown>, key: string, max: number, required 
   return value.trim();
 }
 
+function normalizePhone(phone: string): string {
+  return phone.replace(/\D/g, '');
+}
+
+function normalizeEmail(email: string): string {
+  return email.toLowerCase().trim();
+}
+
+function hash(value: string): string {
+  return createHash('sha256').update(value).digest('hex');
+}
+
 export const createInquiry = onCall({ region: REGION }, async (request) => {
   if (!request.auth) throw new HttpsError('unauthenticated', 'ログインしてください。');
   const auth = request.auth;
@@ -30,7 +43,7 @@ export const createInquiry = onCall({ region: REGION }, async (request) => {
     fullName: text(data, 'fullName', 120, true),
     kana: text(data, 'kana', 120),
     email: text(data, 'email', 254, true),
-    phone: text(data, 'phone', 50),
+    phone: text(data, 'phone', 50, true),
     lineId: text(data, 'lineId', 100),
     message: text(data, 'message', 5000, true),
   };
@@ -53,11 +66,15 @@ export const createInquiry = onCall({ region: REGION }, async (request) => {
   const listingRef = db.collection(COLLECTIONS.LISTINGS).doc(listingId);
   const applicantRef = db.collection(COLLECTIONS.APPLICANTS).doc(applicantId);
 
+  const phoneHash = hash(normalizePhone(details.phone));
+  const emailHash = hash(normalizeEmail(details.email));
+
   await db.runTransaction(async (tx) => {
     const [existing, listingSnap, applicantSnap] = await Promise.all([
       tx.get(inqRef), tx.get(listingRef), tx.get(applicantRef),
     ]);
-    // 応答が失われた場合の再送で二重応募・二重課金しない。
+
+    // 冪等：同じ inquiryId での再送
     if (existing.exists) {
       if (existing.get('applicantId') !== applicantId || existing.get('listingId') !== listingId) {
         throw new HttpsError('already-exists', '応募IDは既に使用されています。');
@@ -74,6 +91,38 @@ export const createInquiry = onCall({ region: REGION }, async (request) => {
     if (advertiserId === applicantId) {
       throw new HttpsError('failed-precondition', '自分の案件には応募できません。');
     }
+
+    // ─── 重複応募チェック（同じ案件 × 電話 or メール一致）───
+    // 電話ハッシュ・メールハッシュで個別に検索
+    const [byPhone, byEmail] = await Promise.all([
+      tx.get(
+        db.collection(COLLECTIONS.INQUIRIES)
+          .where('listingId', '==', listingId)
+          .where('applicantPhoneHash', '==', phoneHash)
+          .limit(3)
+      ),
+      tx.get(
+        db.collection(COLLECTIONS.INQUIRIES)
+          .where('listingId', '==', listingId)
+          .where('applicantEmailHash', '==', emailHash)
+          .limit(3)
+      ),
+    ]);
+
+    // 重複を除外して既存応募の ID セットを作る
+    const existingIds = new Set<string>();
+    byPhone.docs.forEach((d) => existingIds.add(d.id));
+    byEmail.docs.forEach((d) => existingIds.add(d.id));
+    const existingCount = existingIds.size;
+
+    if (existingCount >= 2) {
+      throw new HttpsError(
+        'failed-precondition',
+        'この電話番号とメールアドレスでは以前に申し込みがあったため、資料請求ができません。'
+      );
+    }
+    const isRepeat = existingCount === 1;
+
     const advRef = db.collection(COLLECTIONS.ADVERTISERS).doc(advertiserId);
     const advSnap = await tx.get(advRef);
     if (!advSnap.exists) throw new HttpsError('failed-precondition', '募集者が見つかりません。');
@@ -86,12 +135,18 @@ export const createInquiry = onCall({ region: REGION }, async (request) => {
       maskedPreview,
       depositTransactionId: null,
       deliveredAt: null,
+      // 重複チェック用ハッシュ（PII は含まない）
+      applicantPhoneHash: phoneHash,
+      applicantEmailHash: emailHash,
+      // 2回目の応募フラグ
+      isRepeat,
       createdAt: FV.serverTimestamp(),
     });
     tx.create(detailRef, {
       inquiryId,
       applicantId,
       advertiserId,
+      listingId,
       ...details,
       snapshot: applicantSnap.exists ? applicantSnap.data() : {
         displayName: details.fullName,
