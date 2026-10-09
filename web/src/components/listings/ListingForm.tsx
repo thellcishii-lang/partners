@@ -18,8 +18,6 @@ import {
   getInitialCostRange,
   getExpectedRevenueLabel,
   getExpectedRevenueRange,
-  getRegionSlug,
-  getRegionLabel,
   getFranchiseFeeRange,
   getFranchiseFeeLabel,
   getStockLabel,
@@ -27,9 +25,12 @@ import {
   getProfitAmountLabel,
   getRevenueTypeLabel,
   getOrganizationTypeLabel,
+  expandAreaSlugs,
+  REGION_LABELS,
   STOCK_TYPES,
   REVENUE_TYPES,
   ORGANIZATION_TYPES,
+  type AreaMode,
 } from '@/lib/listingFilters';
 import {
   LISTING_CATEGORIES,
@@ -39,6 +40,17 @@ import {
   type ListingDocument,
 } from '@/types';
 import { cn } from '@/lib/cn';
+
+const REGION_GROUPS: { slug: string; label: string }[] = [
+  { slug: 'hokkaido', label: '北海道' },
+  { slug: 'tohoku',   label: '東北' },
+  { slug: 'kanto',    label: '関東' },
+  { slug: 'chubu',    label: '中部' },
+  { slug: 'kansai',   label: '関西' },
+  { slug: 'chugoku',  label: '中国' },
+  { slug: 'shikoku',  label: '四国' },
+  { slug: 'kyushu',   label: '九州・沖縄' },
+];
 
 export function ListingForm({
   advertiser,
@@ -69,8 +81,11 @@ export function ListingForm({
   const [productSlugs, setProductSlugs] = useState<string[]>(source.productSlugs ?? []);
   const [modelSlugs, setModelSlugs] = useState<string[]>(source.modelSlugs ?? []);
 
-  // 地域
-  const [prefectureSlug, setPrefectureSlug] = useState(source.prefectureSlug ?? '');
+  // エリア（3モード）
+  const [areaMode, setAreaMode] = useState<AreaMode>(
+    (source.areaMode as AreaMode) ?? 'prefecture'
+  );
+  const [areaSlugs, setAreaSlugs] = useState<string[]>(source.areaSlugs ?? []);
 
   // 初期費用
   type CostMode = 'free' | 'amount' | 'unknown';
@@ -101,10 +116,8 @@ export function ListingForm({
     source.franchiseFeeYen != null ? String(source.franchiseFeeYen) : ''
   );
 
-  // 仕入れ
   const [stockType, setStockType] = useState(source.stockType ?? '');
 
-  // 想定月商
   type ProfitMode = 'amount' | 'unknown';
   const [profitMode, setProfitMode] = useState<ProfitMode>(
     source.expectedProfitYen != null ? 'amount' : 'unknown'
@@ -113,11 +126,9 @@ export function ListingForm({
     source.expectedProfitYen != null ? String(source.expectedProfitYen) : ''
   );
 
-  // 収益タイプ / 組織拡大
   const [revenueType, setRevenueType] = useState(source.revenueType ?? '');
   const [organizationType, setOrganizationType] = useState(source.organizationType ?? '');
 
-  // その他
   const [fields, setFields] = useState({
     requirements: source.requirements ?? '',
     reward: source.reward ?? '',
@@ -132,7 +143,6 @@ export function ListingForm({
   const [documents, setDocuments] = useState<ListingDocument[]>(source.documents ?? []);
   const [editNote, setEditNote] = useState(listing?.pendingEdit?.note ?? '');
 
-  // 会社情報
   const [companyInfo, setCompanyInfo] = useState({
     companyAddress: source.companyAddress ?? '',
     companyRepresentative: source.companyRepresentative ?? '',
@@ -140,32 +150,20 @@ export function ListingForm({
     companyBusiness: source.companyBusiness ?? '',
   });
 
-  // こんな方におすすめ
-  const [recommendedFor, setRecommendedFor] = useState<string[]>(
-    source.recommendedFor ?? ['']
-  );
+  const [recommendedFor, setRecommendedFor] = useState<string[]>(source.recommendedFor ?? ['']);
 
-  // ビジネスの説明（固定5個）
-  const [businessPoints, setBusinessPoints] = useState<
-    { title: string; body: string }[]
-  >(() => {
+  const [businessPoints, setBusinessPoints] = useState<{ title: string; body: string }[]>(() => {
     const existing = source.businessPoints ?? [];
     return Array.from({ length: 5 }, (_, i) => existing[i] ?? { title: '', body: '' });
   });
 
-  // 詳細情報
   const [detailInfo, setDetailInfo] = useState({
     salesTarget: source.salesTarget ?? '',
     salesMethod: source.salesMethod ?? '',
     earnings: source.earnings ?? '',
   });
-  const [agentFit, setAgentFit] = useState<string[]>(
-    source.agentFit ?? ['']
-  );
+  const [agentFit, setAgentFit] = useState<string[]>(source.agentFit ?? ['']);
 
-  // ============================================================
-  // マスタの絞り込み
-  // ============================================================
   const targetCategories = categories.filter((c) => c.axis === 'target');
   const productParents = categories.filter((c) => c.axis === 'product' && !c.parentSlug);
   const productSubs = categories.filter((c) => c.axis === 'product' && c.parentSlug);
@@ -208,10 +206,23 @@ export function ListingForm({
       .map((s) => categories.find((c) => c.slug === s)?.label ?? '')
       .filter(Boolean);
 
-    const pref = areas.find((a) => a.slug === prefectureSlug);
-    const prefectureLabel = pref?.label ?? '';
-    const regionSlug = getRegionSlug(prefectureSlug);
-    const regionLabel = getRegionLabel(prefectureSlug);
+    // エリアラベル
+    const areaLabels: string[] = [];
+    if (areaMode === 'nationwide') {
+      areaLabels.push('全国');
+    } else if (areaMode === 'region') {
+      areaSlugs.forEach((slug) => {
+        const label = REGION_LABELS[slug];
+        if (label) areaLabels.push(label);
+      });
+    } else {
+      areaSlugs.forEach((slug) => {
+        const p = areas.find((a) => a.slug === slug);
+        if (p) areaLabels.push(p.label);
+      });
+    }
+
+    const expanded = expandAreaSlugs(areaMode, areaSlugs);
 
     const initialCostYen =
       initialCostMode === 'free' ? 0
@@ -241,8 +252,7 @@ export function ListingForm({
       targetLabels,
       productLabels,
       modelLabels,
-      prefectureLabel,
-      regionLabel,
+      areaLabels,
       category,
       companyName: advertiser.companyName,
     });
@@ -265,10 +275,11 @@ export function ListingForm({
       modelSlugs,
       modelLabels,
 
-      prefectureSlug,
-      prefectureLabel,
-      regionSlug,
-      regionLabel,
+      areaMode,
+      areaSlugs,
+      areaLabels,
+      areaSearchPrefectureSlugs: expanded.prefectureSlugs,
+      areaSearchRegionSlugs: expanded.regionSlugs,
 
       initialCostYen,
       initialCostRange,
@@ -312,9 +323,6 @@ export function ListingForm({
     };
   };
 
-  // ============================================================
-  // プレビュー用オブジェクト
-  // ============================================================
   const previewStatus = listing?.pendingEdit?.submittedAt
     ? 'reviewing'
     : (listing?.status ?? 'draft');
@@ -330,9 +338,6 @@ export function ListingForm({
     pendingEdit: null,
   } as Listing;
 
-  // ============================================================
-  // 保存
-  // ============================================================
   const save = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (saving) return;
@@ -352,8 +357,8 @@ export function ListingForm({
       setError('商材を1つ以上選択してください。');
       return;
     }
-    if (!prefectureSlug) {
-      setError('都道府県を選択してください。');
+    if (areaMode !== 'nationwide' && areaSlugs.length === 0) {
+      setError('地域または都道府県を1つ以上選択してください。');
       return;
     }
     if (!advertiser.companyName?.trim()) {
@@ -418,7 +423,6 @@ export function ListingForm({
   return (
     <>
       <form onSubmit={save} className="space-y-6">
-        {/* 上部バー */}
         <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-white p-4 shadow-sm">
           <div>
             <p className="text-sm font-bold">
@@ -610,40 +614,101 @@ export function ListingForm({
           </div>
         </section>
 
-        {/* 募集エリア・費用 */}
+        {/* 募集エリア */}
         <section className="space-y-5 rounded-2xl bg-white p-6 shadow-sm">
-          <h2 className="font-bold">募集エリア・費用</h2>
+          <h2 className="font-bold">募集エリア</h2>
 
-          <div className="space-y-3">
-            <label className="flex cursor-pointer items-center gap-2">
-              <input
-                type="checkbox"
-                checked={prefectureSlug === 'all'}
-                onChange={(e) => {
-                  setPrefectureSlug(e.target.checked ? 'all' : '');
-                }}
-              />
-              <span className="text-sm font-medium">全国</span>
-            </label>
-
-            <div className={prefectureSlug === 'all' ? 'pointer-events-none opacity-40' : ''}>
-              <Field label="都道府県" required={prefectureSlug !== 'all'}>
-                <select
-                  aria-label="都道府県"
-                  className="h-11 w-full rounded-lg border border-gray-300 px-3 text-sm"
-                  value={prefectureSlug === 'all' ? '' : prefectureSlug}
-                  onChange={(e) => setPrefectureSlug(e.target.value)}
-                  required={prefectureSlug !== 'all'}
-                  disabled={prefectureSlug === 'all'}
-                >
-                  <option value="">選択してください</option>
-                  {prefectures.map((p) => (
-                    <option key={p.slug} value={p.slug}>{p.label}</option>
-                  ))}
-                </select>
-              </Field>
+          <div className="space-y-2">
+            <p className="text-sm font-medium text-gray-800">指定方法</p>
+            <div className="flex flex-wrap gap-3">
+              {([
+                ['nationwide', '全国'],
+                ['region', '地域'],
+                ['prefecture', '都道府県'],
+              ] as const).map(([mode, label]) => (
+                <label key={mode} className="flex items-center gap-1 text-sm">
+                  <input
+                    type="radio"
+                    name="areaMode"
+                    checked={areaMode === mode}
+                    onChange={() => {
+                      setAreaMode(mode);
+                      setAreaSlugs([]);
+                    }}
+                  />
+                  {label}
+                </label>
+              ))}
             </div>
           </div>
+
+          {areaMode === 'nationwide' && (
+            <div className="rounded-lg border-2 border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-800">
+              全国どこでも募集できます。
+            </div>
+          )}
+
+          {areaMode === 'region' && (
+            <div className="space-y-2">
+              <p className="text-sm font-medium text-gray-800">地域（複数選択可）</p>
+              <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+                {REGION_GROUPS.map((g) => (
+                  <label
+                    key={g.slug}
+                    className={cn(
+                      'flex cursor-pointer items-center gap-2 rounded-lg border p-2 text-sm',
+                      areaSlugs.includes(g.slug) ? 'border-brand-600 bg-brand-50' : 'border-gray-200'
+                    )}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={areaSlugs.includes(g.slug)}
+                      onChange={() => toggle(areaSlugs, setAreaSlugs, g.slug)}
+                    />
+                    {g.label}
+                  </label>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {areaMode === 'prefecture' && (
+            <div className="space-y-3">
+              <p className="text-sm font-medium text-gray-800">都道府県（複数選択可）</p>
+              {REGION_GROUPS.map((g) => {
+                const prefsInRegion = prefectures.filter((p) => p.parentSlug === g.slug);
+                if (prefsInRegion.length === 0) return null;
+                return (
+                  <div key={g.slug}>
+                    <p className="mb-1 text-xs font-bold text-gray-500">{g.label}</p>
+                    <div className="flex flex-wrap gap-2">
+                      {prefsInRegion.map((p) => (
+                        <label
+                          key={p.slug}
+                          className={cn(
+                            'flex cursor-pointer items-center gap-1 rounded border px-2 py-1 text-xs',
+                            areaSlugs.includes(p.slug) ? 'border-brand-600 bg-brand-50' : 'border-gray-200'
+                          )}
+                        >
+                          <input
+                            type="checkbox"
+                            checked={areaSlugs.includes(p.slug)}
+                            onChange={() => toggle(areaSlugs, setAreaSlugs, p.slug)}
+                          />
+                          {p.label}
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </section>
+
+        {/* 費用・条件 */}
+        <section className="space-y-5 rounded-2xl bg-white p-6 shadow-sm">
+          <h2 className="font-bold">費用・条件</h2>
 
           <Field label="初期費用" required>
             <div className="space-y-2">
@@ -852,9 +917,7 @@ export function ListingForm({
         {/* 会社情報 */}
         <section className="space-y-5 rounded-2xl bg-white p-6 shadow-sm">
           <h2 className="font-bold">会社情報</h2>
-          <p className="text-xs text-gray-500">
-            案件詳細ページのサイドバーに表示されます。任意項目です。
-          </p>
+          <p className="text-xs text-gray-500">案件詳細ページのサイドバーに表示されます。任意項目です。</p>
           <Field label="所在地">
             <Input
               value={companyInfo.companyAddress}
@@ -889,9 +952,7 @@ export function ListingForm({
         {/* ビジネスの説明 */}
         <section className="space-y-5 rounded-2xl bg-white p-6 shadow-sm">
           <h2 className="font-bold">ビジネスの説明</h2>
-          <p className="text-xs text-gray-500">
-            番号付きで最大5項目まで。空欄の項目は表示されません。
-          </p>
+          <p className="text-xs text-gray-500">番号付きで最大5項目まで。空欄の項目は表示されません。</p>
           {businessPoints.map((point, i) => (
             <div key={i} className="space-y-3 rounded-lg border border-gray-200 p-4">
               <p className="text-xs font-bold text-gray-500">項目 {i + 1}</p>
@@ -925,9 +986,7 @@ export function ListingForm({
         {/* こんな方におすすめ */}
         <section className="space-y-5 rounded-2xl bg-white p-6 shadow-sm">
           <h2 className="font-bold">こんな方におすすめ</h2>
-          <p className="text-xs text-gray-500">
-            案件詳細ページに箇条書きで表示されます。最大5個まで。
-          </p>
+          <p className="text-xs text-gray-500">案件詳細ページに箇条書きで表示されます。最大5個まで。</p>
           {recommendedFor.map((item, i) => (
             <div key={i} className="flex gap-2">
               <Input
@@ -964,9 +1023,7 @@ export function ListingForm({
         {/* 詳細情報 */}
         <section className="space-y-5 rounded-2xl bg-white p-6 shadow-sm">
           <h2 className="font-bold">詳細情報</h2>
-          <p className="text-xs text-gray-500">
-            案件詳細ページのサイドバーに表示されます。任意項目です。
-          </p>
+          <p className="text-xs text-gray-500">案件詳細ページのサイドバーに表示されます。任意項目です。</p>
           <Field label="販売先">
             <Input
               value={detailInfo.salesTarget}
