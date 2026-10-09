@@ -196,6 +196,67 @@ ${p('listingTitle')} に、2回目の資料請求がありました。
 ${footer}`,
       };
 
+          case 'FREE_TRIAL_ENDING_2MONTH':
+      return {
+        subject: `【${SITE_NAME}】無料期間がまもなく終了します`,
+        text: `${p('advertiserName')} 様
+
+登録から3ヶ月間の無料期間が、まもなく終了します。
+終了後は、デポジットがないと案件を公開できなくなります。
+
+デポジットを追加すると、継続して案件を公開できます。
+${SITE_URL}/deposit
+
+無料期間終了日：${p('freeUntil') ? new Date(p('freeUntil')).toLocaleDateString('ja-JP') : '—'}
+${footer}`,
+      };
+
+    case 'FREE_TRIAL_ENDING_10DAYS':
+      return {
+        subject: `【${SITE_NAME}】無料期間終了まで、あと10日です`,
+        text: `${p('advertiserName')} 様
+
+登録から3ヶ月間の無料期間終了まで、あと10日となりました。
+終了後は、デポジットがないと案件を公開できなくなります。
+
+デポジットを追加すると、継続して案件を公開できます。
+${SITE_URL}/deposit
+
+無料期間終了日：${p('freeUntil') ? new Date(p('freeUntil')).toLocaleDateString('ja-JP') : '—'}
+${footer}`,
+      };
+
+    case 'FREE_TRIAL_ENDING_TOMORROW':
+      return {
+        subject: `【${SITE_NAME}】明日で無料期間が終了します`,
+        text: `${p('advertiserName')} 様
+
+明日で、登録から3ヶ月間の無料期間が終了します。
+終了後、デポジットがない場合、すべての案件が非公開となります。
+
+引き続き掲載を続けるには、デポジットを追加してください。
+${SITE_URL}/deposit
+
+無料期間終了日：${p('freeUntil') ? new Date(p('freeUntil')).toLocaleDateString('ja-JP') : '—'}
+${footer}`,
+      };
+
+    case 'FREE_TRIAL_ENDED':
+      return {
+        subject: `【${SITE_NAME}】無料期間が終了し、掲載を停止しました`,
+        text: `${p('advertiserName')} 様
+
+登録から3ヶ月間の無料期間が終了したため、
+すべての案件を非公開としました。
+
+引き続き掲載を再開するには、デポジットを追加してください。
+${SITE_URL}/deposit
+
+デポジットを追加すると、案件を再度公開できます。
+${footer}`,
+      };
+
+
 
 
     default:
