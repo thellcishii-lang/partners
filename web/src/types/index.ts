@@ -282,10 +282,4 @@ export interface ApplicationInput {
   address: string;
   building: string;
   message: string;
-  maskedPreview: {
-    prefecture: string;
-    ageRange: string;
-    budget: string;
-    hasExperience: boolean;
-  };
 }
