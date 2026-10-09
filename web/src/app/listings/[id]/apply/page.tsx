@@ -28,12 +28,7 @@ export default function ApplyPage() {
     building: '',
     message: '',
   });
-  const [preview, setPreview] = useState({
-    prefecture: '',
-    ageRange: '',
-    budget: '',
-    hasExperience: false,
-  });
+ 
   const [smsVerified, setSmsVerified] = useState(false);
   const [sending, setSending] = useState(false);
   const [error, setError] = useState('');
@@ -73,7 +68,6 @@ export default function ApplyPage() {
         ...fields,
         listingId: id,
         inquiryId: inquiryId.current,
-        maskedPreview: preview,
       });
       router.push(
         `/listings/${id}/apply/complete?inquiryId=${encodeURIComponent(result.data.inquiryId)}`,
@@ -210,36 +204,6 @@ export default function ApplyPage() {
             onChange={(e) => setFields({ ...fields, message: e.target.value })}
           />
         </Field>
-
-        {/* 事前開示情報 */}
-        <fieldset className="space-y-4 rounded-lg border p-4">
-          <legend className="px-2 text-sm font-medium">開示前に募集者が確認できる情報</legend>
-          {([
-            ['prefecture', '都道府県', 50],
-            ['ageRange', '年代', 50],
-            ['budget', '予算', 100],
-          ] as const).map(([key, label, maxLength]) => (
-            <Field key={key} label={label}>
-              <Input
-                aria-label={label}
-                maxLength={maxLength}
-                value={preview[key]}
-                onChange={(e) => setPreview({ ...preview, [key]: e.target.value })}
-              />
-            </Field>
-          ))}
-          <label className="flex items-center gap-2 text-sm">
-            <input
-              type="checkbox"
-              checked={preview.hasExperience}
-              onChange={(e) => setPreview({ ...preview, hasExperience: e.target.checked })}
-            />
-            関連業務の経験あり
-          </label>
-          <p className="text-xs text-gray-500">
-            個人を特定できる情報はここに入力しないでください。
-          </p>
-        </fieldset>
 
         {!smsVerified && (
           <SmsVerificationBlock
