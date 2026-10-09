@@ -6,14 +6,25 @@ import { enqueueMail } from './lib/mail';
 // 型
 // ============================================================
 export type ConsumeResult =
-  | { delivered: true; balanceAfter: number; txId: string; notifyLow: boolean }
+  | { delivered: true; balanceAfter: number; txId: string | null; notifyLow: boolean; freeTrial: boolean }
   | { delivered: false; balanceAfter: 0; reason: 'no_balance' | 'already_processed' };
 
 // ============================================================
+// 無料期間チェック
+// ============================================================
+function isInFreeTrial(freeUntil: unknown): boolean {
+  if (!freeUntil) return false;
+  if (typeof freeUntil === 'object' && freeUntil !== null && 'toDate' in freeUntil) {
+    return (freeUntil as { toDate: () => Date }).toDate() > new Date();
+  }
+  if (freeUntil instanceof Date) return freeUntil > new Date();
+  return false;
+}
+
+// ============================================================
 // consumeOne
-//   1デポジット消費して inquiry を delivered に昇格する。
-//   既に delivered なら何もしない（冪等）。
-//   残高0なら pending のまま false を返す。
+//   デポジット消費して inquiry を delivered に昇格する。
+//   無料期間中は消費せず、そのまま delivered にする。
 // ============================================================
 export async function consumeOne(
   advertiserId: string,
@@ -22,7 +33,6 @@ export async function consumeOne(
 ): Promise<ConsumeResult> {
   const advRef = db.collection(COLLECTIONS.ADVERTISERS).doc(advertiserId);
   const inqRef = db.collection(COLLECTIONS.INQUIRIES).doc(inquiryId);
-  const txRef = db.collection(COLLECTIONS.DEPOSIT_TX).doc();
 
   return db.runTransaction(async (tx) => {
     const [advSnap, inqSnap] = await Promise.all([tx.get(advRef), tx.get(inqRef)]);
@@ -33,33 +43,56 @@ export async function consumeOne(
     const adv = advSnap.data()!;
     const inq = inqSnap.data()!;
 
-    // 冪等ガード：既に開示済みなら何もしない
+    // 冪等ガード
     if (inq.status === 'delivered' || inq.status === 'won' || inq.status === 'lost') {
       return { delivered: false, balanceAfter: adv.depositBalance ?? 0, reason: 'already_processed' };
     }
-    // キャンセル・期限切れも消費しない
     if (inq.status === 'cancelled' || inq.status === 'expired') {
       return { delivered: false, balanceAfter: adv.depositBalance ?? 0, reason: 'already_processed' };
     }
 
     const balance = (adv.depositBalance ?? 0) as number;
+    const inFreeTrial = isInFreeTrial(adv.freeUntil);
+    const now = TS.now();
 
-    // 残高ゼロ → 保留のまま
+    // ─── 無料期間中：消費せずに開示 ───
+    if (inFreeTrial) {
+      const advUpdate: Record<string, unknown> = { updatedAt: now };
+      if (inq.status === 'pending') {
+        advUpdate.pendingCount = FV.increment(-1);
+      }
+      tx.update(advRef, advUpdate);
+
+      tx.update(inqRef, {
+        status: 'delivered',
+        deliveredAt: now,
+        depositTransactionId: null,
+        freeTrial: true,
+        updatedAt: now,
+      });
+
+      return {
+        delivered: true as const,
+        balanceAfter: balance,
+        txId: null,
+        notifyLow: false,
+        freeTrial: true,
+      };
+    }
+
+    // ─── 無料期間外：通常消費 ───
     if (balance <= 0) {
       return { delivered: false, balanceAfter: 0, reason: 'no_balance' };
     }
 
+    const txRef = db.collection(COLLECTIONS.DEPOSIT_TX).doc();
     const balanceAfter = balance - 1;
-    const now = TS.now();
 
-    // 通知フラグ判定
-    //   - 残3以下 かつ 0より大きい かつ この残数でまだ通知していない
     const shouldNotifyLow =
       balanceAfter > 0 &&
       balanceAfter <= LOW_DEPOSIT_THRESHOLD &&
       adv.lowDepositNotified !== balanceAfter;
 
-    // 1) advertiser 残高更新
     const advUpdate: Record<string, unknown> = {
       depositBalance: FV.increment(-1),
       updatedAt: now,
@@ -67,13 +100,11 @@ export async function consumeOne(
     if (shouldNotifyLow) {
       advUpdate.lowDepositNotified = balanceAfter;
     }
-    // pendingCount を減らす（delivered に昇格する時のみ）
     if (inq.status === 'pending') {
       advUpdate.pendingCount = FV.increment(-1);
     }
     tx.update(advRef, advUpdate);
 
-    // 2) 台帳記録（追記のみ）
     tx.set(txRef, {
       advertiserId,
       type: 'consume',
@@ -84,11 +115,11 @@ export async function consumeOne(
       createdAt: now,
     });
 
-    // 3) inquiry を delivered へ
     tx.update(inqRef, {
       status: 'delivered',
       deliveredAt: now,
       depositTransactionId: txRef.id,
+      freeTrial: false,
       updatedAt: now,
     });
 
@@ -97,15 +128,13 @@ export async function consumeOne(
       balanceAfter,
       txId: txRef.id,
       notifyLow: shouldNotifyLow,
+      freeTrial: false,
     };
   });
 }
 
 // ============================================================
 // releasePending
-//   残高がある限り、古い pending を delivered に昇格する。
-//   入金直後・無料付与直後に呼ぶ。
-//   ※ 同時実行されてもトランザクションで安全
 // ============================================================
 export async function releasePending(advertiserId: string): Promise<{
   released: string[];
@@ -113,10 +142,9 @@ export async function releasePending(advertiserId: string): Promise<{
   balanceAfter: number;
 }> {
   const released: string[] = [];
-  const MAX_LOOP = 100; // 暴走防止
+  const MAX_LOOP = 100;
 
   for (let i = 0; i < MAX_LOOP; i++) {
-    // 一番古い pending を1件取る
     const q = await db.collection(COLLECTIONS.INQUIRIES)
       .where('advertiserId', '==', advertiserId)
       .where('status', '==', 'pending')
@@ -131,19 +159,16 @@ export async function releasePending(advertiserId: string): Promise<{
       reason: `release_pending:${inquiryId}`,
     });
 
-    if (!result.delivered) {
-      // 残高切れ or 既処理
-      break;
-    }
+    if (!result.delivered) break;
 
     released.push(inquiryId);
 
-    // 開示メール
     const adv = (await db.collection(COLLECTIONS.ADVERTISERS).doc(advertiserId).get()).data()!;
     await enqueueMail('INQUIRY_DELIVERED', adv.email, {
       inquiryId,
       advertiserId,
       balanceAfter: result.balanceAfter,
+      freeTrial: result.freeTrial,
     });
 
     if (result.notifyLow) {
@@ -154,7 +179,6 @@ export async function releasePending(advertiserId: string): Promise<{
     }
   }
 
-  // 最終状態を取得
   const [advSnap, pendingCountSnap] = await Promise.all([
     db.collection(COLLECTIONS.ADVERTISERS).doc(advertiserId).get(),
     db.collection(COLLECTIONS.INQUIRIES)
@@ -172,9 +196,7 @@ export async function releasePending(advertiserId: string): Promise<{
 }
 
 // ============================================================
-// grantDeposit
-//   デポジット加算（購入 / 管理者付与 / 無料トライアル）
-//   ※ Webhook か Admin 操作からのみ呼ぶ
+// grantDeposit（変更なし）
 // ============================================================
 export async function grantDeposit(params: {
   advertiserId: string;
@@ -199,7 +221,6 @@ export async function grantDeposit(params: {
 
     tx.update(advRef, {
       depositBalance: FV.increment(amount),
-      // 購入時に低残高通知フラグをリセット（次のサイクルで通知できる）
       lowDepositNotified: null,
       updatedAt: now,
     });
@@ -221,8 +242,7 @@ export async function grantDeposit(params: {
 }
 
 // ============================================================
-// refundDeposit
-//   返金（マイナス加算）。残高不足なら例外。
+// refundDeposit（変更なし）
 // ============================================================
 export async function refundDeposit(params: {
   advertiserId: string;
