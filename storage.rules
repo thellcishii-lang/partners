@@ -3,8 +3,7 @@ rules_version = '2';
 service firebase.storage {
   match /b/{bucket}/o {
 
-    // 案件画像：`listings/{advertiserUid}/xxx.webp`
-    // 誰でも読める。書き込みは本人のみ、画像のみ、5MB以下。
+    // 案件画像
     match /listings/{uid}/{fileName} {
       allow read: if true;
       allow write: if request.auth != null
@@ -12,6 +11,21 @@ service firebase.storage {
                    && request.resource.size < 5 * 1024 * 1024
                    && request.resource.contentType.matches('image/.*');
       allow delete: if request.auth != null && request.auth.uid == uid;
+    }
+
+    // 案件資料（PDF・PowerPoint・画像）
+    match /listingDocuments/{advertiserId}/{fileName} {
+      allow read: if true;
+      allow write: if request.auth != null
+                   && request.auth.uid == advertiserId
+                   && request.resource.size < 10 * 1024 * 1024
+                   && (
+                     request.resource.contentType == 'application/pdf'
+                     || request.resource.contentType == 'application/vnd.ms-powerpoint'
+                     || request.resource.contentType == 'application/vnd.openxmlformats-officedocument.presentationml.presentation'
+                     || request.resource.contentType.matches('image/.*')
+                   );
+      allow delete: if request.auth != null && request.auth.uid == advertiserId;
     }
 
     // デフォルト：全拒否
