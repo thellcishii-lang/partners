@@ -12,7 +12,7 @@ export const MAIL_FROM_DISPLAY = `代理店募集・加盟店募集.com <${MAIL_
 
 export function createTransporter() {
   return nodemailer.createTransport({
-    host: 'smtp.zoho.jp',
+    host: 'smtppro.zoho.jp',   // smtp.zoho.jp → smtppro.zoho.jp
     port: 465,
     secure: true,
     auth: {
@@ -21,7 +21,6 @@ export function createTransporter() {
     },
   });
 }
-
 // ============================================================
 // 添付ファイル
 // ============================================================
