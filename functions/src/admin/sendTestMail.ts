@@ -1,6 +1,5 @@
 import { onCall, HttpsError } from 'firebase-functions/v2/https';
 import { REGION } from '../lib/admin';
-import { requireAdmin } from '../lib/roles';
 import { enqueueMail, type MailTemplate } from '../lib/mail';
 
 const ALLOWED_TEMPLATES: MailTemplate[] = [
@@ -34,8 +33,11 @@ function text(data: Record<string, unknown>, key: string, max: number, required 
   return value.trim();
 }
 
+// テスト用：ログインしていれば誰でも使える
 export const sendTestMail = onCall({ region: REGION }, async (request) => {
-  await requireAdmin(request);
+  if (!request.auth) {
+    throw new HttpsError('unauthenticated', 'ログインしてください。');
+  }
   const data = (request.data ?? {}) as Record<string, unknown>;
 
   const template = text(data, 'template', 50, true) as MailTemplate;
@@ -53,12 +55,10 @@ export const sendTestMail = onCall({ region: REGION }, async (request) => {
       ? (rawParams as Record<string, unknown>)
       : {};
 
-  // テスト送信は毎回固有のキーにして、冪等性で弾かれないようにする
   const nonce = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 
   await enqueueMail(template, to, {
     ...params,
-    // inquiryId をテスト用のユニーク値に差し替え（冪等キーに使われる）
     inquiryId: `test-${nonce}`,
   });
 
