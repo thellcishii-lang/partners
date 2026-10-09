@@ -25,6 +25,21 @@ export function useSmsVerification(containerId: string) {
   }, []);
 
   const sendCode = useCallback(async (phoneNumber: string) => {
+    function normalizePhone(input: string): string {
+  // 全角数字→半角、ハイフン・スペース・カッコを除去
+  const cleaned = input
+    .replace(/[０-９]/g, (s) => String.fromCharCode(s.charCodeAt(0) - 0xfee0))
+    .replace(/[\s\-()]/g, '');
+
+  // すでに +81 で始まっていればそのまま
+  if (cleaned.startsWith('+81')) return cleaned;
+  // 81 で始まる（+なし）なら +81 に
+  if (cleaned.startsWith('81')) return `+${cleaned}`;
+  // 0 で始まる（国内形式）なら +81 に変換して 0 を除く
+  if (cleaned.startsWith('0')) return `+81${cleaned.slice(1)}`;
+  // それ以外は + を付けて返す（国際番号想定）
+  return `+${cleaned}`;
+}
     setLoading(true);
     setError('');
     try {
@@ -34,11 +49,12 @@ export function useSmsVerification(containerId: string) {
           size: 'invisible',
         });
       }
-      const result = await linkWithPhoneNumber(
-        auth.currentUser,
-        phoneNumber,
-        verifierRef.current,
-      );
+      const normalized = normalizePhone(phoneNumber);
+const result = await linkWithPhoneNumber(
+  auth.currentUser,
+  normalized,
+  verifierRef.current,
+);
       setConfirmation(result);
       return true;
     } catch (e) {
