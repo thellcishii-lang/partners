@@ -1,4 +1,5 @@
 export { onInquiryCreated } from './triggers/onInquiryCreated';
+export { onInquiryDelivered } from './triggers/onInquiryDelivered';
 export { onDepositOrderPaid } from './triggers/onDepositOrderPaid';
 export { onMailQueued } from './triggers/onMailQueued';
 export { createInquiry } from './applications/createInquiry';
