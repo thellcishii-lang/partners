@@ -16,17 +16,27 @@ export type MailTemplate =
   | 'LISTING_REJECTED'
   | 'LISTING_EDIT_APPROVED'
   | 'LISTING_EDIT_REJECTED'
-  | 'APPLICANT_RESOURCES';   // ★ 追加
+  | 'APPLICANT_RESOURCES';
+
+export interface MailAttachmentSpec {
+  path: string;
+  name: string;
+  type: string;
+}
+
+export interface MailParams extends Record<string, unknown> {
+  inquiryId?: string;
+  orderId?: string;
+  advertiserId?: string;
+  listingId?: string;
+  /** 添付ファイル（Storage の path / name / type） */
+  attachments?: MailAttachmentSpec[];
+}
 
 export async function enqueueMail(
   template: MailTemplate,
   to: string,
-  params: Record<string, unknown> & {
-    inquiryId?: string;
-    orderId?: string;
-    advertiserId?: string;
-    listingId?: string;
-  }
+  params: MailParams
 ): Promise<void> {
   const idempotencyKey = [
     template,
