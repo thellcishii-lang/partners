@@ -80,7 +80,7 @@ export function ListingDetail({
       <section className="mb-5 rounded-2xl bg-white p-5">
         {images.length > 0 ? (
           <>
-            <div className="relative flex aspect-[21/9] items-center justify-center overflow-hidden rounded-xl bg-gray-100">
+            <div className="relative flex aspect-video items-center justify-center overflow-hidden rounded-xl bg-gray-100">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={images[Math.min(imageIndex, images.length - 1)]}
@@ -129,7 +129,7 @@ export function ListingDetail({
             )}
           </>
         ) : (
-          <div className="relative flex aspect-[21/9] items-center justify-center overflow-hidden rounded-xl bg-gradient-to-br from-gray-100 to-gray-200">
+          <div className="relative flex aspect-video items-center justify-center overflow-hidden rounded-xl bg-gradient-to-br from-gray-100 to-gray-200">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} className="h-24 w-24 text-gray-300">
               <rect x="3" y="3" width="18" height="18" rx="2" />
               <circle cx="8.5" cy="8.5" r="1.5" />
