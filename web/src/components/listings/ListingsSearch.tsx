@@ -717,7 +717,7 @@ function ListingCard({ listing }: { listing: Listing }) {
     >
       <div className="flex gap-5 p-5">
         {/* 左：メイン画像 */}
-        <div className="h-44 w-44 shrink-0 overflow-hidden rounded-xl bg-gray-100 sm:h-48 sm:w-48">
+        <div className="aspect-video w-64 shrink-0 overflow-hidden rounded-xl bg-gray-100 sm:w-80">
           {mainImage ? (
             /* eslint-disable-next-line @next/next/no-img-element */
             <img
