@@ -181,6 +181,22 @@ ${p('advertiserName')} より、資料をお送りします。
 ${footer}`,
       };
 
+          case 'INQUIRY_REPEAT':
+      return {
+        subject: `【${SITE_NAME}】2回目の資料請求がありました`,
+        text: `${p('advertiserName')} 様
+
+${p('listingTitle')} に、2回目の資料請求がありました。
+
+同じ電話番号またはメールアドレスからの再応募のため、
+今回はデポジット消費はありません。
+応募者の資料は、応募者宛に自動送信されています。
+
+マイページ：${SITE_URL}/dashboard
+${footer}`,
+      };
+
+
 
     default:
       return {
