@@ -223,6 +223,11 @@ export default function DashboardPage() {
                 </div>
               </div>
               <div className="flex shrink-0 flex-wrap gap-2">
+                <Link href={`/dashboard/listings/${listing.id}/inquiries`}>
+                  <Button size="sm" variant="outline" disabled={isBusy}>
+                    応募者一覧
+                  </Button>
+                </Link>
                 <Button
                   size="sm"
                   variant="outline"
