@@ -82,15 +82,13 @@ ${footer}`,
 ${footer}`,
       };
 
-    case 'APPLICATION_RECEIVED':
+        case 'APPLICATION_RECEIVED':
       return {
-        subject: `【${SITE_NAME}】応募を受け付けました`,
-        text: `ご応募ありがとうございます。
+        subject: `【${SITE_NAME}】資料請求ありがとうございます`,
+        text: `${p('applicantName')} 様
 
-`${p('applicantName')} 様
-
-ご応募ありがとうございます。
-${p('advertiserName')} より、資料をお送りします。
+資料請求ありがとうございます。
+${p('advertiserName')} の「${p('listingTitle')}」の資料をお送りします。
 
 ─────────────
 案件：${p('listingTitle')}
@@ -100,15 +98,6 @@ ${p('advertiserName')} より、資料をお送りします。
 資料は本メールに添付しています。
 ご不明な点がございましたら、本メールにご返信ください。
 
-${footer}`,
-      };
-
-    case 'LISTING_APPROVED':
-      return {
-        subject: `【${SITE_NAME}】案件が承認されました`,
-        text: `ご申請いただいた案件が承認され、サイトに公開されました。
-
-マイページ：${SITE_URL}/dashboard
 ${footer}`,
       };
 
