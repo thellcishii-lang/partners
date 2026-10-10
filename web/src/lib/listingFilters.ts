@@ -286,6 +286,12 @@ export function getOrganizationTypeLabel(slug: string): string {
   return ORGANIZATION_TYPES.find((t) => t.slug === slug)?.label ?? '';
 }
 
+export function getOrganizationTypeLabels(slugs: string[]): string[] {
+  return slugs
+    .map((s) => ORGANIZATION_TYPES.find((t) => t.slug === s)?.label ?? '')
+    .filter(Boolean);
+}
+
 
 // ============================================================
 // 地域（単一都道府県版）
