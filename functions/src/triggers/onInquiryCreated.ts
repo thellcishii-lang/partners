@@ -58,21 +58,29 @@ export const onInquiryCreated = onDocumentCreated(
         const listingTitle = listingSnap.data()?.title ?? '';
         const advName = advSnap.data()?.companyName ?? '';
 
+                const repeatDetailSnap = await db.collection(COLLECTIONS.INQUIRY_DETAILS).doc(inquiryId).get();
+        const repeatDetail = repeatDetailSnap.data() ?? {};
+        const repeatApplicantName = (repeatDetail.fullName ?? '') as string;
+        const repeatAddress = [
+          repeatDetail.prefecture, repeatDetail.city, repeatDetail.address, repeatDetail.building,
+        ].filter(Boolean).join('');
+        const repeatPhone = (repeatDetail.phone ?? '') as string;
+        const repeatEmail = (repeatDetail.email ?? '') as string;
+
         if (typeof advEmail === 'string' && advEmail) {
           await enqueueMail('INQUIRY_REPEAT', advEmail, {
             inquiryId,
             advertiserId,
             listingTitle,
             advertiserName: advName,
+            applicantName: repeatApplicantName,
+            address: repeatAddress,
+            phone: repeatPhone,
+            email: repeatEmail,
           });
         }
 
         // 応募者に受付完了メール
-        const detailSnap = await db.collection(COLLECTIONS.INQUIRY_DETAILS).doc(inquiryId).get();
-        const applicantEmail = detailSnap.data()?.email;
-        if (typeof applicantEmail === 'string' && applicantEmail) {
-          await enqueueMail('APPLICATION_RECEIVED', applicantEmail, { inquiryId });
-        }
 
         logger.info('onInquiryCreated: repeat inquiry delivered without consuming', {
           inquiryId,
@@ -119,13 +127,35 @@ export const onInquiryCreated = onDocumentCreated(
       }
     }
 
+    
+    // メール用：応募者情報・案件情報を取得
+    const detailSnap = await db.collection(COLLECTIONS.INQUIRY_DETAILS).doc(inquiryId).get();
+    const detail = detailSnap.data() ?? {};
+    const applicantName = (detail.fullName ?? '') as string;
+    const applicantAddress = [
+      detail.prefecture, detail.city, detail.address, detail.building,
+    ].filter(Boolean).join('');
+    const applicantPhone = (detail.phone ?? '') as string;
+    const applicantEmail = (detail.email ?? '') as string;
+
+    const listingSnap2 = await db.collection(COLLECTIONS.LISTINGS).doc(inq.listingId).get();
+    const listingTitle = (listingSnap2.data()?.title ?? '') as string;
+    const advertiserName = (adv.companyName ?? '') as string;
+    
     if (result.delivered) {
       await enqueueMail('INQUIRY_DELIVERED', adv.email, {
         inquiryId,
         advertiserId,
+        advertiserName,
+        listingTitle,
+        applicantName,
+        address: applicantAddress,
+        phone: applicantPhone,
+        email: applicantEmail,
         balanceAfter: result.balanceAfter,
         freeTrial: result.freeTrial,
       });
+
       if (result.notifyLow) {
         await enqueueMail('DEPOSIT_LOW', adv.email, {
           advertiserId,
