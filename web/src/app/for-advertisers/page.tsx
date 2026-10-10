@@ -1,13 +1,12 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import {
-  Wallet, Users, ShieldCheck, CalendarCheck, TrendingUp, CheckCircle2,
+  Wallet, Users, ShieldCheck, CalendarCheck, CheckCircle2,
   ArrowRight, Sparkles, Zap, HeartHandshake,
 } from 'lucide-react';
-
 export const metadata: Metadata = {
   title: '掲載について | 代理店・加盟店募集.com',
-  description: '代理店・加盟店募集を掲載しませんか？初期費用0円・月額0円、応募1件2,500円のデポジット型。最短3日で掲載開始。',
+  description: '代理店・加盟店募集を掲載しませんか？初期費用0円・月額0円、応募1件2,500円のデポジット型。最短即日で掲載開始。',
 };
 
 export default function ForAdvertisersPage() {
@@ -25,11 +24,11 @@ export default function ForAdvertisersPage() {
           }}
         />
         <div className="relative mx-auto max-w-6xl px-4 py-20 sm:py-28">
-          <div className="grid items-center gap-12 lg:grid-cols-2">
+          <div className="mx-auto max-w-3xl">
             <div>
               <span className="inline-flex items-center gap-1.5 rounded-full bg-white/80 px-4 py-1.5 text-xs font-bold text-emerald-700 shadow-sm backdrop-blur">
                 <Sparkles className="h-3.5 w-3.5" />
-                最短3日で募集スタート
+                最短即日募集スタート
               </span>
               <h1 className="mt-5 text-4xl font-bold leading-tight tracking-tight text-emerald-950 sm:text-5xl lg:text-[3.5rem]">
                 代理店募集を、
@@ -76,33 +75,6 @@ export default function ForAdvertisersPage() {
                   <p className="mt-0.5 text-xs text-emerald-800/70">応募1件〜</p>
                 </div>
               </div>
-            </div>
-
-            {/* 右側のイラスト的カード */}
-            <div className="relative hidden lg:block">
-              <div className="relative rounded-3xl bg-white p-6 shadow-2xl shadow-emerald-900/10">
-                <div className="flex items-center gap-3 border-b pb-4">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-100 text-emerald-700">
-                    <TrendingUp className="h-5 w-5" />
-                  </div>
-                  <div>
-                    <p className="text-xs text-gray-500">本日の応募</p>
-                    <p className="text-lg font-bold">3件</p>
-                  </div>
-                </div>
-                <div className="mt-4 space-y-3">
-                  {[1, 2, 3].map((i) => (
-                    <div key={i} className="rounded-xl bg-emerald-50/60 p-3">
-                      <div className="flex items-center gap-2">
-                        <div className="h-2 w-2 rounded-full bg-emerald-500" />
-                        <p className="text-xs font-bold text-emerald-900">新しい応募が届きました</p>
-                      </div>
-                      <p className="mt-1 pl-4 text-[11px] text-emerald-800/60">東京都・30代・経験あり</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-              <div className="absolute -bottom-4 -right-4 -z-10 h-32 w-32 rounded-full bg-emerald-300/40 blur-2xl" />
             </div>
           </div>
         </div>
