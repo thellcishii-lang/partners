@@ -15,7 +15,7 @@ export function renderTemplate(
   const p = (k: string) => (params[k] != null ? String(params[k]) : '');
   const n = (k: string) => (typeof params[k] === 'number' ? (params[k] as number) : 0);
 
-  const footer = `\n─────────────────────\n${SITE_NAME}\n${SITE_URL}\n`;
+  const footer = `\n─────────────────────\n代理店・加盟店募集.com\nhttps://www.代理店・加盟店.com\ninfo@agent-partners.space\n`;
 
   switch (template) {
         case 'INQUIRY_DELIVERED':
@@ -87,7 +87,7 @@ ${footer}`,
         subject: `【${SITE_NAME}】資料請求ありがとうございます`,
         text: `${p('applicantName')} 様
 
-資料請求ありがとうございます。
+この度は、資料請求頂き誠にありがとうございます。
 ${p('advertiserName')} の「${p('listingTitle')}」の資料をお送りします。
 
 ─────────────
@@ -166,25 +166,6 @@ ${footer}`,
       return {
         subject: `【${SITE_NAME}】応募の有効期限が切れました`,
         text: `一定期間内に開示されなかったため、応募は期限切れとなりました。
-${footer}`,
-      };
-
-          case 'APPLICANT_RESOURCES':
-      return {
-        subject: `【${SITE_NAME}】${p('listingTitle')} の資料をお送りします`,
-        text: `${p('applicantName')} 様
-
-ご応募ありがとうございます。
-${p('advertiserName')} より、資料をお送りします。
-
-─────────────
-案件：${p('listingTitle')}
-募集企業：${p('advertiserName')}
-─────────────
-
-資料は本メールに添付しています。
-ご不明な点がございましたら、本メールにご返信ください。
-
 ${footer}`,
       };
 
