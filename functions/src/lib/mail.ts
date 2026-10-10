@@ -21,7 +21,6 @@ export type MailTemplate =
   | 'LISTING_REJECTED'
   | 'LISTING_EDIT_APPROVED'
   | 'LISTING_EDIT_REJECTED'
-  | 'APPLICANT_RESOURCES';
 
 export interface MailAttachmentSpec {
   path: string;
