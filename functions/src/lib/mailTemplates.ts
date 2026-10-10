@@ -18,12 +18,21 @@ export function renderTemplate(
   const footer = `\n─────────────────────\n${SITE_NAME}\n${SITE_URL}\n`;
 
   switch (template) {
-    case 'INQUIRY_DELIVERED':
+        case 'INQUIRY_DELIVERED':
       return {
-        subject: `【${SITE_NAME}】新しい応募が届きました`,
-        text: `新しい応募が届き、内容を開示しました。
+        subject: `【${SITE_NAME}】資料請求がございました`,
+        text: `${p('advertiserName')} 様
 
-マイページにログインしてご確認ください。
+「${p('listingTitle')}」に資料請求がございました。
+
+─────────────
+氏名：${p('applicantName')}
+住所：${p('address')}
+電話番号：${p('phone')}
+メール：${p('email')}
+─────────────
+
+応募者の応募動機など詳細は、マイページでご確認いただけます。
 ${SITE_URL}/dashboard
 
 残りのデポジット：${n('balanceAfter')}件
@@ -46,7 +55,8 @@ ${footer}`,
         subject: `【${SITE_NAME}】デポジット残高が少なくなっています`,
         text: `デポジット残高が残り${n('balance')}件になりました。
 
-追加すると、保留中の応募が古い順に自動開示されます。
+デポジットが０になりますと掲載されている案件がすべて非公開になります。
+非公開になるのを避けるには、あらかじめ余裕をもってデポジット追加する事をお勧めいたします。
 ${SITE_URL}/deposit
 ${footer}`,
       };
@@ -56,8 +66,8 @@ ${footer}`,
         subject: `【${SITE_NAME}】デポジット残高がゼロになりました`,
         text: `デポジット残高がゼロになりました。
 
-新しい応募の内容は開示されず、保留状態になります。
-追加すると自動的に開示されます。
+現在掲載中の案件が非公開となりました。
+公開を再開するにはデポジットが必要になります。
 ${SITE_URL}/deposit
 ${footer}`,
       };
@@ -66,7 +76,6 @@ ${footer}`,
       return {
         subject: `【${SITE_NAME}】デポジットを購入しました`,
         text: `${n('credits')}件分のデポジットを購入しました。
-${n('releasedCount') > 0 ? `\n保留中だった応募 ${n('releasedCount')}件を自動開示しました。` : ''}${n('remainingPending') > 0 ? `\n未開示の応募が ${n('remainingPending')}件 残っています。` : ''}
 
 マイページ：${SITE_URL}/dashboard
 デポジット履歴：${SITE_URL}/dashboard/deposits
@@ -78,10 +87,19 @@ ${footer}`,
         subject: `【${SITE_NAME}】応募を受け付けました`,
         text: `ご応募ありがとうございます。
 
-応募を受け付けました。
-募集者が内容を確認すると、開示処理が行われます。
+`${p('applicantName')} 様
 
-応募履歴：${SITE_URL}/applicant
+ご応募ありがとうございます。
+${p('advertiserName')} より、資料をお送りします。
+
+─────────────
+案件：${p('listingTitle')}
+募集企業：${p('advertiserName')}
+─────────────
+
+資料は本メールに添付しています。
+ご不明な点がございましたら、本メールにご返信ください。
+
 ${footer}`,
       };
 
@@ -181,16 +199,22 @@ ${p('advertiserName')} より、資料をお送りします。
 ${footer}`,
       };
 
-          case 'INQUIRY_REPEAT':
+           case 'INQUIRY_REPEAT':
       return {
-        subject: `【${SITE_NAME}】2回目の資料請求がありました`,
+        subject: `【${SITE_NAME}】2回目の資料請求がございました`,
         text: `${p('advertiserName')} 様
 
-${p('listingTitle')} に、2回目の資料請求がありました。
+「${p('listingTitle')}」に、2回目の資料請求がございました。
+
+─────────────
+氏名：${p('applicantName')}
+住所：${p('address')}
+電話番号：${p('phone')}
+メール：${p('email')}
+─────────────
 
 同じ電話番号またはメールアドレスからの再応募のため、
 今回はデポジット消費はありません。
-応募者の資料は、応募者宛に自動送信されています。
 
 マイページ：${SITE_URL}/dashboard
 ${footer}`,
