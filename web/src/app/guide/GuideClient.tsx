@@ -54,11 +54,11 @@ export default function GuideClient() {
               📖 Guide
             </span>
             <h1>
-  1から始めない、<br />
-  <span className="accent">起業の実践ガイド。</span>
+  独立開業の近道を、<br />
+  <span className="accent">実践ガイドで学ぶ。</span>
 </h1>
 <p>
-  1から全てを作り上げるのは、費用も時間もかかる。
+  ゼロから全てを作り上げるのは、費用も時間もかかる。
   代理店・フランチャイズ・加盟店などの
   既存のプラットフォームに乗ることで、
   少ないリスクで、確実に事業を始められます。
