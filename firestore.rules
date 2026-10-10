@@ -176,10 +176,15 @@ service cloud.firestore {
     //   - 応募者本人と admin のみ読める。募集者は読めない（メールで受け取る想定）
     //   - 書き込みは Functions（Admin SDK）のみ
     // ============================================================
-    match /inquiryDetails/{inquiryId} {
+       match /inquiryDetails/{inquiryId} {
+      // 応募者本人 / admin / 該当案件の募集者（開示済みのみ）
       allow read: if isAuth() && (
         resource.data.applicantId == uid() ||
-        isAdmin()
+        isAdmin() ||
+        (
+          resource.data.advertiserId == uid() &&
+          get(/databases/$(database)/documents/inquiries/$(inquiryId)).data.status != 'pending'
+        )
       );
       allow write: if false;
     }
