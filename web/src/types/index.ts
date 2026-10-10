@@ -257,11 +257,17 @@ export interface InquiryDetail {
   inquiryId: string;
   applicantId: string;
   advertiserId: string;
+  listingId?: string;
   fullName: string;
   kana: string;
   email: string;
   phone: string;
-  lineId: string;
+  postalCode?: string;
+  prefecture?: string;
+  city?: string;
+  address?: string;
+  building?: string;
+  lineId?: string;
   message: string;
   snapshot?: {
     displayName?: string;
