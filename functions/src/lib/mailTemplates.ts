@@ -101,6 +101,15 @@ ${p('advertiserName')} の「${p('listingTitle')}」の資料をお送りしま�
 ${footer}`,
       };
 
+        case 'LISTING_APPROVED':
+      return {
+        subject: `【${SITE_NAME}】案件が承認されました`,
+        text: `ご申請いただいた案件が承認され、サイトに公開されました。
+
+マイページ：${SITE_URL}/dashboard
+${footer}`,
+      };
+
     case 'LISTING_REJECTED':
       return {
         subject: `【${SITE_NAME}】案件の審査結果`,
