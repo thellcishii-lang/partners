@@ -10,7 +10,7 @@ export default function HomePage() {
         className="animate-flow relative left-1/2 w-screen -translate-x-1/2"
         style={{
           backgroundImage:
-            'linear-gradient(120deg, #a7f3d0 0%, #6ee7b7 20%, #93c5fd 45%, #a5b4fc 70%, #6ee7b7 90%, #a7f3d0 100%)'
+            'linear-gradient(120deg, #d1fae5 0%, #a7f3d0 25%, #bfdbfe 50%, #c7d2fe 75%, #d1fae5 100%)',
         }}
       >
         <div className="mx-auto max-w-6xl px-4 py-16 text-center text-emerald-900 sm:py-24">
