@@ -1,6 +1,7 @@
 {
   "storage": {
-    "rules": "storage.rules"
+  "bucket": "partners-ab2a3.firebasestorage.app",
+  "rules": "storage.rules"
   },
   "firestore": {
     "rules": "firestore.rules",
