@@ -24,7 +24,7 @@ import {
   getProfitAmountRange,
   getProfitAmountLabel,
   getRevenueTypeLabel,
-  getOrganizationTypeLabel,
+  getOrganizationTypeLabels,
   expandAreaSlugs,
   REGION_LABELS,
   STOCK_TYPES,
@@ -127,7 +127,9 @@ export function ListingForm({
   );
 
   const [revenueType, setRevenueType] = useState(source.revenueType ?? '');
-  const [organizationType, setOrganizationType] = useState(source.organizationType ?? '');
+  const [organizationTypes, setOrganizationTypes] = useState<string[]>(
+    source.organizationTypes ?? []
+  );
 
   const [fields, setFields] = useState({
     requirements: source.requirements ?? '',
@@ -303,9 +305,9 @@ export function ListingForm({
       revenueType,
       revenueTypeLabel: getRevenueTypeLabel(revenueType),
 
-      organizationType,
-      organizationTypeLabel: getOrganizationTypeLabel(organizationType),
-
+            organizationTypes,
+      organizationTypeLabels: getOrganizationTypeLabels(organizationTypes),
+      
       searchText,
       images,
       documents,
