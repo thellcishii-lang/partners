@@ -36,7 +36,7 @@ export function ListingDetail({
     { label: '売上推定', value: listing.expectedRevenueLabel || '応相談' },
     { label: '利益推定', value: listing.expectedProfitLabel || '—' },
     { label: '収益タイプ', value: listing.revenueTypeLabel || '—' },
-    { label: '組織拡大', value: listing.organizationTypeLabel || '—' },
+    { label: '組織拡大', value: listing.organizationTypeLabels?.length ? listing.organizationTypeLabels.join('・') : '—' },
     { label: '対応エリア', value: listing.areaLabels?.length ? listing.areaLabels.slice(0, 3).join('・') : '全国' },
   ];
 
