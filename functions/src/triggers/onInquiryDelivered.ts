@@ -74,11 +74,6 @@ export const onInquiryDelivered = onDocumentUpdated(
           type: d.type as string,
         }));
 
-      if (attachments.length === 0) {
-        logger.info('onInquiryDelivered: no documents, skipping', { inquiryId });
-        return;
-      }
-
       // 募集者の会社名
       let advertiserName = '';
       if (typeof advertiserId === 'string' && advertiserId && !advertiserId.includes('/')) {
