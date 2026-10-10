@@ -1,6 +1,7 @@
 'use client';
 
 import { useRef, useState, type FormEvent } from 'react';
+import { signOut } from 'firebase/auth';
 import { useParams, useRouter } from 'next/navigation';
 import { collection, doc } from 'firebase/firestore';
 import { httpsCallable } from 'firebase/functions';
@@ -65,13 +66,14 @@ export default function ApplyPage() {
         'createInquiry',
       );
       const result = await createInquiry({
-        ...fields,
-        listingId: id,
-        inquiryId: inquiryId.current,
-      });
-      router.push(
-        `/listings/${id}/apply/complete?inquiryId=${encodeURIComponent(result.data.inquiryId)}`,
-      );
+      ...fields,
+      listingId: id,
+      inquiryId: inquiryId.current,
+    });
+    await signOut(auth);                          // ★ この行を追加
+    router.push(
+      `/listings/${id}/apply/complete?inquiryId=${encodeURIComponent(result.data.inquiryId)}`,
+    );
     } catch (error) {
       setError(error instanceof Error ? error.message : '応募の送信に失敗しました。');
       setSending(false);
