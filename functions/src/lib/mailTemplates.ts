@@ -6,7 +6,7 @@ export interface RenderedMail {
 }
 
 const SITE_URL = 'https://partners-tau-kohl.vercel.app';
-const SITE_NAME = '代理店募集・加盟店募集.com';
+const SITE_NAME = '代理店・加盟店募集.com';
 
 export function renderTemplate(
   template: MailTemplate,
@@ -15,7 +15,7 @@ export function renderTemplate(
   const p = (k: string) => (params[k] != null ? String(params[k]) : '');
   const n = (k: string) => (typeof params[k] === 'number' ? (params[k] as number) : 0);
 
-  const footer = `\n─────────────────────\n代理店・加盟店募集.com\nhttps://www.代理店・加盟店.com\ninfo@agent-partners.space\n`;
+  const footer = `\n─────────────────────\n代理店・加盟店募集.com\nhttps://www.代理店・加盟店募集.com\ninfo@agent-partners.space\n`;
 
   switch (template) {
         case 'INQUIRY_DELIVERED':
