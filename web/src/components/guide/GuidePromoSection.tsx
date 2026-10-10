@@ -21,11 +21,11 @@ export function GuidePromoSection() {
               📖 起業・独立ガイド
             </span>
             <h2 className="mt-4 text-3xl font-bold tracking-tight text-emerald-950">
-              はじめての起業に、<br className="sm:hidden" />
-              役立つ知識。
+               独立開業の近道を、<br className="sm:hidden" />
+              実践ガイドで学ぶ。
             </h2>
             <p className="mt-3 max-w-xl text-sm leading-relaxed text-gray-600">
-              1から始めない選択、失敗しない準備、ストックビジネスの基礎——
+              ゼロから始めない選択、失敗しない準備、ストックビジネスの基礎——
               起業を考えたときに読んでおきたい記事をまとめました。
             </p>
           </div>
