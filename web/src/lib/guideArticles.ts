@@ -134,6 +134,96 @@ export const GUIDE_ARTICLES: GuideArticle[] = [
     publishedAt: '2026-10-10',
     readingMinutes: 11,
   },
+    {
+    slug: 'solar-reform-agent',
+    title: '太陽光・リフォーム代理店の注意点｜高単価の裏側',
+    description:
+      '住宅関連は高単価な代理店案件が豊富。一方で悪質業者も多い分野です。仕組み、稼ぐコツ、失敗しないための注意点をまとめて解説します。',
+    category: 'industry',
+    tags: ['太陽光 代理店', 'リフォーム 代理店', '蓄電池', '住宅 営業'],
+    publishedAt: '2026-10-10',
+    readingMinutes: 11,
+  },
+  {
+    slug: 'insurance-agent',
+    title: '保険代理店・金融商品の副業事情｜必要な資格と収益モデル',
+    description:
+      '保険・投資・カードなど金融系代理店はストック収益の代表格。副業で始めるために必要な資格、収益モデル、注意点を解説します。',
+    category: 'industry',
+    tags: ['保険 代理店', '金融 副業', 'ストック収益', '募集人資格'],
+    publishedAt: '2026-10-10',
+    readingMinutes: 12,
+  },
+  {
+    slug: 'food-franchise',
+    title: '飲食フランチャイズ加盟のリアル｜失敗しないチェックポイント',
+    description:
+      'カフェ・居酒屋・ラーメン・コンビニなど飲食FCは独立の王道。一方で撤退率も高い分野です。初期投資、メリット・デメリット、失敗しないコツを解説。',
+    category: 'industry',
+    tags: ['飲食 FC', 'フランチャイズ 加盟', 'カフェ 開業', '独立'],
+    publishedAt: '2026-10-10',
+    readingMinutes: 12,
+  },
+  {
+    slug: 'agent-contract-checklist',
+    title: '代理店契約前に確認すべき5つのポイント',
+    description:
+      '代理店契約は、ビジネスの土台を作る契約。報酬体系・費用・契約期間・業務範囲・サポート体制——サイン前に必ず確認したい5つのポイントを解説します。',
+    category: 'know-how',
+    tags: ['代理店 契約', '契約書', 'チェックリスト', '注意点'],
+    publishedAt: '2026-10-10',
+    readingMinutes: 10,
+  },
+  {
+    slug: 'referral-agent',
+    title: '紹介型代理店で稼ぐ仕組み｜在庫も店舗も不要のビジネス',
+    description:
+      '商品を持たない、店舗も持たない、在庫も抱えない。もっとも参入しやすい紹介型代理店の仕組みと、実際に稼ぐ方法を解説します。',
+    category: 'agent',
+    tags: ['紹介 代理店', '紹介ビジネス', '副業', '在宅'],
+    publishedAt: '2026-10-10',
+    readingMinutes: 10,
+  },
+  {
+    slug: 'work-from-home-agent',
+    title: '在宅でできる代理店・加盟店｜完全在宅で稼ぐ方法',
+    description:
+      '通勤から解放される在宅型の代理店・加盟店。種類、メリット・デメリット、稼ぐためのコツを、初心者向けにわかりやすく解説します。',
+    category: 'agent',
+    tags: ['在宅 代理店', '在宅 副業', 'リモートワーク', '在宅ワーク'],
+    publishedAt: '2026-10-10',
+    readingMinutes: 11,
+  },
+  {
+    slug: 'agent-vs-outsourcing',
+    title: '代理店と業務委託の違い｜どちらを選ぶべきか',
+    description:
+      '「代理店」と「業務委託」は似て非なるもの。立場・報酬・自由度・法的扱いの違いを整理し、自分に合う方を判断できるように解説します。',
+    category: 'comparison',
+    tags: ['代理店 業務委託 違い', '業務委託', 'フリーランス', '比較'],
+    publishedAt: '2026-10-10',
+    readingMinutes: 10,
+  },
+  {
+    slug: 'agent-vs-affiliate',
+    title: '代理店とアフィリエイトの違い｜どちらが稼げるか',
+    description:
+      '代理店とアフィリエイトは、報酬の仕組みが根本的に違います。契約先・報酬単価・集客方法を比較し、自分に向いている方を解説します。',
+    category: 'comparison',
+    tags: ['代理店 アフィリエイト 違い', 'アフィリエイト', '副業', '比較'],
+    publishedAt: '2026-10-10',
+    readingMinutes: 11,
+  },
+  {
+    slug: 'resale-vs-agent',
+    title: '転売・せどりと代理店、どちらが稼げるか',
+    description:
+      '「副業で稼ぐ」の代表格、転売・せどりと代理店を徹底比較。在庫リスク、初期費用、収益モデル、法規制の違いを中立に解説します。',
+    category: 'comparison',
+    tags: ['転売 代理店 比較', 'せどり', '副業', '在庫リスク'],
+    publishedAt: '2026-10-10',
+    readingMinutes: 11,
+  },
 ];
 
 export function getArticleBySlug(slug: string): GuideArticle | undefined {
