@@ -124,11 +124,5 @@ export const onInquiryCreated = onDocumentCreated(
         }
       }
     }
-
-    const appSnap = await db.collection(COLLECTIONS.APPLICANTS).doc(applicantId).get();
-    const appEmail = appSnap.data()?.email;
-    if (appEmail) {
-      await enqueueMail('APPLICATION_RECEIVED', appEmail, { inquiryId });
-    }
   }
 );
