@@ -1,6 +1,6 @@
 import { onCall, HttpsError } from 'firebase-functions/v2/https';
 import { createHash } from 'crypto';
-import { db, FV, REGION } from '../lib/admin';
+import { db, FV, REGION, isInFreeTrial } from '../lib/admin';
 import { COLLECTIONS } from '../lib/constants';
 
 function object(value: unknown): Record<string, unknown> {
@@ -117,6 +117,11 @@ export const createInquiry = onCall({ region: REGION }, async (request) => {
     const advRef = db.collection(COLLECTIONS.ADVERTISERS).doc(advertiserId);
     const advSnap = await tx.get(advRef);
     if (!advSnap.exists) throw new HttpsError('failed-precondition', '募集者が見つかりません。');
+    const inFree = isInFreeTrial(advSnap.get('freeUntil'));
+    const balance = (advSnap.get('depositBalance') ?? 0) as number;
+    if (!inFree && balance <= 0) {
+      throw new HttpsError('failed-precondition', '現在、この案件の資料請求は停止しております。');
+    }
 
     tx.create(inqRef, {
       listingId,
