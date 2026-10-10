@@ -893,21 +893,20 @@ export function ListingForm({
             </div>
           </Field>
 
-          <Field label="組織拡大">
+                    <Field label="組織拡大">
             <div className="flex flex-wrap gap-2">
               {ORGANIZATION_TYPES.map((t) => (
                 <label
                   key={t.slug}
                   className={cn(
                     'flex cursor-pointer items-center gap-1 rounded-lg border px-3 py-2 text-sm',
-                    organizationType === t.slug ? 'border-brand-600 bg-brand-50' : 'border-gray-200'
+                    organizationTypes.includes(t.slug) ? 'border-brand-600 bg-brand-50' : 'border-gray-200'
                   )}
                 >
                   <input
-                    type="radio"
-                    name="organizationType"
-                    checked={organizationType === t.slug}
-                    onChange={() => setOrganizationType(t.slug)}
+                    type="checkbox"
+                    checked={organizationTypes.includes(t.slug)}
+                    onChange={() => toggle(organizationTypes, setOrganizationTypes, t.slug)}
                   />
                   {t.label}
                 </label>
