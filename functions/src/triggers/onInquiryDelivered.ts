@@ -91,7 +91,7 @@ export const onInquiryDelivered = onDocumentUpdated(
       const applicantName = (detail.fullName ?? detail.kana ?? '') as string;
       const listingTitle = (listing.title ?? '') as string;
 
-      await enqueueMail('APPLICANT_RESOURCES', applicantEmail, {
+            await enqueueMail('APPLICATION_RECEIVED', applicantEmail, {
         inquiryId,
         listingId,
         advertiserId: typeof advertiserId === 'string' ? advertiserId : undefined,
@@ -105,7 +105,7 @@ export const onInquiryDelivered = onDocumentUpdated(
         advertiserId?: string;
       });
 
-      logger.info('onInquiryDelivered: queued mail with attachments', {
+      logger.info('onInquiryDelivered: queued APPLICATION_RECEIVED mail', {
         inquiryId,
         attachmentCount: attachments.length,
       });
