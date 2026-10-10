@@ -70,10 +70,8 @@ export default function ApplyPage() {
       listingId: id,
       inquiryId: inquiryId.current,
     });
-    await signOut(auth);                          // ★ この行を追加
-    router.push(
-      `/listings/${id}/apply/complete?inquiryId=${encodeURIComponent(result.data.inquiryId)}`,
-    );
+        await signOut(auth);
+    router.push('/');
     } catch (error) {
       setError(error instanceof Error ? error.message : '応募の送信に失敗しました。');
       setSending(false);
