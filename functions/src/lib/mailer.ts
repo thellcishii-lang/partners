@@ -8,7 +8,7 @@ export const ZOHO_APP_PASSWORD = defineSecret('ZOHO_APP_PASSWORD');
 
 // 送信元表示（受信者に見えるアドレス）
 export const MAIL_FROM_ADDRESS = 'info@agent-partners.space';
-export const MAIL_FROM_DISPLAY = `代理店募集・加盟店募集.com <${MAIL_FROM_ADDRESS}>`;
+export const MAIL_FROM_DISPLAY = `代理店・加盟店募集.com <${MAIL_FROM_ADDRESS}>`;
 
 export function createTransporter() {
   return nodemailer.createTransport({
