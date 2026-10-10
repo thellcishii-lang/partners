@@ -14,5 +14,4 @@ export { rejectPendingEdit } from './admin/rejectPendingEdit';
 export { forcePauseListing } from './admin/forcePauseListing';
 export { forceCloseListing } from './admin/forceCloseListing';
 export { sendTestMail } from './admin/sendTestMail';
-export { testMail } from './admin/testMail';
 export { setSmsVerified } from './auth/setSmsVerified';
