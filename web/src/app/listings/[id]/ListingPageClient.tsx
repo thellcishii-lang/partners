@@ -5,7 +5,7 @@ import { useListing } from '@/hooks/useListing';
 import { useAuth } from '@/providers/AuthProvider';
 import { ListingDetail } from '@/components/listings/ListingDetail';
 
-export default function ListingPage() {
+export function ListingPageClient() {
   const { id } = useParams<{ id: string }>();
   const { listing, loading, error } = useListing(id);
   const { user } = useAuth();
