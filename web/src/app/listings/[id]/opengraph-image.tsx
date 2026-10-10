@@ -1,7 +1,6 @@
 import { ImageResponse } from 'next/og';
 import { getAdminDb } from '@/lib/firebaseAdmin';
 
-export const runtime = 'edge';
 export const alt = '案件詳細';
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
