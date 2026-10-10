@@ -3,9 +3,9 @@
 import Link from 'next/link';
 import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { doc, onSnapshot } from 'firebase/firestore';
+import { httpsCallable } from 'firebase/functions';
 import { signOut } from 'firebase/auth';
-import { auth, db } from '@/lib/firebase';
+import { auth, functions } from '@/lib/firebase';
 
 export default function ApplicationCompletePage() {
   return <Suspense fallback={<p>読み込み中…</p>}><ApplicationStatus /></Suspense>;
@@ -30,15 +30,17 @@ function ApplicationStatus() {
       setError('応募IDが正しくありません。');
       return;
     }
-    return onSnapshot(doc(db, 'inquiries', inquiryId), (snap) => {
-      if (!snap.exists()) {
-        setStatus('');
-        setError('応募が見つかりません。');
-        return;
-      }
-      setError('');
-      setStatus(snap.get('status'));
-    }, (e) => { setStatus(''); setError(e.message); });
+    let active = true;
+    const fn = httpsCallable<{ inquiryId: string }, { status: string }>(
+      functions,
+      'getInquiryStatus',
+    );
+    fn({ inquiryId })
+      .then((res) => { if (active) setStatus(res.data.status); })
+      .catch((e) => {
+        if (active) setError(e instanceof Error ? e.message : '取得に失敗しました。');
+      });
+    return () => { active = false; };
   }, [inquiryId]);
 
   return (
