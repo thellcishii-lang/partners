@@ -52,8 +52,12 @@ export default function ListingInquiriesPage() {
       if (active) setListing(listingData);
 
       const inqSnap = await getDocs(
-        query(collection(db, 'inquiries'), where('listingId', '==', id))
-      );
+  query(
+    collection(db, 'inquiries'),
+    where('listingId', '==', id),
+    where('advertiserId', '==', user.uid)
+  )
+);
       const inquiries = inqSnap.docs.map((d) => ({ ...d.data(), id: d.id } as Inquiry));
       inquiries.sort((a, b) => {
         const at = a.createdAt?.seconds ?? 0;
