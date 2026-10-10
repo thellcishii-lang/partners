@@ -95,6 +95,29 @@ export const onInquiryCreated = onDocumentCreated(
 
     const advSnap = await db.collection(COLLECTIONS.ADVERTISERS).doc(advertiserId).get();
     const adv = advSnap.data()!;
+    
+    // デポジット残高が0になったら、その募集者の全公開案件を停止
+    if (result.delivered && result.balanceAfter === 0 && !result.freeTrial) {
+      const publishedSnap = await db
+        .collection(COLLECTIONS.LISTINGS)
+        .where('advertiserId', '==', advertiserId)
+        .where('status', '==', 'published')
+        .get();
+      if (!publishedSnap.empty) {
+        const batch = db.batch();
+        publishedSnap.docs.forEach((d) => {
+          batch.update(d.ref, {
+            status: 'paused',
+            updatedAt: FV.serverTimestamp(),
+          });
+        });
+        await batch.commit();
+        logger.info('onInquiryCreated: paused all listings (balance 0)', {
+          advertiserId,
+          count: publishedSnap.size,
+        });
+      }
+    }
 
     if (result.delivered) {
       await enqueueMail('INQUIRY_DELIVERED', adv.email, {
