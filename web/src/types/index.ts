@@ -160,8 +160,8 @@ export interface Listing {
   revenueType: string;
   revenueTypeLabel: string;
 
-  organizationType: string;
-  organizationTypeLabel: string;
+  organizationTypes: string[];
+  organizationTypeLabels: string[];
   
   // ============================================================
   // 募集企業情報（詳細ページのサイドバー）
