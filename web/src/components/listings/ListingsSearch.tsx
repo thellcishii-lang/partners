@@ -201,7 +201,7 @@ function SearchContent() {
       if (selectedRevenue && l.expectedRevenueRange !== selectedRevenue) return false;
       if (selectedProfit && l.expectedProfitRange !== selectedProfit) return false;
       if (selectedRevenueType && l.revenueType !== selectedRevenueType) return false;
-      if (selectedOrg && l.organizationType !== selectedOrg) return false;
+      if (selectedOrg && !l.organizationTypes?.includes(selectedOrg)) return false;
       return true;
     });
     result.sort((a, b) => {
