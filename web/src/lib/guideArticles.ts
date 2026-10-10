@@ -104,6 +104,36 @@ export const GUIDE_ARTICLES: GuideArticle[] = [
     readingMinutes: 11,
     featured: true,
   },
+  {
+    slug: 'ai-saas-agent',
+    title: 'AI・SaaS代理店の始め方｜未経験からストック収益を作る',
+    description:
+      'AI・SaaSは今もっとも代理店案件が増えている分野。在庫不要・初期費用0円〜で始められ、契約が続く限り継続報酬が入ります。仕組みと始め方を解説。',
+    category: 'industry',
+    tags: ['AI 代理店', 'SaaS 代理店', 'ストック収益', '副業'],
+    publishedAt: '2026-10-10',
+    readingMinutes: 10,
+  },
+  {
+    slug: 'telecom-agent',
+    title: '通信代理店で稼ぐ仕組み｜携帯・光回線の代理店の始め方',
+    description:
+      '携帯キャリア・光回線は代理店ビジネスの代表格。成約単価が高く、継続報酬も狙えます。未経験から始める方法と、稼ぐコツを解説します。',
+    category: 'industry',
+    tags: ['通信 代理店', '携帯 代理店', '光回線 代理店', '副業'],
+    publishedAt: '2026-10-10',
+    readingMinutes: 11,
+  },
+  {
+    slug: 'beauty-franchise',
+    title: '美容・エステ・脱毛サロンの加盟店の選び方',
+    description:
+      'エステ・脱毛・ネイル・美容室の加盟店選びで失敗しないために。フランチャイズと代理店の違い、チェックすべき5つのポイントを解説します。',
+    category: 'industry',
+    tags: ['エステ 加盟店', '脱毛 サロン', '美容室 独立', 'フランチャイズ'],
+    publishedAt: '2026-10-10',
+    readingMinutes: 11,
+  },
 ];
 
 export function getArticleBySlug(slug: string): GuideArticle | undefined {
