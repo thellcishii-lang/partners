@@ -16,9 +16,9 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params;
   const label = TARGET_LABELS[slug];
-  if (!label) return { title: '代理店募集・加盟店募集.com' };
+  if (!label) return { title: '代理店・加盟店募集.com' };
   return {
-    title: `${label}向けの代理店募集・加盟店募集`,
+    title: `${label}向けの代理店・加盟店募集`,
     description: `${label}向けの商材を扱う代理店・加盟店を募集している企業の一覧です。`,
   };
 }
@@ -36,7 +36,7 @@ export default async function TargetPage({
     <FilteredListingList
       filterKey="targetSlugs"
       filterValue={slug}
-      heading={`${label}向けの代理店募集・加盟店募集`}
+      heading={`${label}向けの代理店・加盟店募集`}
       description={`${label}向けの商材を扱う代理店・加盟店を募集している企業の一覧です。`}
     />
   );

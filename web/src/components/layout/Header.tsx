@@ -19,7 +19,7 @@ export function Header() {
       <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4">
         <div className="flex items-center gap-6">
           <Link href="/" className="font-bold text-emerald-700">
-            代理店募集・加盟店募集.com
+            代理店・加盟店募集.com
           </Link>
           <Link
             href="/guide"

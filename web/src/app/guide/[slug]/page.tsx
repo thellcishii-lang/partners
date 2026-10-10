@@ -29,7 +29,7 @@ export async function generateMetadata({
   const article = getArticleBySlug(slug);
   if (!article) return { title: '記事が見つかりません' };
   return {
-    title: `${article.title} | 代理店募集・加盟店募集.com`,
+    title: `${article.title} | 代理店・加盟店募集.com`,
     description: article.description,
     keywords: article.tags,
     alternates: { canonical: `/guide/${slug}` },
@@ -99,7 +99,7 @@ export default async function ArticlePage({ params }: { params: Params }) {
     url: `${SITE_URL}/guide/${slug}`,
     publisher: {
       '@type': 'Organization',
-      name: '代理店募集・加盟店募集.com',
+      name: '代理店・加盟店募集.com',
     },
   };
 

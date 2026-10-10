@@ -16,12 +16,12 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { range } = await params;
   const label = INITIAL_COST_LABELS[range];
-  if (!label) return { title: '代理店募集・加盟店募集.com' };
+  if (!label) return { title: '代理店・加盟店募集.com' };
   return {
-    title: `${label}の代理店募集・加盟店募集`,
+    title: `${label}の代理店・加盟店募集`,
     description: `初期費用が${label}の代理店・加盟店を募集している企業の一覧です。登録3ヶ月無料、デポジット型。`,
     openGraph: {
-      title: `${label}の代理店募集・加盟店募集`,
+      title: `${label}の代理店・加盟店募集`,
       description: `初期費用${label}の代理店・加盟店の募集一覧。`,
     },
   };
@@ -40,7 +40,7 @@ export default async function CostInitialPage({
     <FilteredListingList
       filterKey="initialCostRange"
       filterValue={range}
-      heading={`${label}の代理店募集・加盟店募集`}
+      heading={`${label}の代理店・加盟店募集`}
       description={`初期費用が${label}の代理店・加盟店を募集している企業の一覧です。`}
     />
   );

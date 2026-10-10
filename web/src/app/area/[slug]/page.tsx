@@ -16,12 +16,12 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params;
   const info = AREA_LABELS[slug];
-  if (!info) return { title: '代理店募集・加盟店募集.com' };
+  if (!info) return { title: '代理店・加盟店募集.com' };
   return {
-    title: `${info.label}の代理店募集・加盟店募集`,
+    title: `${info.label}の代理店・加盟店募集`,
     description: `${info.label}エリアの代理店・加盟店を募集している企業の一覧です。登録3ヶ月無料、デポジット型で必要な問い合わせだけにお金を払う。`,
     openGraph: {
-      title: `${info.label}の代理店募集・加盟店募集`,
+      title: `${info.label}の代理店・加盟店募集`,
       description: `${info.label}エリアの代理店・加盟店の募集一覧。`,
     },
   };
@@ -40,7 +40,7 @@ export default async function AreaPage({
     <FilteredListingList
       filterKey="area"
       filterValue={slug}
-      heading={`${info.label}の代理店募集・加盟店募集`}
+      heading={`${info.label}の代理店・加盟店募集`}
       description={`${info.label}エリアの代理店・加盟店を募集している企業の一覧です。`}
     />
   );

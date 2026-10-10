@@ -5,7 +5,7 @@ import { GUIDE_ARTICLES } from '@/lib/guideArticles';
 const SITE_URL = 'https://partners-tau-kohl.vercel.app';
 
 export const metadata: Metadata = {
-  title: '起業・代理店の実践ガイド | 代理店募集・加盟店募集.com',
+  title: '起業・代理店の実践ガイド | 代理店・加盟店募集.com',
   description:
     '起業するなら、1から始めるより代理店として乗る方が成功しやすい。費用・リスク・成功確率の違いから、代理店の選び方まで、実践的に解説します。',
   keywords: [
@@ -21,7 +21,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     locale: 'ja_JP',
-    title: '起業・代理店の実践ガイド | 代理店募集・加盟店募集.com',
+    title: '起業・代理店の実践ガイド | 代理店・加盟店募集.com',
     description: '起業するなら代理店。費用・リスク・成功確率の違いから、選び方まで実践的に解説。',
     url: '/guide',
   },

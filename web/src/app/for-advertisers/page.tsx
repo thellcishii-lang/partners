@@ -6,7 +6,7 @@ import {
 } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: '掲載について | 代理店募集・加盟店募集.com',
+  title: '掲載について | 代理店・加盟店募集.com',
   description: '代理店・加盟店募集を掲載しませんか？初期費用0円・月額0円、応募1件2,500円のデポジット型。最短3日で掲載開始。',
 };
 

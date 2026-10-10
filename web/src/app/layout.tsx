@@ -5,9 +5,27 @@ import { AuthProvider } from '@/providers/AuthProvider';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 
+const SITE_URL = 'https://partners-tau-kohl.vercel.app';
+const SITE_NAME = '代理店・加盟店募集.com';
+const SITE_DESCRIPTION = '代理店・加盟店・FC加盟の募集と応募ができるマッチングサイト';
+
 export const metadata: Metadata = {
-  title: '代理店・加盟店募集.com',
-  description: '代理店・加盟店・FC加盟の募集と応募ができるマッチングサイト',
+  metadataBase: new URL(SITE_URL),
+  title: SITE_NAME,
+  description: SITE_DESCRIPTION,
+  openGraph: {
+    type: 'website',
+    locale: 'ja_JP',
+    url: SITE_URL,
+    siteName: SITE_NAME,
+    title: SITE_NAME,
+    description: SITE_DESCRIPTION,
+  },
+  twitter: {
+    card: 'summary',
+    title: SITE_NAME,
+    description: SITE_DESCRIPTION,
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

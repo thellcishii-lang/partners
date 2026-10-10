@@ -16,9 +16,9 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params;
   const label = MODEL_LABELS[slug];
-  if (!label) return { title: '代理店募集・加盟店募集.com' };
+  if (!label) return { title: '代理店・加盟店募集.com' };
   return {
-    title: `${label}代理店募集・加盟店募集`,
+    title: `${label}代理店・加盟店募集`,
     description: `${label}の代理店・加盟店を募集している企業の一覧です。`,
   };
 }
@@ -36,7 +36,7 @@ export default async function ModelPage({
     <FilteredListingList
       filterKey="modelSlugs"
       filterValue={slug}
-      heading={`${label}の代理店募集・加盟店募集`}
+      heading={`${label}の代理店・加盟店募集`}
       description={`${label}の代理店・加盟店を募集している企業の一覧です。`}
     />
   );
