@@ -8,12 +8,12 @@ import { Footer } from '@/components/layout/Footer';
 const SITE_URL = 'https://www.代理店・加盟店募集.com';
 const SITE_NAME = '代理店・加盟店募集.com';
 const SITE_DESCRIPTION =
-  '代理店・加盟店・フランチャイズ（FC）の募集案件を探せるマッチングサイト。AI・通信・美容・住宅など業種別、全国の地域別に検索できます。登録3ヶ月無料、成果報酬型。';
+  '代理店・加盟店・FCで成功の近道を手に入れる。独立開業を目指す方のための募集案件マッチングサイト。様々な業種、全国の地域別に検索可能。';
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: '代理店・加盟店募集.com｜代理店・加盟店・FCの募集と応募',
+    default: '代理店・加盟店募集.com｜独立開業への最短ルートを探す',
     template: '%s｜代理店・加盟店募集.com',
   },
   description: SITE_DESCRIPTION,
@@ -22,6 +22,7 @@ export const metadata: Metadata = {
     '加盟店募集',
     'フランチャイズ',
     'FC加盟',
+    '独立開業',
     '代理店 副業',
     '業務委託',
     '代理店 マッチング',
@@ -33,7 +34,7 @@ export const metadata: Metadata = {
     locale: 'ja_JP',
     url: SITE_URL,
     siteName: SITE_NAME,
-    title: '代理店・加盟店募集.com｜代理店・加盟店・FCの募集と応募',
+    title: '代理店・加盟店募集.com｜独立開業への最短ルートを探す',
     description: SITE_DESCRIPTION,
   },
   twitter: {
