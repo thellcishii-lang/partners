@@ -26,6 +26,7 @@ export interface Advertiser {
   depositBalance: number;
   plan: 'free' | 'standard' | 'premium';
   freeUntil?: { seconds: number; nanoseconds: number } | null;
+  unlimitedUntil?: { seconds: number; nanoseconds: number } | null;
   pendingCount: number;
   lowDepositNotified: number | null;
   onboardingCompleted?: boolean;
