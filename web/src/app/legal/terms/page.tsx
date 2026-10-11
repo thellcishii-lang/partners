@@ -67,26 +67,18 @@ export default function TermsPage() {
         </ol>
       </section>
 
-      <section className="mb-6">
+            <section className="mb-6">
         <h2 className="mb-3 text-lg font-bold">第5条（デポジットの返金）</h2>
         <ol className="list-decimal space-y-2 pl-6 text-sm leading-relaxed">
           <li>
             購入済みデポジットの残高について、募集者は当社所定の方法により返金を申請することができます。
           </li>
           <li>
-            返金手続きにあたり、返金手数料として一律550円（税込）を申し受けます。
+            返金手続きにあたり、返金事務手数料として一律550円（税込）を申し受けます。
           </li>
           <li>
             返金は、申請月の末日締め、翌月15日までに、募集者が指定する銀行口座へ振り込みます。
             振込手数料は当社が負担します。
-          </li>
-          <li>
-            最後のデポジット購入日または最後のデポジット消費日のいずれか遅い日から
-            1年間、当該募集者による案件の掲載がない場合、当社は残高の全額を
-            返金の対象とし、募集者へ通知します。
-          </li>
-          <li>
-            本条に基づく返金は、当社が指定する銀行口座への振込により行います。
           </li>
         </ol>
       </section>
