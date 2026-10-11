@@ -711,20 +711,15 @@ function ListingCard({ listing }: { listing: Listing }) {
   const mainImage = listing.images?.[0];
 
   return (
-    <Link
+        <Link
       href={`/listings/${listing.id}`}
       className="block rounded-2xl bg-white shadow-sm transition hover:shadow-md hover:ring-2 hover:ring-emerald-500"
     >
-      <div className="flex gap-5 p-5">
-        {/* 左：メイン画像 */}
-        <div className="aspect-video w-64 shrink-0 overflow-hidden rounded-xl bg-gray-100 sm:w-80">
+      <div className="flex flex-col gap-3 p-4 sm:flex-row sm:gap-5 sm:p-5">
+        {/* 画像：モバイルは全幅、PCは固定幅 */}
+        <div className="aspect-video w-full shrink-0 overflow-hidden rounded-xl bg-gray-100 sm:w-64 lg:w-80">
           {mainImage ? (
-            /* eslint-disable-next-line @next/next/no-img-element */
-            <img
-              src={mainImage}
-              alt={listing.title}
-              className="h-full w-full object-cover"
-            />
+            <img src={mainImage} alt={listing.title} className="h-full w-full object-cover" />
           ) : (
             <div className="flex h-full w-full items-center justify-center text-gray-300">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} className="h-14 w-14">
@@ -736,15 +731,12 @@ function ListingCard({ listing }: { listing: Listing }) {
           )}
         </div>
 
-        {/* 右：情報 */}
+        {/* 情報 */}
         <div className="flex min-w-0 flex-1 flex-col">
-          {/* タグ行 */}
-          <div className="mb-2 flex flex-wrap gap-1.5">
+          {/* タグ行：PCのみ */}
+          <div className="mb-2 hidden flex-wrap gap-1.5 sm:flex">
             {listing.targetLabels?.slice(0, 2).map((label) => (
-              <span
-                key={label}
-                className="rounded-md bg-gray-100 px-2 py-0.5 text-[11px] font-bold text-gray-700"
-              >
+              <span key={label} className="rounded-md bg-gray-100 px-2 py-0.5 text-[11px] font-bold text-gray-700">
                 {label}
               </span>
             ))}
@@ -752,42 +744,36 @@ function ListingCard({ listing }: { listing: Listing }) {
               {areaText}
             </span>
             {listing.productLabels?.slice(0, 2).map((label) => (
-              <span
-                key={label}
-                className="rounded-md bg-emerald-50 px-2 py-0.5 text-[11px] font-bold text-emerald-700"
-              >
+              <span key={label} className="rounded-md bg-emerald-50 px-2 py-0.5 text-[11px] font-bold text-emerald-700">
                 {label}
               </span>
             ))}
             {listing.modelLabels?.slice(0, 1).map((label) => (
-              <span
-                key={label}
-                className="rounded-md bg-green-50 px-2 py-0.5 text-[11px] font-bold text-green-700"
-              >
+              <span key={label} className="rounded-md bg-green-50 px-2 py-0.5 text-[11px] font-bold text-green-700">
                 {label}
               </span>
             ))}
           </div>
 
-          {/* タイトル */}
-          <h2 className="line-clamp-2 text-lg font-bold leading-snug text-gray-900">
+          {/* タイトル：常に表示 */}
+          <h2 className="line-clamp-2 text-base font-bold leading-snug text-gray-900 sm:text-lg">
             {listing.title}
           </h2>
 
-          {/* 掲載企業 */}
-          <p className="mt-1 text-xs text-gray-500">
+          {/* 掲載企業：PCのみ */}
+          <p className="mt-1 hidden text-xs text-gray-500 sm:block">
             掲載企業：{listing.companyName || '未設定'}
           </p>
 
-          {/* 説明 */}
+          {/* 説明：PCのみ */}
           {listing.description && (
-            <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-gray-600">
+            <p className="mt-2 hidden line-clamp-2 text-sm leading-relaxed text-gray-600 sm:block">
               {listing.description}
             </p>
           )}
 
-          {/* 下部：条件 */}
-          <div className="mt-auto flex flex-wrap gap-x-4 gap-y-1 pt-3 text-xs text-gray-600">
+          {/* 条件：PCのみ */}
+          <div className="mt-auto hidden flex-wrap gap-x-4 gap-y-1 pt-3 text-xs text-gray-600 sm:flex">
             {listing.initialCostLabel && (
               <span>💵 初期費用：{listing.initialCostLabel}</span>
             )}
