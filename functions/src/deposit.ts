@@ -6,7 +6,7 @@ import { enqueueMail } from './lib/mail';
 // 型
 // ============================================================
 export type ConsumeResult =
-  | { delivered: true; balanceAfter: number; txId: string | null; notifyLow: boolean; freeTrial: boolean }
+  | { delivered: true; balanceAfter: number; txId: string | null; notifyLow: boolean; freeTrial: boolean; unlimited?: boolean }
   | { delivered: false; balanceAfter: 0; reason: 'no_balance' | 'already_processed' };
 
 // ============================================================
@@ -18,6 +18,15 @@ function isInFreeTrial(freeUntil: unknown): boolean {
     return (freeUntil as { toDate: () => Date }).toDate() > new Date();
   }
   if (freeUntil instanceof Date) return freeUntil > new Date();
+  return false;
+}
+
+function isInUnlimited(unlimitedUntil: unknown): boolean {
+  if (!unlimitedUntil) return false;
+  if (typeof unlimitedUntil === 'object' && unlimitedUntil !== null && 'toDate' in unlimitedUntil) {
+    return (unlimitedUntil as { toDate: () => Date }).toDate() > new Date();
+  }
+  if (unlimitedUntil instanceof Date) return unlimitedUntil > new Date();
   return false;
 }
 
@@ -51,9 +60,37 @@ export async function consumeOne(
       return { delivered: false, balanceAfter: adv.depositBalance ?? 0, reason: 'already_processed' };
     }
 
-    const balance = (adv.depositBalance ?? 0) as number;
+        const balance = (adv.depositBalance ?? 0) as number;
     const inFreeTrial = isInFreeTrial(adv.freeUntil);
+    const inUnlimited = isInUnlimited(adv.unlimitedUntil);
     const now = TS.now();
+
+    // ─── 無制限期間中：消費せずに開示 ───
+    if (inUnlimited) {
+      const advUpdate: Record<string, unknown> = { updatedAt: now };
+      if (inq.status === 'pending') {
+        advUpdate.pendingCount = FV.increment(-1);
+      }
+      tx.update(advRef, advUpdate);
+
+      tx.update(inqRef, {
+        status: 'delivered',
+        deliveredAt: now,
+        depositTransactionId: null,
+        freeTrial: false,
+        unlimited: true,
+        updatedAt: now,
+      });
+
+      return {
+        delivered: true as const,
+        balanceAfter: balance,
+        txId: null,
+        notifyLow: false,
+        freeTrial: false,
+        unlimited: true,
+      };
+    }
 
     // ─── 無料期間中：消費せずに開示 ───
     if (inFreeTrial) {
