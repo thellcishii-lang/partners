@@ -23,6 +23,8 @@ export type MailTemplate =
   | 'LISTING_EDIT_REJECTED'
   | 'UNLIMITED_PURCHASED'
   | 'INQUIRY_DELIVERED_UNLIMITED';
+  | 'REFUND_REQUESTED'
+  | 'REFUND_COMPLETED';
 
 export interface MailAttachmentSpec {
   path: string;
