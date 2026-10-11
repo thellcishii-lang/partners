@@ -711,13 +711,28 @@ function ListingCard({ listing }: { listing: Listing }) {
   const mainImage = listing.images?.[0];
 
   return (
-        <Link
+           <Link
       href={`/listings/${listing.id}`}
-      className="block rounded-2xl bg-white shadow-sm transition hover:shadow-md hover:ring-2 hover:ring-emerald-500"
+      className="block overflow-hidden rounded-2xl bg-white shadow-sm transition hover:shadow-md hover:ring-2 hover:ring-emerald-500"
     >
-      <div className="flex flex-col gap-3 p-4 sm:flex-row sm:gap-5 sm:p-5">
-        {/* 画像：モバイルは全幅、PCは固定幅 */}
-        <div className="aspect-video w-full shrink-0 overflow-hidden rounded-xl bg-gray-100 sm:w-64 lg:w-80">
+      {/* 画像 */}
+      <div className="aspect-[16/9] w-full overflow-hidden bg-gray-100 sm:hidden">
+        {mainImage ? (
+          <img src={mainImage} alt={listing.title} className="h-full w-full object-cover" />
+        ) : (
+          <div className="flex h-full w-full items-center justify-center text-gray-300">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} className="h-14 w-14">
+              <rect x="3" y="3" width="18" height="18" rx="2" />
+              <circle cx="8.5" cy="8.5" r="1.5" />
+              <path d="M21 15l-5-5L5 21" />
+            </svg>
+          </div>
+        )}
+      </div>
+
+      <div className="flex gap-5 p-4 sm:p-5">
+        {/* PC用の画像（左サイド） */}
+        <div className="hidden aspect-video w-64 shrink-0 overflow-hidden rounded-xl bg-gray-100 sm:block lg:w-80">
           {mainImage ? (
             <img src={mainImage} alt={listing.title} className="h-full w-full object-cover" />
           ) : (
@@ -733,7 +748,7 @@ function ListingCard({ listing }: { listing: Listing }) {
 
         {/* 情報 */}
         <div className="flex min-w-0 flex-1 flex-col">
-          {/* タグ行：PCのみ */}
+          {/* タグ（PCのみ） */}
           <div className="mb-2 hidden flex-wrap gap-1.5 sm:flex">
             {listing.targetLabels?.slice(0, 2).map((label) => (
               <span key={label} className="rounded-md bg-gray-100 px-2 py-0.5 text-[11px] font-bold text-gray-700">
@@ -748,37 +763,32 @@ function ListingCard({ listing }: { listing: Listing }) {
                 {label}
               </span>
             ))}
-            {listing.modelLabels?.slice(0, 1).map((label) => (
-              <span key={label} className="rounded-md bg-green-50 px-2 py-0.5 text-[11px] font-bold text-green-700">
-                {label}
-              </span>
-            ))}
           </div>
 
-          {/* タイトル：常に表示 */}
+          {/* タイトル */}
           <h2 className="line-clamp-2 text-base font-bold leading-snug text-gray-900 sm:text-lg">
             {listing.title}
           </h2>
 
-          {/* 掲載企業：PCのみ */}
+          {/* 掲載企業（PCのみ） */}
           <p className="mt-1 hidden text-xs text-gray-500 sm:block">
             掲載企業：{listing.companyName || '未設定'}
           </p>
 
-          {/* 説明：PCのみ */}
+          {/* 説明文 */}
           {listing.description && (
-            <p className="mt-2 hidden line-clamp-2 text-sm leading-relaxed text-gray-600 sm:block">
+            <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-gray-600">
               {listing.description}
             </p>
           )}
 
-          {/* 条件：PCのみ */}
-          <div className="mt-auto hidden flex-wrap gap-x-4 gap-y-1 pt-3 text-xs text-gray-600 sm:flex">
+          {/* 下部：条件 */}
+          <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-600 sm:mt-auto sm:pt-3">
             {listing.initialCostLabel && (
-              <span>💵 初期費用：{listing.initialCostLabel}</span>
+              <span>💵 {listing.initialCostLabel}</span>
             )}
             {listing.franchiseFeeLabel && (
-              <span>💰 加盟金：{listing.franchiseFeeLabel}</span>
+              <span>💰 {listing.franchiseFeeLabel}</span>
             )}
             {listing.revenueTypeLabel && (
               <span>📈 {listing.revenueTypeLabel}</span>
