@@ -2,10 +2,10 @@ import { onCall, HttpsError } from 'firebase-functions/v2/https';
 import { logger } from 'firebase-functions';
 import { db, FV, REGION } from '../lib/admin';
 import { COLLECTIONS } from '../lib/constants';
-import { isEmulator, stripeClient, STRIPE_SECRET_KEY } from '../lib/stripe';
 import { creditsForAmount, UNIT_PRICE_JPY, withTax, TAX_RATE } from '../depositPricing';
+import { isEmulator, stripeClient, STRIPE_SECRET_KEY } from '../lib/stripe';
 
-// 決済後の戻り先。本番は functions/.env の APP_ORIGINS（カンマ区切り）に登録した Origin のみ許可。
+// 決済後の戻り先。
 export function allowedReturnOrigin(origin: unknown, emulator = isEmulator()): string | null {
   if (typeof origin !== 'string') return null;
   let url: URL;
@@ -32,10 +32,10 @@ export const createDepositCheckout = onCall(
     const amountJpy = data?.amountJpy;
     const credits = creditsForAmount(amountJpy);
     if (credits === null) {
-      throw new HttpsError('invalid-argument',
-        '金額は 10,000円・30,000円、または 30,000円を超える 2,500円単位で指定してください。');
+      throw new HttpsError('invalid-argument', '金額は 10,000円 または 30,000円 から選択してください。');
     }
     const priceJpy = amountJpy as number;
+    const totalJpy = withTax(priceJpy);
     const origin = allowedReturnOrigin(request.rawRequest.headers.origin);
     if (!origin) throw new HttpsError('failed-precondition', 'このサイトからは決済を開始できません。');
 
@@ -48,9 +48,8 @@ export const createDepositCheckout = onCall(
       throw new HttpsError('failed-precondition', '決済の設定が完了していません。');
     }
 
-        const orderRef = db.collection(COLLECTIONS.DEPOSIT_ORDERS).doc();
+    const orderRef = db.collection(COLLECTIONS.DEPOSIT_ORDERS).doc();
     const successUrl = `${origin}/deposit/complete?orderId=${orderRef.id}`;
-    const totalJpy = withTax(priceJpy);
     await orderRef.set({
       advertiserId,
       credits,
@@ -66,7 +65,6 @@ export const createDepositCheckout = onCall(
     });
 
     if (!stripe) {
-      // エミュレータで Stripe キー未設定のときだけ、決済成功を模擬して即時入金する。
       await orderRef.update({ status: 'paid', paidAt: FV.serverTimestamp() });
       return { orderId: orderRef.id, url: successUrl, simulated: true };
     }
