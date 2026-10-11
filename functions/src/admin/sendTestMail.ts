@@ -24,6 +24,9 @@ const ALLOWED_TEMPLATES: MailTemplate[] = [
   'LISTING_EDIT_REJECTED',
   'UNLIMITED_PURCHASED',
   'INQUIRY_DELIVERED_UNLIMITED',
+  'REFUND_REQUESTED',
+  'REFUND_COMPLETED',
+  
 ];
 
 function text(data: Record<string, unknown>, key: string, max: number, required = false): string {
