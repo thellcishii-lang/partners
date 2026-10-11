@@ -30,7 +30,7 @@ export async function applyCheckoutEvent(event: Stripe.Event): Promise<Outcome> 
       tx.update(orderRef, { status: 'canceled', stripeSessionId: session.id });
       return 'expired';
     }
-    if (session.currency !== 'jpy' || session.amount_total !== order.get('priceJpy') ||
+    if (session.currency !== 'jpy' || session.amount_total !== order.get('totalJpy') ||
         (session.metadata?.advertiserId && session.metadata.advertiserId !== order.get('advertiserId'))) {
       return 'mismatch';
     }
