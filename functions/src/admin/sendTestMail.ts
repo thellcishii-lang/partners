@@ -22,7 +22,8 @@ const ALLOWED_TEMPLATES: MailTemplate[] = [
   'LISTING_REJECTED',
   'LISTING_EDIT_APPROVED',
   'LISTING_EDIT_REJECTED',
-  'APPLICANT_RESOURCES',
+  'UNLIMITED_PURCHASED',
+  'INQUIRY_DELIVERED_UNLIMITED',
 ];
 
 function text(data: Record<string, unknown>, key: string, max: number, required = false): string {
@@ -33,7 +34,6 @@ function text(data: Record<string, unknown>, key: string, max: number, required 
   return value.trim();
 }
 
-// テスト用：ログインしていれば誰でも使える
 export const sendTestMail = onCall({ region: REGION }, async (request) => {
   if (!request.auth) {
     throw new HttpsError('unauthenticated', 'ログインしてください。');
