@@ -105,7 +105,7 @@ export const onInquiryCreated = onDocumentCreated(
     const adv = advSnap.data()!;
     
     // デポジット残高が0になったら、その募集者の全公開案件を停止
-    if (result.delivered && result.balanceAfter === 0 && !result.freeTrial) {
+    if (result.delivered && result.balanceAfter === 0 && !result.freeTrial && !result.unlimited) {
       const publishedSnap = await db
         .collection(COLLECTIONS.LISTINGS)
         .where('advertiserId', '==', advertiserId)
