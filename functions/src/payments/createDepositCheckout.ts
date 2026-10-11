@@ -2,8 +2,9 @@ import { onCall, HttpsError } from 'firebase-functions/v2/https';
 import { logger } from 'firebase-functions';
 import { db, FV, REGION } from '../lib/admin';
 import { COLLECTIONS } from '../lib/constants';
-import { creditsForAmount, UNIT_PRICE_JPY } from '../depositPricing';
+import { creditsForAmount, UNIT_PRICE_JPY, withTax } from '../depositPricing';
 import { isEmulator, stripeClient, STRIPE_SECRET_KEY } from '../lib/stripe';
+import { creditsForAmount, UNIT_PRICE_JPY, withTax, TAX_RATE } from '../depositPricing';
 
 // 決済後の戻り先。本番は functions/.env の APP_ORIGINS（カンマ区切り）に登録した Origin のみ許可。
 export function allowedReturnOrigin(origin: unknown, emulator = isEmulator()): string | null {
@@ -48,12 +49,15 @@ export const createDepositCheckout = onCall(
       throw new HttpsError('failed-precondition', '決済の設定が完了していません。');
     }
 
-    const orderRef = db.collection(COLLECTIONS.DEPOSIT_ORDERS).doc();
+        const orderRef = db.collection(COLLECTIONS.DEPOSIT_ORDERS).doc();
     const successUrl = `${origin}/deposit/complete?orderId=${orderRef.id}`;
+    const totalJpy = withTax(priceJpy);
     await orderRef.set({
       advertiserId,
       credits,
       priceJpy,
+      totalJpy,
+      taxRate: TAX_RATE,
       unitPriceJpy: UNIT_PRICE_JPY,
       status: 'pending',
       provider: stripe ? 'stripe' : 'emulator',
@@ -77,8 +81,8 @@ export const createDepositCheckout = onCall(
           quantity: 1,
           price_data: {
             currency: 'jpy',
-            unit_amount: priceJpy,
-            product_data: { name: `応募開示デポジット ${credits}件分` },
+            unit_amount: totalJpy,
+            product_data: { name: `応募開示デポジット ${credits}件分（税込）` },
           },
         }],
         metadata: { orderId: orderRef.id, advertiserId },
