@@ -27,6 +27,8 @@ export interface Advertiser {
   plan: 'free' | 'standard' | 'premium';
   freeUntil?: { seconds: number; nanoseconds: number } | null;
   unlimitedUntil?: { seconds: number; nanoseconds: number } | null;
+  refundRequestedAt?: { seconds: number; nanoseconds: number } | null;
+  refundCompletedAt?: { seconds: number; nanoseconds: number } | null;
   pendingCount: number;
   lowDepositNotified: number | null;
   onboardingCompleted?: boolean;
@@ -114,36 +116,34 @@ export interface Listing {
   // ============================================================
   // フィルタ用（3軸 + 地域 + 費用）
   // ============================================================
-  targetSlugs: string[];        // ['target-retail', 'target-individual']
-  targetLabels: string[];       // ['小売・店舗ビジネス', '個人']
-  productSlugs: string[];       // ['product-ai-it', 'product-ai']
-  productLabels: string[];      // ['AI / IT / DX / SaaS', 'AI']
-  modelSlugs: string[];         // ['model-low-risk']
-  modelLabels: string[];        // ['簡単・低リスクで始める']
+  targetSlugs: string[];
+  targetLabels: string[];
+  productSlugs: string[];
+  productLabels: string[];
+  modelSlugs: string[];
+  modelLabels: string[];
 
-   areaMode: 'nationwide' | 'region' | 'prefecture';
+  areaMode: 'nationwide' | 'region' | 'prefecture';
   areaSlugs: string[];
   areaLabels: string[];
 
-  // 検索用（保存時に自動展開）
   areaSearchPrefectureSlugs: string[];
-  areaSearchRegionSlugs: string[];        // '関東'
+  areaSearchRegionSlugs: string[];
 
-   // 資料（PDF・PPT・画像）
   documents?: ListingDocument[];
 
-  initialCostYen: number | null;    // 数値（円）。不明は null
-  initialCostRange: string;         // 'initial-free' など
-  initialCostLabel: string;         // '初期費用無料'
+  initialCostYen: number | null;
+  initialCostRange: string;
+  initialCostLabel: string;
 
   expectedRevenueYen: number | null;
-  expectedRevenueRange: string;     // 'revenue-under500' など
+  expectedRevenueRange: string;
   expectedRevenueLabel: string;
 
-  searchText: string;               // 検索用の結合テキスト
+  searchText: string;
 
   reviewNote?: string | null;
-  
+
   // ============================================================
   // 拡張フィルタ項目
   // ============================================================
@@ -163,7 +163,7 @@ export interface Listing {
 
   organizationTypes: string[];
   organizationTypeLabels: string[];
-  
+
   // ============================================================
   // 募集企業情報（詳細ページのサイドバー）
   // ============================================================
@@ -172,19 +172,10 @@ export interface Listing {
   companyEstablished?: string;
   companyBusiness?: string;
 
-  // ============================================================
-  // こんな方におすすめ
-  // ============================================================
   recommendedFor?: string[];
 
-  // ============================================================
-  // ビジネスの説明（番号付き）
-  // ============================================================
   businessPoints?: { title: string; body: string }[];
 
-  // ============================================================
-  // 詳細情報（サイドバー）
-  // ============================================================
   salesTarget?: string;
   salesMethod?: string;
   earnings?: string;
@@ -195,24 +186,17 @@ export interface Listing {
     note?: string;
   } | null;
 
-  // 編集審査中かどうかのフラグ（admin 検索用）
   pendingEditSubmitted?: boolean;
 }
-
 
 // ============================================================
 // 案件資料
 // ============================================================
 export interface ListingDocument {
-  /** 元のファイル名（メール添付時の名前） */
   name: string;
-  /** ダウンロードURL */
   url: string;
-  /** Storage パス（削除用） */
   path: string;
-  /** バイトサイズ */
   size: number;
-  /** MIMEタイプ */
   type: string;
 }
 
@@ -276,6 +260,7 @@ export interface InquiryDetail {
   };
   createdAt?: unknown;
 }
+
 export interface ApplicationInput {
   inquiryId: string;
   listingId: string;
