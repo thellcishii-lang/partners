@@ -19,11 +19,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     );
   }
 
-  const nav = [
+    const nav = [
     { href: '/admin', label: 'ダッシュボード' },
     { href: '/admin/listings', label: '案件審査' },
     { href: '/admin/advertisers', label: '掲載主' },
     { href: '/admin/inquiries', label: '応募' },
+    { href: '/admin/refunds', label: '返金' },
   ];
 
   return (
