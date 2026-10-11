@@ -1,16 +1,24 @@
-// functions/src/depositPricing.ts と同じ値を保つこと（金額の最終検証はサーバー側）。
+// 消費税率（変更時はここを書き換える）
+export const TAX_RATE = 0.1;
+
+// デポジット（税抜）
 export const UNIT_PRICE_JPY = 2500;
 export const PRESET_AMOUNTS_JPY = [10000, 30000] as const;
-export const CUSTOM_MIN_EXCLUSIVE_JPY = 30000;
-export const MAX_AMOUNT_JPY = UNIT_PRICE_JPY * 1000;
 
+// 無制限プラン（税抜）
+export const UNLIMITED_PRICE_JPY = 75000;
+export const UNLIMITED_DAYS = 30;
+
+// 税込に変換
+export function withTax(amountJpy: number): number {
+  return Math.floor(amountJpy * (1 + TAX_RATE));
+}
+
+// プリセット金額 → クレジット数
 export function creditsForAmount(amountJpy: number): number | null {
   if (!Number.isInteger(amountJpy)) return null;
   const preset = (PRESET_AMOUNTS_JPY as readonly number[]).includes(amountJpy);
-  const custom = amountJpy > CUSTOM_MIN_EXCLUSIVE_JPY &&
-    amountJpy <= MAX_AMOUNT_JPY &&
-    amountJpy % UNIT_PRICE_JPY === 0;
-  return preset || custom ? amountJpy / UNIT_PRICE_JPY : null;
+  return preset ? amountJpy / UNIT_PRICE_JPY : null;
 }
 
 export const yen = (value: number) => `${value.toLocaleString('ja-JP')}円`;
