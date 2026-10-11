@@ -14,7 +14,7 @@ export default function DepositCompletePage() {
 function DepositStatus() {
   const { user, loading } = useRequireAuth();
   const orderId = useSearchParams().get('orderId');
-  const [order, setOrder] = useState<{ status: string; credits: number } | null>(null);
+  const [order, setOrder] = useState<{ status: string; credits: number; totalJpy?: number } | null>(null);
   const [balance, setBalance] = useState<number | null>(null);
   const [error, setError] = useState('');
 
@@ -31,7 +31,11 @@ function DepositStatus() {
         setError('注文が見つかりません。');
         return;
       }
-      setOrder({ status: snap.get('status'), credits: snap.get('credits') });
+      setOrder({
+  status: snap.get('status'),
+  credits: snap.get('credits'),
+  totalJpy: snap.get('totalJpy'),
+});
     }, (error) => setError(error.message));
     const stopAdv = onSnapshot(doc(db, 'advertisers', user.uid),
       (snap) => setBalance(snap.get('depositBalance') ?? 0), () => {});
