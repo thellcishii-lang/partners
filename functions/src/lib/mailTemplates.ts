@@ -180,6 +180,46 @@ ${SITE_URL}/dashboard
 ${footer}`,
       };
 
+          case 'REFUND_REQUESTED':
+      return {
+        subject: `【${SITE_NAME}】返金申請がありました`,
+        text: `${p('advertiserName')}（${p('email')}）から返金申請がありました。
+
+─────────────
+返金総額：${n('amountYen').toLocaleString('ja-JP')}円
+返金手数料：${n('feeYen').toLocaleString('ja-JP')}円
+実振込額：${n('netAmountYen').toLocaleString('ja-JP')}円
+─────────────
+
+振込先
+銀行名：${p('bankName')}
+支店名：${p('branchName')}
+口座種別：${p('accountType')}
+口座番号：${p('accountNumber')}
+口座名義：${p('accountHolder')}
+
+管理画面から確認してください。
+${SITE_URL}/admin/refunds
+${footer}`,
+      };
+
+    case 'REFUND_COMPLETED':
+      return {
+        subject: `【${SITE_NAME}】返金の振込が完了しました`,
+        text: `${p('advertiserName')} 様
+
+デポジット残高の返金を、下記口座に振り込みました。
+
+─────────────
+振込額：${n('netAmountYen').toLocaleString('ja-JP')}円
+振込先：${p('bankName')} ${p('branchName')} ${p('accountNumber')}
+─────────────
+
+ご確認ください。
+${SITE_URL}/dashboard/deposits
+${footer}`,
+      };
+
     case 'WELCOME_ADVERTISER':
       return {
         subject: `【${SITE_NAME}】ご登録ありがとうございます`,
