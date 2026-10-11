@@ -73,6 +73,11 @@ export default function DashboardPage() {
 
     const goingPublic = listing.status === 'paused';
 
+    if (goingPublic && listing.adminSuspended) {
+      window.alert('管理者により公開停止中のため、再公開できません。');
+      return;
+    }
+
     // ─── 公開する時：無料期間 or デポジット残高をチェック ───
     if (goingPublic && adv) {
       const inFree = isInFreeTrial(adv.freeUntil);
@@ -226,8 +231,10 @@ export default function DashboardPage() {
         <h2 className="text-lg font-bold">自分の案件一覧</h2>
         {listings.length === 0 && <p className="text-sm text-gray-600">まだ案件がありません。</p>}
         {listings.map((listing) => {
-          const isBusy = busy === listing.id;
-          const canToggle = listing.status === 'published' || listing.status === 'paused';
+         const isBusy = busy === listing.id;
+          const canToggle =
+            !listing.adminSuspended &&
+            (listing.status === 'published' || listing.status === 'paused');
           const canDelete = listing.status !== 'published';
 
           return (
@@ -241,6 +248,11 @@ export default function DashboardPage() {
                   <span className="rounded-full bg-gray-100 px-3 py-1">
                     {LISTING_STATUS_LABELS[listing.status]}
                   </span>
+                  {listing.adminSuspended && (
+                    <span className="rounded-full bg-red-600 px-3 py-1 text-white">
+                      管理者により公開停止中
+                    </span>
+                  )}
                   {listing.pendingEditSubmitted && (
                     <span className="rounded-full bg-orange-100 px-3 py-1 text-orange-800">
                       編集審査中
