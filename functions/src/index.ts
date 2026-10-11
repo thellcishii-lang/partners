@@ -3,6 +3,8 @@ export { onInquiryCreated } from './triggers/onInquiryCreated';
 export { onInquiryDelivered } from './triggers/onInquiryDelivered';
 export { onDepositOrderPaid } from './triggers/onDepositOrderPaid';
 export { createUnlimitedCheckout } from './payments/createUnlimitedCheckout';
+export { createRefundRequest } from './refunds/createRefundRequest';
+export { completeRefund } from './refunds/completeRefund';
 export { onUnlimitedOrderPaid } from './triggers/onUnlimitedOrderPaid';
 export { onMailQueued } from './triggers/onMailQueued';
 export { onFreeTrialCheck } from './triggers/onFreeTrialCheck';
