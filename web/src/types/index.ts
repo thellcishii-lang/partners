@@ -186,6 +186,8 @@ export interface Listing {
     note?: string;
   } | null;
 
+    /** 管理者による公開停止中かどうか（募集者は再公開できない） */
+  adminSuspended?: boolean;
   pendingEditSubmitted?: boolean;
 }
 
