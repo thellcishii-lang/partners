@@ -20,6 +20,14 @@ function isInFreeTrial(freeUntil: unknown): boolean {
   return false;
 }
 
+function isInUnlimited(unlimitedUntil: unknown): boolean {
+  if (!unlimitedUntil) return false;
+  if (typeof unlimitedUntil === 'object' && unlimitedUntil !== null && 'seconds' in unlimitedUntil) {
+    return (unlimitedUntil as { seconds: number }).seconds * 1000 > Date.now();
+  }
+  return false;
+}
+
 export default function DashboardPage() {
   const { user, loading } = useRequireAuth();
   const [adv, setAdv] = useState<Advertiser | null>(null);
@@ -67,17 +75,10 @@ export default function DashboardPage() {
 
     // ─── 公開する時：無料期間 or デポジット残高をチェック ───
     if (goingPublic && adv) {
+      const inFree = isInFreeTrial(adv.freeUntil);
+      const inUnl = isInUnlimited(adv.unlimitedUntil);
       const balance = adv.depositBalance ?? 0;
-  const inFreeTrial = isInFreeTrial(adv.freeUntil);
-
-  const unlimitedUntilDate = adv.unlimitedUntil && typeof adv.unlimitedUntil === 'object' && 'seconds' in adv.unlimitedUntil
-    ? new Date((adv.unlimitedUntil as { seconds: number }).seconds * 1000)
-    : null;
-  const inUnlimited = unlimitedUntilDate ? unlimitedUntilDate.getTime() > Date.now() : false;
-  const unlimitedDaysLeft = unlimitedUntilDate
-    ? Math.max(0, Math.ceil((unlimitedUntilDate.getTime() - Date.now()) / (24 * 60 * 60 * 1000)))
-    : 0;
-      if (!inFree && balance <= 0) {
+      if (!inFree && !inUnl && balance <= 0) {
         window.alert(
           '無料期間が終了しているため、デポジットを追加しないと公開できません。\n\n「デポジットを追加」から購入してください。'
         );
@@ -136,6 +137,14 @@ export default function DashboardPage() {
     ? Math.max(0, Math.ceil((freeUntilDate.getTime() - Date.now()) / (24 * 60 * 60 * 1000)))
     : 0;
 
+  const unlimitedUntilDate = adv.unlimitedUntil && typeof adv.unlimitedUntil === 'object' && 'seconds' in adv.unlimitedUntil
+    ? new Date((adv.unlimitedUntil as { seconds: number }).seconds * 1000)
+    : null;
+  const inUnlimited = unlimitedUntilDate ? unlimitedUntilDate.getTime() > Date.now() : false;
+  const unlimitedDaysLeft = unlimitedUntilDate
+    ? Math.max(0, Math.ceil((unlimitedUntilDate.getTime() - Date.now()) / (24 * 60 * 60 * 1000)))
+    : 0;
+
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-2">
@@ -159,7 +168,7 @@ export default function DashboardPage() {
         </div>
       )}
 
-　　　　　　　　　　　　　      {/* 無制限期間の案内 */}
+      {/* 無制限期間の案内 */}
       {inUnlimited && (
         <div className="rounded-xl border border-emerald-300 bg-emerald-100 p-4 text-sm text-emerald-900">
           <strong>🎉 無制限期間中</strong>：あと <strong>{unlimitedDaysLeft}日</strong>
@@ -185,7 +194,7 @@ export default function DashboardPage() {
           無料期間は終了しました。デポジット残高 <strong>{balance}件</strong> で公開中です。
         </div>
       )}
-      {!inFreeTrial && balance <= 0 && (
+      {!inFreeTrial && !inUnlimited && balance <= 0 && (
         <div className="rounded-xl border border-red-200 bg-red-50 p-4">
           <p className="text-sm font-medium text-red-800">
             無料期間が終了し、デポジット残高が0です。デポジットを追加するまで、新規の公開はできません。
@@ -197,16 +206,19 @@ export default function DashboardPage() {
       )}
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <Card label="残りデポジット" value={balance} unit="件" highlight={!inFreeTrial && balance <= 3} />
+        <Card label="残りデポジット" value={balance} unit="件" highlight={!inFreeTrial && !inUnlimited && balance <= 3} />
         <Card label="未開示（保留）" value={pendingCount} unit="件" highlight={pendingCount > 0} />
         <Card label="開示済み" value={deliveredCount} unit="件" />
       </div>
 
-      {balance > 0 && (
-        <div className="text-right">
-          <Link href="/deposit" className="text-sm text-brand-700 underline">デポジットを追加</Link>
-        </div>
-      )}
+      <div className="flex flex-wrap gap-3">
+        <Link href="/deposit" className="text-sm text-brand-700 underline">
+          デポジットを追加
+        </Link>
+        <Link href="/unlimited" className="text-sm text-emerald-700 underline">
+          30日間 無制限プラン
+        </Link>
+      </div>
 
       {error && <p role="alert" className="text-sm text-red-600">{error}</p>}
 
