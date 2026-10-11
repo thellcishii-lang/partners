@@ -7,6 +7,7 @@ export interface RenderedMail {
 
 const SITE_URL = 'https://partners-tau-kohl.vercel.app';
 const SITE_NAME = '代理店・加盟店募集.com';
+const UNLIMITED_DAYS_LABEL = 30;
 
 export function renderTemplate(
   template: MailTemplate,
@@ -138,6 +139,44 @@ ${footer}`,
 
 ${p('reason') ? `理由：${p('reason')}\n` : ''}
 マイページ：${SITE_URL}/dashboard
+${footer}`,
+      };
+
+          case 'UNLIMITED_PURCHASED':
+      return {
+        subject: `【${SITE_NAME}】無制限プランをお申し込みいただきました`,
+        text: `${p('advertiserName')} 様
+
+${UNLIMITED_DAYS_LABEL}日間の無制限プランをお申し込みいただきました。
+
+─────────────
+開始日：${p('startAt') ? new Date(p('startAt')).toLocaleDateString('ja-JP') : '—'}
+終了日：${p('endAt') ? new Date(p('endAt')).toLocaleDateString('ja-JP') : '—'}
+─────────────
+
+期間中は、デポジットを消費せずに応募者の情報を開示できます。
+${SITE_URL}/dashboard
+${footer}`,
+      };
+
+    case 'INQUIRY_DELIVERED_UNLIMITED':
+      return {
+        subject: `【${SITE_NAME}】資料請求がございました`,
+        text: `${p('advertiserName')} 様
+
+「${p('listingTitle')}」に資料請求がございました。
+
+無制限期間中ですので、デポジットの消費はございません。
+応募者情報はダッシュボードよりご確認ください。
+
+─────────────
+氏名：${p('applicantName')}
+住所：${p('address')}
+電話番号：${p('phone')}
+メール：${p('email')}
+─────────────
+
+${SITE_URL}/dashboard
 ${footer}`,
       };
 
