@@ -142,8 +142,9 @@ export const onInquiryCreated = onDocumentCreated(
     const listingTitle = (listingSnap2.data()?.title ?? '') as string;
     const advertiserName = (adv.companyName ?? '') as string;
     
-    if (result.delivered) {
-      await enqueueMail('INQUIRY_DELIVERED', adv.email, {
+        if (result.delivered) {
+      const template = result.unlimited ? 'INQUIRY_DELIVERED_UNLIMITED' : 'INQUIRY_DELIVERED';
+      await enqueueMail(template, adv.email, {
         inquiryId,
         advertiserId,
         advertiserName,
@@ -155,7 +156,6 @@ export const onInquiryCreated = onDocumentCreated(
         balanceAfter: result.balanceAfter,
         freeTrial: result.freeTrial,
       });
-
       if (result.notifyLow) {
         await enqueueMail('DEPOSIT_LOW', adv.email, {
           advertiserId,
