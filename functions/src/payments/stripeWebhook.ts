@@ -7,7 +7,9 @@ import { STRIPE_WEBHOOK_SECRET, webhookSecret } from '../lib/stripe';
 
 type Outcome = 'paid' | 'already-paid' | 'expired' | 'ignored' | 'mismatch' | 'not-found';
 
-// Checkout の結果を depositOrders に反映する。paid への更新で onDepositOrderPaid が残高を加算する。
+// Checkout の結果を depositOrders / unlimitedOrders に反映する。
+// depositOrders が paid になると onDepositOrderPaid が残高を加算する。
+// unlimitedOrders が paid になると onUnlimitedOrderPaid が期間を設定する。
 export async function applyCheckoutEvent(event: Stripe.Event): Promise<Outcome> {
   const paidEvent = event.type === 'checkout.session.completed' ||
     event.type === 'checkout.session.async_payment_succeeded';
@@ -20,7 +22,11 @@ export async function applyCheckoutEvent(event: Stripe.Event): Promise<Outcome> 
   if (!orderId || orderId.includes('/')) return 'not-found';
   if (paidEvent && session.payment_status !== 'paid') return 'ignored';
 
-  const orderRef = db.collection(COLLECTIONS.DEPOSIT_ORDERS).doc(orderId);
+  const isUnlimited = session.metadata?.type === 'unlimited';
+  const orderRef = isUnlimited
+    ? db.collection('unlimitedOrders').doc(orderId)
+    : db.collection(COLLECTIONS.DEPOSIT_ORDERS).doc(orderId);
+
   return db.runTransaction(async (tx) => {
     const order = await tx.get(orderRef);
     if (!order.exists) return 'not-found';
@@ -71,7 +77,7 @@ export const stripeWebhook = onRequest(
     try {
       const outcome = await applyCheckoutEvent(event);
       if (outcome === 'mismatch' || outcome === 'not-found') {
-        logger.error('Stripe checkout does not match a deposit order', { eventId: event.id, outcome });
+        logger.error('Stripe checkout does not match an order', { eventId: event.id, outcome });
       }
       res.json({ received: true, outcome });
     } catch (error) {
