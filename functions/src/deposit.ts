@@ -6,7 +6,7 @@ import { enqueueMail } from './lib/mail';
 // 型
 // ============================================================
 export type ConsumeResult =
-  | { delivered: true; balanceAfter: number; txId: string | null; notifyLow: boolean; freeTrial: boolean; unlimited?: boolean }
+  | { delivered: true; balanceAfter: number; txId: string | null; notifyLow: boolean; freeTrial: boolean; unlimited: boolean }
   | { delivered: false; balanceAfter: 0; reason: 'no_balance' | 'already_processed' };
 
 // ============================================================
@@ -33,7 +33,7 @@ function isInUnlimited(unlimitedUntil: unknown): boolean {
 // ============================================================
 // consumeOne
 //   デポジット消費して inquiry を delivered に昇格する。
-//   無料期間中は消費せず、そのまま delivered にする。
+//   無料期間中 / 無制限期間中は消費せず、そのまま delivered にする。
 // ============================================================
 export async function consumeOne(
   advertiserId: string,
@@ -60,7 +60,7 @@ export async function consumeOne(
       return { delivered: false, balanceAfter: adv.depositBalance ?? 0, reason: 'already_processed' };
     }
 
-        const balance = (adv.depositBalance ?? 0) as number;
+    const balance = (adv.depositBalance ?? 0) as number;
     const inFreeTrial = isInFreeTrial(adv.freeUntil);
     const inUnlimited = isInUnlimited(adv.unlimitedUntil);
     const now = TS.now();
@@ -105,6 +105,7 @@ export async function consumeOne(
         deliveredAt: now,
         depositTransactionId: null,
         freeTrial: true,
+        unlimited: false,
         updatedAt: now,
       });
 
@@ -114,6 +115,7 @@ export async function consumeOne(
         txId: null,
         notifyLow: false,
         freeTrial: true,
+        unlimited: false,
       };
     }
 
@@ -157,6 +159,7 @@ export async function consumeOne(
       deliveredAt: now,
       depositTransactionId: txRef.id,
       freeTrial: false,
+      unlimited: false,
       updatedAt: now,
     });
 
@@ -166,6 +169,7 @@ export async function consumeOne(
       txId: txRef.id,
       notifyLow: shouldNotifyLow,
       freeTrial: false,
+      unlimited: false,
     };
   });
 }
@@ -233,7 +237,7 @@ export async function releasePending(advertiserId: string): Promise<{
 }
 
 // ============================================================
-// grantDeposit（変更なし）
+// grantDeposit
 // ============================================================
 export async function grantDeposit(params: {
   advertiserId: string;
@@ -279,7 +283,7 @@ export async function grantDeposit(params: {
 }
 
 // ============================================================
-// refundDeposit（変更なし）
+// refundDeposit
 // ============================================================
 export async function refundDeposit(params: {
   advertiserId: string;
