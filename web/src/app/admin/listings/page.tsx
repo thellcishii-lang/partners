@@ -59,7 +59,8 @@ export default function AdminListingsPage() {
     fnName:
       | 'approveListing' | 'rejectListing'
       | 'approvePendingEdit' | 'rejectPendingEdit'
-      | 'forcePauseListing' | 'forceCloseListing',
+      | 'forcePauseListing' | 'forceCloseListing'
+      | 'suspendListing' | 'unsuspendListing',
     listingId: string,
     payload: Record<string, unknown> = {},
     removeFromList = true,
@@ -100,8 +101,19 @@ export default function AdminListingsPage() {
 
   const forcePause = (id: string) => {
     const reason = window.prompt('非公開にする理由（任意）') ?? '';
-    if (!window.confirm('この案件を強制的に非公開にしますか？')) return;
+    if (!window.confirm('この案件を非公開にしますか？（募集者は再公開できます）')) return;
     call('forcePauseListing', id, { reason }, false);
+  };
+
+  const suspend = (id: string) => {
+    const reason = window.prompt('公開停止の理由（任意）') ?? '';
+    if (!window.confirm('公開停止にしますか？\n\n募集者は自分では再公開できなくなります。')) return;
+    call('suspendListing', id, { reason }, false);
+  };
+
+  const unsuspend = (id: string) => {
+    if (!window.confirm('公開停止を解除しますか？\n\n募集者が再公開できるようになります。')) return;
+    call('unsuspendListing', id, {}, false);
   };
 
   const forceClose = (id: string) => {
@@ -189,6 +201,11 @@ export default function AdminListingsPage() {
                     <span className="rounded-full bg-gray-100 px-3 py-1">
                       {LISTING_STATUS_LABELS[l.status]}
                     </span>
+                    {l.adminSuspended && (
+                      <span className="rounded-full bg-red-600 px-3 py-1 text-white">
+                        公開停止中
+                      </span>
+                    )}
                     <span>📍 {l.areaLabels?.length ? l.areaLabels.slice(0, 2).join('・') : '未設定'}</span>
                     {l.productLabels?.length ? <span>🏷 {l.productLabels.join(', ')}</span> : null}
                     {l.initialCostLabel ? <span>💵 {l.initialCostLabel}</span> : null}
@@ -244,6 +261,7 @@ export default function AdminListingsPage() {
 
                   {tab === 'all' && (
                     <>
+                      {/* 非公開（募集者は再公開できる） */}
                       {l.status === 'published' && (
                         <Button
                           size="sm"
@@ -251,9 +269,31 @@ export default function AdminListingsPage() {
                           disabled={busy === l.id}
                           onClick={() => forcePause(l.id)}
                         >
-                          強制非公開
+                          非公開
                         </Button>
                       )}
+                      {/* 公開停止 / 再開 */}
+                      {l.adminSuspended ? (
+                        <Button
+                          size="sm"
+                          disabled={busy === l.id}
+                          onClick={() => unsuspend(l.id)}
+                        >
+                          公開停止を解除
+                        </Button>
+                      ) : (
+                        l.status !== 'closed' && (
+                          <Button
+                            size="sm"
+                            variant="danger"
+                            disabled={busy === l.id}
+                            onClick={() => suspend(l.id)}
+                          >
+                            公開停止
+                          </Button>
+                        )
+                      )}
+                      {/* 募集終了 */}
                       {l.status !== 'closed' && (
                         <Button
                           size="sm"
