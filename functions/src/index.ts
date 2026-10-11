@@ -16,6 +16,8 @@ export { rejectListing } from './admin/rejectListing';
 export { approvePendingEdit } from './admin/approvePendingEdit';
 export { rejectPendingEdit } from './admin/rejectPendingEdit';
 export { forcePauseListing } from './admin/forcePauseListing';
+export { suspendListing } from './admin/suspendListing';
+export { unsuspendListing } from './admin/suspendListing';
 export { forceCloseListing } from './admin/forceCloseListing';
 export { sendTestMail } from './admin/sendTestMail';
 export { setSmsVerified } from './auth/setSmsVerified';
