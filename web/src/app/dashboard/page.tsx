@@ -67,8 +67,16 @@ export default function DashboardPage() {
 
     // ─── 公開する時：無料期間 or デポジット残高をチェック ───
     if (goingPublic && adv) {
-      const inFree = isInFreeTrial(adv.freeUntil);
       const balance = adv.depositBalance ?? 0;
+  const inFreeTrial = isInFreeTrial(adv.freeUntil);
+
+  const unlimitedUntilDate = adv.unlimitedUntil && typeof adv.unlimitedUntil === 'object' && 'seconds' in adv.unlimitedUntil
+    ? new Date((adv.unlimitedUntil as { seconds: number }).seconds * 1000)
+    : null;
+  const inUnlimited = unlimitedUntilDate ? unlimitedUntilDate.getTime() > Date.now() : false;
+  const unlimitedDaysLeft = unlimitedUntilDate
+    ? Math.max(0, Math.ceil((unlimitedUntilDate.getTime() - Date.now()) / (24 * 60 * 60 * 1000)))
+    : 0;
       if (!inFree && balance <= 0) {
         window.alert(
           '無料期間が終了しているため、デポジットを追加しないと公開できません。\n\n「デポジットを追加」から購入してください。'
@@ -148,6 +156,17 @@ export default function DashboardPage() {
           <Link href="/onboarding" className="ml-1 text-brand-700 underline">
             入力を完了する
           </Link>
+        </div>
+      )}
+
+　　　　　　　　　　　　　      {/* 無制限期間の案内 */}
+      {inUnlimited && (
+        <div className="rounded-xl border border-emerald-300 bg-emerald-100 p-4 text-sm text-emerald-900">
+          <strong>🎉 無制限期間中</strong>：あと <strong>{unlimitedDaysLeft}日</strong>
+          （{unlimitedUntilDate?.toLocaleDateString('ja-JP')} まで）
+          <p className="mt-1 text-xs text-emerald-800">
+            期間中は、デポジットを消費せずに応募者の情報を確認できます。
+          </p>
         </div>
       )}
 
