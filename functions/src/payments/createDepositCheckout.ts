@@ -2,7 +2,6 @@ import { onCall, HttpsError } from 'firebase-functions/v2/https';
 import { logger } from 'firebase-functions';
 import { db, FV, REGION } from '../lib/admin';
 import { COLLECTIONS } from '../lib/constants';
-import { creditsForAmount, UNIT_PRICE_JPY, withTax } from '../depositPricing';
 import { isEmulator, stripeClient, STRIPE_SECRET_KEY } from '../lib/stripe';
 import { creditsForAmount, UNIT_PRICE_JPY, withTax, TAX_RATE } from '../depositPricing';
 
