@@ -224,6 +224,24 @@ service cloud.firestore {
     }
 
     // ============================================================
+    // refundRequests : 返金申請
+    // ============================================================
+    match /refundRequests/{requestId} {
+      allow read: if isAuth() && (
+        resource.data.advertiserId == uid() || isAdmin()
+      );
+      allow create: if isAuth()
+                    && request.resource.data.advertiserId == uid()
+                    && request.resource.data.status == 'pending'
+                    && request.resource.data.amountYen is int
+                    && request.resource.data.amountYen > 0
+                    && request.resource.data.feeYen is int
+                    && request.resource.data.netAmountYen is int
+                    && request.resource.data.netAmountYen > 0;
+      allow update, delete: if false;
+    }
+
+    // ============================================================
     // depositPackages / mailLogs / settings
     // ============================================================
     match /depositPackages/{packageId} {
