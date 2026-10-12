@@ -3,21 +3,30 @@ rules_version = '2';
 service firebase.storage {
   match /b/{bucket}/o {
 
+    // ============================================================
+    // ヘルパー：管理者判定
+    // ============================================================
+    function isAdmin() {
+      return request.auth != null
+        && firestore.get(/databases/(default)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+
     // 案件画像
     match /listings/{uid}/{fileName} {
       allow read: if true;
       allow write: if request.auth != null
-                   && request.auth.uid == uid
+                   && (request.auth.uid == uid || isAdmin())
                    && request.resource.size < 5 * 1024 * 1024
                    && request.resource.contentType.matches('image/.*');
-      allow delete: if request.auth != null && request.auth.uid == uid;
+      allow delete: if request.auth != null
+                    && (request.auth.uid == uid || isAdmin());
     }
 
     // 案件資料（PDF・PowerPoint・画像）
     match /listingDocuments/{advertiserId}/{fileName} {
       allow read: if true;
       allow write: if request.auth != null
-                   && request.auth.uid == advertiserId
+                   && (request.auth.uid == advertiserId || isAdmin())
                    && request.resource.size < 10 * 1024 * 1024
                    && (
                      request.resource.contentType == 'application/pdf'
@@ -25,7 +34,8 @@ service firebase.storage {
                      || request.resource.contentType == 'application/vnd.openxmlformats-officedocument.presentationml.presentation'
                      || request.resource.contentType.matches('image/.*')
                    );
-      allow delete: if request.auth != null && request.auth.uid == advertiserId;
+      allow delete: if request.auth != null
+                    && (request.auth.uid == advertiserId || isAdmin());
     }
 
     // デフォルト：全拒否
