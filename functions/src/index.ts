@@ -21,3 +21,6 @@ export { unsuspendListing } from './admin/suspendListing';
 export { forceCloseListing } from './admin/forceCloseListing';
 export { sendTestMail } from './admin/sendTestMail';
 export { setSmsVerified } from './auth/setSmsVerified';
+export { createPromotionCheckout } from './promotions/createPromotionCheckout';
+export { onPromotionOrderPaid } from './triggers/onPromotionOrderPaid';
+export { onPromotionCheck } from './triggers/onPromotionCheck';
