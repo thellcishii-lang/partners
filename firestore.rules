@@ -244,6 +244,16 @@ service cloud.firestore {
       allow update, delete: if false;
     }
 
+　　　    // ============================================================
+    // listingPromotions : おすすめ表示（有料オプション）
+    // ============================================================
+    match /listingPromotions/{promotionId} {
+      allow read: if isAuth() && (
+        resource.data.advertiserId == uid() || isAdmin()
+      );
+      allow create, update, delete: if false;
+    }
+
     // ============================================================
     // depositPackages / mailLogs / settings
     // ============================================================
