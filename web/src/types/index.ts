@@ -34,7 +34,6 @@ export interface Advertiser {
   onboardingCompleted?: boolean;
   createdAt?: unknown;
   updatedAt?: unknown;
-  canceledAt?: { seconds: number; nanoseconds: number } | null;
 }
 
 // ============================================================
