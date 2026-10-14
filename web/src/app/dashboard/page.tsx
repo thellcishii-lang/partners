@@ -154,9 +154,12 @@ export default function DashboardPage() {
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <h1 className="text-xl font-bold">マイページ</h1>
-        <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-2">
           <Link href="/dashboard/deposits">
             <Button variant="outline">デポジット履歴</Button>
+          </Link>
+          <Link href="/dashboard/promotions">
+            <Button variant="outline">おすすめ表示</Button>
           </Link>
           <Link href="/listings/new">
             <Button>案件を作成</Button>
@@ -216,12 +219,15 @@ export default function DashboardPage() {
         <Card label="開示済み" value={deliveredCount} unit="件" />
       </div>
 
-      <div className="flex flex-wrap gap-3">
+            <div className="flex flex-wrap gap-3">
         <Link href="/deposit" className="text-sm text-brand-700 underline">
           デポジットを追加
         </Link>
         <Link href="/unlimited" className="text-sm text-emerald-700 underline">
           30日間 無制限プラン
+        </Link>
+        <Link href="/promotions" className="text-sm text-orange-700 underline">
+          おすすめ表示プラン
         </Link>
       </div>
 
