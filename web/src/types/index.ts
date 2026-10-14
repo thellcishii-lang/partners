@@ -180,16 +180,17 @@ export interface Listing {
   salesMethod?: string;
   earnings?: string;
   agentFit?: string[];
+
   pendingEdit?: {
     data: Partial<Listing>;
     submittedAt: { seconds: number; nanoseconds: number } | null;
     note?: string;
   } | null;
 
-    /** 管理者による公開停止中かどうか（募集者は再公開できない） */
+  /** 管理者による公開停止中かどうか（募集者は再公開できない） */
   adminSuspended?: boolean;
   pendingEditSubmitted?: boolean;
-}
+
   /** 上部表示中かどうか */
   isPromotedTop?: boolean;
   /** おすすめ表示中かどうか */
@@ -198,7 +199,7 @@ export interface Listing {
   promotedTopUntil?: { seconds: number; nanoseconds: number } | null;
   /** おすすめ表示の有効期限 */
   promotedRecommendUntil?: { seconds: number; nanoseconds: number } | null;
-
+}
 
 // ============================================================
 // 案件資料
@@ -323,4 +324,5 @@ export interface ListingPromotion {
   paidAt: { seconds: number; nanoseconds: number } | null;
   createdAt?: { seconds: number; nanoseconds: number } | null;
   updatedAt?: { seconds: number; nanoseconds: number } | null;
+  canceledAt?: { seconds: number; nanoseconds: number } | null;
 }
