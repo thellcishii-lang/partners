@@ -173,7 +173,7 @@ export const createPromotionCheckout = onCall(
           plan,
           billingType,
         },
-        ...(billingType === 'payment'
+        ...(billingType === 'one_time'
           ? { payment_intent_data: { metadata: { type: 'promotion', promotionId: promotionRef.id } } }
           : { subscription_data: { metadata: { type: 'promotion', promotionId: promotionRef.id } } }),
         success_url: successUrl,
