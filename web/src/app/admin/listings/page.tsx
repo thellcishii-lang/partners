@@ -55,12 +55,13 @@ export default function AdminListingsPage() {
     load(tab);
   }, [tab, load]);
 
-  const call = async (
+    const call = async (
     fnName:
       | 'approveListing' | 'rejectListing'
       | 'approvePendingEdit' | 'rejectPendingEdit'
       | 'forcePauseListing' | 'forceCloseListing'
-      | 'suspendListing' | 'unsuspendListing',
+      | 'suspendListing' | 'unsuspendListing'
+      | 'togglePromotion',
     listingId: string,
     payload: Record<string, unknown> = {},
     removeFromList = true,
@@ -120,6 +121,14 @@ export default function AdminListingsPage() {
     const reason = window.prompt('募集終了の理由（任意）') ?? '';
     if (!window.confirm('この案件を募集終了にしますか？この操作は募集者側から戻せません。')) return;
     call('forceCloseListing', id, { reason }, false);
+  };
+
+  const togglePromoTop = (id: string, enabled: boolean) => {
+    call('togglePromotion', id, { plan: 'top', enabled }, false);
+  };
+
+  const togglePromoRecommend = (id: string, enabled: boolean) => {
+    call('togglePromotion', id, { plan: 'recommend', enabled }, false);
   };
 
   const previewMerged: Listing | null = useMemo(() => {
@@ -304,6 +313,27 @@ export default function AdminListingsPage() {
                           募集終了
                         </Button>
                       )}
+                    </>
+                  )}
+                  {/* おすすめ表示（公開中のみ） */}
+                  {l.status === 'published' && (
+                    <>
+                      <Button
+                        size="sm"
+                        variant={l.isPromotedTop ? 'primary' : 'outline'}
+                        disabled={busy === l.id}
+                        onClick={() => togglePromoTop(l.id, !l.isPromotedTop)}
+                      >
+                        {l.isPromotedTop ? '★ 上部表示中' : '上部表示'}
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant={l.isPromotedRecommend ? 'primary' : 'outline'}
+                        disabled={busy === l.id}
+                        onClick={() => togglePromoRecommend(l.id, !l.isPromotedRecommend)}
+                      >
+                        {l.isPromotedRecommend ? '★ おすすめ中' : 'おすすめ表示'}
+                      </Button>
                     </>
                   )}
                 </div>
