@@ -220,6 +220,79 @@ ${SITE_URL}/dashboard/deposits
 ${footer}`,
       };
 
+        case 'PROMOTION_PURCHASED':
+      return {
+        subject: `【${SITE_NAME}】${p('planLabel')}をお申し込みいただきました`,
+        text: `${p('advertiserName')} 様
+
+「${p('listingTitle')}」の${p('planLabel')}をお申し込みいただきました。
+
+─────────────
+プラン：${p('planLabel')}
+開始日：${p('startAt') ? new Date(p('startAt')).toLocaleDateString('ja-JP') : '—'}
+終了日：${p('endAt') ? new Date(p('endAt')).toLocaleDateString('ja-JP') : '—'}
+─────────────
+
+期間中、案件が優先的に表示されます。
+${SITE_URL}/dashboard/promotions
+${footer}`,
+      };
+
+    case 'PROMOTION_ENDING':
+      return {
+        subject: `【${SITE_NAME}】${p('planLabel')}がまもなく終了します`,
+        text: `${p('advertiserName')} 様
+
+「${p('listingTitle')}」の${p('planLabel')}がまもなく終了します。
+
+─────────────
+終了日：${p('endAt') ? new Date(p('endAt')).toLocaleDateString('ja-JP') : '—'}
+─────────────
+
+引き続きご利用の場合は、再度お申し込みください。
+${SITE_URL}/promotions
+${footer}`,
+      };
+
+    case 'PROMOTION_EXPIRED':
+      return {
+        subject: `【${SITE_NAME}】${p('planLabel')}が終了しました`,
+        text: `${p('advertiserName')} 様
+
+「${p('listingTitle')}」の${p('planLabel')}が終了しました。
+
+引き続きご利用の場合は、再度お申し込みください。
+${SITE_URL}/promotions
+${footer}`,
+      };
+
+    case 'PROMOTION_RENEWED':
+      return {
+        subject: `【${SITE_NAME}】${p('planLabel')}を更新しました`,
+        text: `${p('advertiserName')} 様
+
+「${p('listingTitle')}」の${p('planLabel')}を更新しました。
+
+─────────────
+次回請求日：${p('nextBillingAt') ? new Date(p('nextBillingAt')).toLocaleDateString('ja-JP') : '—'}
+─────────────
+
+${SITE_URL}/dashboard/promotions
+${footer}`,
+      };
+
+    case 'PROMOTION_PAYMENT_FAILED':
+      return {
+        subject: `【${SITE_NAME}】お支払いに失敗しました`,
+        text: `${p('advertiserName')} 様
+
+「${p('listingTitle')}」の${p('planLabel')}のお支払いに失敗しました。
+クレジットカード情報をご確認ください。
+
+${SITE_URL}/dashboard/promotions
+${footer}`,
+      };
+
     case 'WELCOME_ADVERTISER':
       return {
         subject: `【${SITE_NAME}】ご登録ありがとうございます`,
