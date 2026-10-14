@@ -39,8 +39,7 @@ export function ListingsSearch() {
   );
 }
 
-type SortKey = 'newest' | 'initialCost';
-
+type SortKey = 'recommended' | 'newest' | 'initialCost';
 type TopFilterKey =
   | 'fee'
   | 'initial'
@@ -92,7 +91,7 @@ function SearchContent() {
   const [listings, setListings] = useState<Listing[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [sortKey, setSortKey] = useState<SortKey>('newest');
+  const [sortKey, setSortKey] = useState<SortKey>('recommended');
   const [filterOpen, setFilterOpen] = useState(false);
   const [openTopFilter, setOpenTopFilter] = useState<TopFilterKey | null>(null);
   const [keywordInput, setKeywordInput] = useState(searchParams.get('q') ?? '');
@@ -176,15 +175,16 @@ function SearchContent() {
     };
   }, []);
 
-  const filtered = useMemo(() => {
+    const filtered = useMemo(() => {
     const kw = keyword.toLowerCase().trim();
-    const result = listings.filter((l) => {
+    const now = Date.now();
+
+    const matches = (l: Listing) => {
       if (kw && !(l.searchText ?? '').toLowerCase().includes(kw)) return false;
       if (selectedTargets.length > 0 && !selectedTargets.some((t) => l.targetSlugs?.includes(t))) return false;
       if (selectedProducts.length > 0 && !selectedProducts.some((p) => l.productSlugs?.includes(p))) return false;
       if (selectedModels.length > 0 && !selectedModels.some((m) => l.modelSlugs?.includes(m))) return false;
 
-      // エリア
       if (selectedArea) {
         if (selectedArea === 'all') {
           if (l.areaMode !== 'nationwide') return false;
@@ -201,19 +201,61 @@ function SearchContent() {
       if (selectedRevenue && l.expectedRevenueRange !== selectedRevenue) return false;
       if (selectedProfit && l.expectedProfitRange !== selectedProfit) return false;
       if (selectedRevenueType && l.revenueType !== selectedRevenueType) return false;
-      if (selectedOrg && !l.organizationTypes?.includes(selectedOrg)) return false;
+      if (selectedOrg && l.organizationTypes?.includes(selectedOrg) !== true) return false;
       return true;
-    });
-    result.sort((a, b) => {
-      if (sortKey === 'initialCost') {
+    };
+
+    const all = listings.filter(matches);
+    const isActivePromo = (l: Listing) => {
+      if (!l.isPromotedRecommend) return false;
+      const until = l.promotedRecommendUntil;
+      if (!until) return false;
+      return until.seconds * 1000 > now;
+    };
+
+    const promotions = all.filter(isActivePromo).sort(() => Math.random() - 0.5).slice(0, 10);
+    const regular = all.filter((l) => !isActivePromo(l));
+
+    // 通常案件のソート
+    if (sortKey === 'newest') {
+      regular.sort((a, b) => {
+        const aT = (a.publishedAt as { seconds?: number } | null)?.seconds ?? 0;
+        const bT = (b.publishedAt as { seconds?: number } | null)?.seconds ?? 0;
+        return bT - aT;
+      });
+    } else if (sortKey === 'initialCost') {
+      regular.sort((a, b) => {
         const aC = a.initialCostYen ?? Number.MAX_SAFE_INTEGER;
         const bC = b.initialCostYen ?? Number.MAX_SAFE_INTEGER;
         return aC - bC;
+      });
+    }
+
+    // おすすめ順（デフォルト）の時は、最初に5件まとめて出して、
+    // その後は5件に1回挿入
+    if (sortKey === 'recommended') {
+      const top = promotions.slice(0, 5);
+      const rest = promotions.slice(5);
+      const result: Listing[] = [...top];
+      let pIdx = 0;
+      for (let i = 0; i < regular.length; i++) {
+        result.push(regular[i]);
+        if ((i + 1) % 5 === 0 && pIdx < rest.length) {
+          result.push(rest[pIdx++]);
+        }
       }
-      const aT = (a.publishedAt as { seconds?: number } | null)?.seconds ?? 0;
-      const bT = (b.publishedAt as { seconds?: number } | null)?.seconds ?? 0;
-      return bT - aT;
-    });
+      return result;
+    }
+
+    // 他のソート：5件に1回挿入（トップは無し）
+    const result: Listing[] = [];
+    let pIdx = 0;
+    for (let i = 0; i < regular.length; i++) {
+      result.push(regular[i]);
+      if ((i + 1) % 5 === 0 && pIdx < promotions.length) {
+        result.push(promotions[pIdx++]);
+      }
+    }
     return result;
   }, [listings, keyword, selectedTargets, selectedProducts, selectedModels, selectedCosts,
       selectedArea, selectedFee, selectedStock, selectedRevenue, selectedProfit,
@@ -664,6 +706,7 @@ function SearchContent() {
               value={sortKey}
               onChange={(e) => setSortKey(e.target.value as SortKey)}
             >
+              <option value="recommended">おすすめ順</option>
               <option value="newest">新着順</option>
               <option value="initialCost">初期費用が安い順</option>
             </select>
