@@ -146,7 +146,7 @@
         { "fieldPath": "listingId", "order": "ASCENDING" },
         { "fieldPath": "applicantEmailHash", "order": "ASCENDING" }
       ]
-    }
+    },
         {
       "collectionGroup": "listings",
       "queryScope": "COLLECTION",
