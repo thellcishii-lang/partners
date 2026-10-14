@@ -30,9 +30,10 @@ export function FeaturedHero() {
         // promotedTopUntil が未来のもののみ
         const valid = snap.docs
           .map((d) => ({ ...d.data(), id: d.id } as Listing))
-          .filter((l) => {
+                    .filter((l) => {
             const until = l.promotedTopUntil;
-            if (!until) return false;
+            // 期限なし（管理者の手動ON）も許可
+            if (!until) return true;
             return until.seconds * 1000 > now.getTime();
           })
           // ランダム
