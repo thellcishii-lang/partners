@@ -18,14 +18,26 @@ export const onPromotionCheck = onSchedule(
     const now = new Date();
     logger.info('onPromotionCheck start');
 
-    // ─── ① 期限切れの処理 ───
-    // endAt < now かつ status === 'active' の 30日プランを探す
-    const expiredSnap = await db
-      .collection('listingPromotions')
-      .where('status', '==', 'active')
-      .where('billingType', '==', 'one_time')
-      .where('endAt', '<', now)
-      .get();
+     // ─── ① 期限切れの処理 ───
+    // endAt < now かつ status === 'active' の契約を探す
+    // （30日プランの期限切れ、または解約済みサブスクの期間終了）
+    const [expiredOneTime, expiredSub] = await Promise.all([
+      db.collection('listingPromotions')
+        .where('status', '==', 'active')
+        .where('billingType', '==', 'one_time')
+        .where('endAt', '<', now)
+        .get(),
+      db.collection('listingPromotions')
+        .where('status', '==', 'active')
+        .where('billingType', '==', 'subscription')
+        .where('endAt', '<', now)
+        .get(),
+    ]);
+
+    const expiredSnap = {
+      size: expiredOneTime.size + expiredSub.size,
+      docs: [...expiredOneTime.docs, ...expiredSub.docs],
+    };
 
     logger.info('onPromotionCheck: expired found', { count: expiredSnap.size });
 
