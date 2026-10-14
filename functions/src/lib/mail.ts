@@ -23,9 +23,13 @@ export type MailTemplate =
   | 'LISTING_EDIT_REJECTED'
   | 'UNLIMITED_PURCHASED'
   | 'INQUIRY_DELIVERED_UNLIMITED'
-  | 'REFUND_REQUESTED'
-  | 'REFUND_COMPLETED';
-
+　　 | 'REFUND_REQUESTED'
+  | 'REFUND_COMPLETED'
+  | 'PROMOTION_PURCHASED'
+  | 'PROMOTION_ENDING'
+  | 'PROMOTION_EXPIRED'
+  | 'PROMOTION_RENEWED'
+  | 'PROMOTION_PAYMENT_FAILED';
 export interface MailAttachmentSpec {
   path: string;
   name: string;
