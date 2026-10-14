@@ -38,7 +38,7 @@ export function PromotionToast() {
           .map((d) => ({ ...d.data(), id: d.id } as Listing))
           .filter((l) => {
             const until = l.promotedTopUntil;
-            if (!until) return false;
+            if (!until) return true;
             return until.seconds * 1000 > now.getTime();
           })
           .sort(() => Math.random() - 0.5)
