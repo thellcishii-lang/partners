@@ -25,6 +25,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     { href: '/admin/advertisers', label: '掲載主' },
     { href: '/admin/inquiries', label: '応募' },
     { href: '/admin/refunds', label: '返金' },
+    { href: '/admin/promotions', label: 'おすすめ' },
   ];
 
   return (
