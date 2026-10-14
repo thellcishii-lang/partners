@@ -190,6 +190,15 @@ export interface Listing {
   adminSuspended?: boolean;
   pendingEditSubmitted?: boolean;
 }
+  /** 上部表示中かどうか */
+  isPromotedTop?: boolean;
+  /** おすすめ表示中かどうか */
+  isPromotedRecommend?: boolean;
+  /** 上部表示の有効期限 */
+  promotedTopUntil?: { seconds: number; nanoseconds: number } | null;
+  /** おすすめ表示の有効期限 */
+  promotedRecommendUntil?: { seconds: number; nanoseconds: number } | null;
+
 
 // ============================================================
 // 案件資料
@@ -276,4 +285,42 @@ export interface ApplicationInput {
   address: string;
   building: string;
   message: string;
+}
+
+// ============================================================
+// おすすめ表示（有料オプション）
+// ============================================================
+export type PromotionPlan = 'top' | 'recommend';
+export type PromotionBillingType = 'one_time' | 'subscription';
+export type PromotionStatus = 'pending' | 'active' | 'expired' | 'canceled';
+
+export const PROMOTION_PLAN_LABELS: Record<PromotionPlan, string> = {
+  top: '上部表示',
+  recommend: 'おすすめ表示',
+};
+
+export const PROMOTION_STATUS_LABELS: Record<PromotionStatus, string> = {
+  pending: '決済待ち',
+  active: '掲載中',
+  expired: '終了',
+  canceled: 'キャンセル',
+};
+
+export interface ListingPromotion {
+  id: string;
+  advertiserId: string;
+  listingId: string;
+  plan: PromotionPlan;
+  priceJpy: number;
+  totalJpy: number;
+  taxRate: number;
+  billingType: PromotionBillingType;
+  startAt: { seconds: number; nanoseconds: number };
+  endAt: { seconds: number; nanoseconds: number } | null;
+  status: PromotionStatus;
+  stripeSessionId: string | null;
+  stripeSubscriptionId: string | null;
+  paidAt: { seconds: number; nanoseconds: number } | null;
+  createdAt?: { seconds: number; nanoseconds: number } | null;
+  updatedAt?: { seconds: number; nanoseconds: number } | null;
 }
