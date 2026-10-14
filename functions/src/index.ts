@@ -25,3 +25,4 @@ export { createPromotionCheckout } from './promotions/createPromotionCheckout';
 export { onPromotionOrderPaid } from './triggers/onPromotionOrderPaid';
 export { onPromotionCheck } from './triggers/onPromotionCheck';
 export { cancelPromotion } from './promotions/cancelPromotion';
+export { togglePromotion } from './admin/togglePromotion';
