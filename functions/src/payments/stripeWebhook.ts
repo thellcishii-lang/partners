@@ -7,9 +7,6 @@ import { STRIPE_WEBHOOK_SECRET, webhookSecret } from '../lib/stripe';
 
 type Outcome = 'paid' | 'already-paid' | 'expired' | 'ignored' | 'mismatch' | 'not-found';
 
-// Checkout の結果を depositOrders / unlimitedOrders に反映する。
-// depositOrders が paid になると onDepositOrderPaid が残高を加算する。
-// unlimitedOrders が paid になると onUnlimitedOrderPaid が期間を設定する。
 export async function applyCheckoutEvent(event: Stripe.Event): Promise<Outcome> {
   const paidEvent = event.type === 'checkout.session.completed' ||
     event.type === 'checkout.session.async_payment_succeeded';
@@ -23,14 +20,18 @@ export async function applyCheckoutEvent(event: Stripe.Event): Promise<Outcome> 
   if (paidEvent && session.payment_status !== 'paid') return 'ignored';
 
   const isUnlimited = session.metadata?.type === 'unlimited';
+  const isPromotion = session.metadata?.type === 'promotion';
+
   const orderRef = isUnlimited
     ? db.collection('unlimitedOrders').doc(orderId)
-    : db.collection(COLLECTIONS.DEPOSIT_ORDERS).doc(orderId);
+    : isPromotion
+      ? db.collection('listingPromotions').doc(session.metadata?.promotionId ?? orderId)
+      : db.collection(COLLECTIONS.DEPOSIT_ORDERS).doc(orderId);
 
   return db.runTransaction(async (tx) => {
     const order = await tx.get(orderRef);
     if (!order.exists) return 'not-found';
-    if (order.get('status') === 'paid') return 'already-paid';
+    if (order.get('status') === 'paid' || order.get('status') === 'active') return 'already-paid';
     if (order.get('status') !== 'pending') return 'ignored';
     if (expiredEvent) {
       tx.update(orderRef, { status: 'canceled', stripeSessionId: session.id });
@@ -42,13 +43,27 @@ export async function applyCheckoutEvent(event: Stripe.Event): Promise<Outcome> 
     }
     const paymentIntent = typeof session.payment_intent === 'string'
       ? session.payment_intent : session.payment_intent?.id ?? null;
-    tx.update(orderRef, {
-      status: 'paid',
-      paidAt: FV.serverTimestamp(),
-      stripeSessionId: session.id,
-      stripePaymentIntentId: paymentIntent,
-      stripeEventId: event.id,
-    });
+    const subscription = typeof session.subscription === 'string'
+      ? session.subscription : session.subscription?.id ?? null;
+
+    if (isPromotion) {
+      tx.update(orderRef, {
+        status: 'active',
+        paidAt: FV.serverTimestamp(),
+        stripeSessionId: session.id,
+        stripePaymentIntentId: paymentIntent,
+        stripeSubscriptionId: subscription,
+        stripeEventId: event.id,
+      });
+    } else {
+      tx.update(orderRef, {
+        status: 'paid',
+        paidAt: FV.serverTimestamp(),
+        stripeSessionId: session.id,
+        stripePaymentIntentId: paymentIntent,
+        stripeEventId: event.id,
+      });
+    }
     return 'paid';
   });
 }
