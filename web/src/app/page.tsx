@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { ListingsSearch } from '@/components/listings/ListingsSearch';
+import { FeaturedHero } from '@/components/listings/FeaturedHero';
 import { GuidePromoSection } from '@/components/guide/GuidePromoSection';
 import { Button } from '@/components/ui/Button';
 
@@ -45,6 +46,9 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* おすすめ案件（上部表示契約のもの） */}
+      <FeaturedHero />
 
       <ListingsSearch />
 
