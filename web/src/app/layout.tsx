@@ -4,6 +4,7 @@ import './globals.css';
 import { AuthProvider } from '@/providers/AuthProvider';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
+import { PromotionToast } from '@/components/listings/PromotionToast';
 
 const SITE_URL = 'https://www.代理店・加盟店募集.com';
 const SITE_NAME = '代理店・加盟店募集.com';
@@ -90,6 +91,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <Header />
           <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8">{children}</main>
           <Footer />
+          <PromotionToast />
         </AuthProvider>
       </body>
     </html>
