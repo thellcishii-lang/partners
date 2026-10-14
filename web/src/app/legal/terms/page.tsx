@@ -69,14 +69,14 @@ export default function TermsPage() {
         </ol>
       </section>
 
-            <section className="mb-6">
+      <section className="mb-6">
         <h2 className="mb-3 text-lg font-bold">第5条（デポジットの返金）</h2>
         <ol className="list-decimal space-y-2 pl-6 text-sm leading-relaxed">
           <li>
             購入済みデポジットの残高について、募集者は当社所定の方法により返金を申請することができます。
           </li>
           <li>
-            返金手続きにあたり、返金事務手数料として一律550円（税込）を申し受けます。
+            返金手続きにあたり、返金手数料として一律550円（税込）を申し受けます。
           </li>
           <li>
             返金は、申請月の末日締め、翌月15日までに、募集者が指定する銀行口座へ振り込みます。
@@ -86,7 +86,42 @@ export default function TermsPage() {
       </section>
 
       <section className="mb-6">
-        <h2 className="mb-3 text-lg font-bold">第6条（禁止事項）</h2>
+        <h2 className="mb-3 text-lg font-bold">第6条（おすすめ表示プラン）</h2>
+        <ol className="list-decimal space-y-2 pl-6 text-sm leading-relaxed">
+          <li>
+            当社は、募集者に対し、案件を優先的に表示する有料オプション（以下「おすすめ表示プラン」といいます）を提供します。
+            プランの種類・料金は以下のとおりです。
+            <ul className="mt-2 list-disc space-y-1 pl-6">
+              <li>上部表示：月額 55,000円（税抜）。トップページのヒーローエリアに表示。5枠限定。</li>
+              <li>おすすめ表示：月額 33,000円（税抜）。案件一覧・検索結果の中に優先的に挿入。10枠限定。</li>
+            </ul>
+          </li>
+          <li>
+            おすすめ表示プランは、30日間の買い切り、または月額サブスクリプションのいずれかを選択できます。
+            開始日は購入時に指定することができ、指定した開始日から効力が発生します。
+          </li>
+          <li>
+            掲載枠が満杯の場合、新規のお申し込みはお受けできません。
+          </li>
+          <li>
+            おすすめ表示プランはその性質上、購入後の返金はお受けできません。
+          </li>
+          <li>
+            おすすめ表示の対象となる案件は、公開中の案件に限ります。
+            契約期間中に対象案件が非公開となった場合でも、返金は行いません。
+          </li>
+          <li>
+            消費税率の変更があった場合、変更後の税率が適用されます。
+          </li>
+          <li>
+            月額サブスクリプションは、利用者が解約手続きを行わない限り、毎月自動的に更新されます。
+            解約手続きは、マイページより行うことができます。
+          </li>
+        </ol>
+      </section>
+
+      <section className="mb-6">
+        <h2 className="mb-3 text-lg font-bold">第7条（禁止事項）</h2>
         <p className="mb-2 text-sm leading-relaxed">利用者は、本サービスの利用にあたり、以下の行為をしてはなりません。</p>
         <ul className="list-disc space-y-1 pl-6 text-sm leading-relaxed">
           <li>法令または公序良俗に違反する行為</li>
@@ -109,7 +144,7 @@ export default function TermsPage() {
       </section>
 
       <section className="mb-6">
-        <h2 className="mb-3 text-lg font-bold">第7条（本サービスの提供の停止等）</h2>
+        <h2 className="mb-3 text-lg font-bold">第8条（本サービスの提供の停止等）</h2>
         <ol className="list-decimal space-y-2 pl-6 text-sm leading-relaxed">
           <li>当社は、以下のいずれかの事由があると判断した場合、利用者に事前に通知することなく本サービスの全部または一部の提供を停止または中断することができるものとします。
             <ul className="mt-2 list-disc space-y-1 pl-6">
@@ -124,7 +159,7 @@ export default function TermsPage() {
       </section>
 
       <section className="mb-6">
-        <h2 className="mb-3 text-lg font-bold">第8条（著作権）</h2>
+        <h2 className="mb-3 text-lg font-bold">第9条（著作権）</h2>
         <ol className="list-decimal space-y-2 pl-6 text-sm leading-relaxed">
           <li>利用者は、自ら著作権等の必要な知的財産権を有するか、または必要な権利者の許諾を得た文章、画像等の情報に関してのみ、本サービスを利用し、投稿することができるものとします。</li>
           <li>利用者が本サービスを利用して投稿した文章、画像等の著作権は、当該利用者または既存の権利者に帰属します。</li>
@@ -133,7 +168,7 @@ export default function TermsPage() {
       </section>
 
       <section className="mb-6">
-        <h2 className="mb-3 text-lg font-bold">第9条（利用制限および登録抹消）</h2>
+        <h2 className="mb-3 text-lg font-bold">第10条（利用制限および登録抹消）</h2>
         <p className="text-sm leading-relaxed">
           当社は、利用者が以下のいずれかに該当する場合、事前の通知なく、投稿データを削除し、
           利用者に対して本サービスの全部もしくは一部の利用を制限し、または利用者としての登録を
@@ -148,7 +183,7 @@ export default function TermsPage() {
       </section>
 
       <section className="mb-6">
-        <h2 className="mb-3 text-lg font-bold">第10条（免責事項）</h2>
+        <h2 className="mb-3 text-lg font-bold">第11条（免責事項）</h2>
         <ol className="list-decimal space-y-2 pl-6 text-sm leading-relaxed">
           <li>当社は、本サービスに事実上または法律上の瑕疵がないことを明示的にも黙示的にも保証しておりません。</li>
           <li>当社は、本サービスに起因して利用者に生じたあらゆる損害について、当社の故意または重大な過失による場合を除き、一切の責任を負いません。</li>
@@ -158,7 +193,7 @@ export default function TermsPage() {
       </section>
 
       <section className="mb-6">
-        <h2 className="mb-3 text-lg font-bold">第11条（サービス内容の変更等）</h2>
+        <h2 className="mb-3 text-lg font-bold">第12条（サービス内容の変更等）</h2>
         <p className="text-sm leading-relaxed">
           当社は、利用者への事前の告知をもって、本サービスの内容を変更、追加または廃止することが
           あり得るものとし、利用者はこれを承諾するものとします。
@@ -166,7 +201,7 @@ export default function TermsPage() {
       </section>
 
       <section className="mb-6">
-        <h2 className="mb-3 text-lg font-bold">第12条（利用規約の変更）</h2>
+        <h2 className="mb-3 text-lg font-bold">第13条（利用規約の変更）</h2>
         <p className="text-sm leading-relaxed">
           当社は、必要と判断した場合には、利用者に通知することなくいつでも本規約を変更することが
           できるものとします。なお、本規約の変更後、本サービスの利用を開始した場合には、当該
@@ -175,7 +210,7 @@ export default function TermsPage() {
       </section>
 
       <section className="mb-6">
-        <h2 className="mb-3 text-lg font-bold">第13条（個人情報の取扱い）</h2>
+        <h2 className="mb-3 text-lg font-bold">第14条（個人情報の取扱い）</h2>
         <p className="text-sm leading-relaxed">
           当社は、本サービスの利用によって取得する個人情報については、当社
           「<a href="/legal/privacy" className="text-brand-700 underline">プライバシーポリシー</a>」
@@ -184,7 +219,7 @@ export default function TermsPage() {
       </section>
 
       <section className="mb-6">
-        <h2 className="mb-3 text-lg font-bold">第14条（通知または連絡）</h2>
+        <h2 className="mb-3 text-lg font-bold">第15条（通知または連絡）</h2>
         <p className="text-sm leading-relaxed">
           利用者と当社との間の通知または連絡は、当社の定める方法によって行うものとします。
           当社は、利用者から、当社が別途定める方式に従った変更届け出がない限り、現在登録されている
@@ -194,7 +229,7 @@ export default function TermsPage() {
       </section>
 
       <section className="mb-6">
-        <h2 className="mb-3 text-lg font-bold">第15条（権利義務の譲渡の禁止）</h2>
+        <h2 className="mb-3 text-lg font-bold">第16条（権利義務の譲渡の禁止）</h2>
         <p className="text-sm leading-relaxed">
           利用者は、当社の書面による事前の承諾なく、利用契約上の地位または本規約に基づく権利もしくは
           義務につき、第三者に対し、譲渡、移転、担保設定、その他の処分をすることはできません。
@@ -202,7 +237,7 @@ export default function TermsPage() {
       </section>
 
       <section className="mb-6">
-        <h2 className="mb-3 text-lg font-bold">第16条（準拠法・裁判管轄）</h2>
+        <h2 className="mb-3 text-lg font-bold">第17条（準拠法・裁判管轄）</h2>
         <ol className="list-decimal space-y-2 pl-6 text-sm leading-relaxed">
           <li>本規約の解釈にあたっては、日本法を準拠法とします。</li>
           <li>本サービスに関して紛争が生じた場合には、当社の本店所在地を管轄する裁判所を専属的合意管轄とします。</li>
