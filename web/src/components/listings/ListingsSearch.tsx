@@ -209,7 +209,7 @@ function SearchContent() {
     const isActivePromo = (l: Listing) => {
       if (!l.isPromotedRecommend) return false;
       const until = l.promotedRecommendUntil;
-      if (!until) return false;
+      if (!until) return true;
       return until.seconds * 1000 > now;
     };
 
