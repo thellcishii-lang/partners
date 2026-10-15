@@ -20,6 +20,7 @@ export async function generateMetadata({
   return {
     title: `${label}の代理店・加盟店募集`,
     description: `初期費用が${label}の代理店・加盟店を募集している企業の一覧です。登録3ヶ月無料、デポジット型。`,
+    alternates: { canonical: `/cost/initial/${range}` },
     openGraph: {
       title: `${label}の代理店・加盟店募集`,
       description: `初期費用${label}の代理店・加盟店の募集一覧。`,

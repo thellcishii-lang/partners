@@ -20,6 +20,7 @@ export async function generateMetadata({
   return {
     title: `${label}向けの代理店・加盟店募集`,
     description: `${label}向けの商材を扱う代理店・加盟店を募集している企業の一覧です。`,
+    alternates: { canonical: `/target/${slug}` },
   };
 }
 

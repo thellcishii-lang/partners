@@ -3,6 +3,7 @@ import { COMPANY_INFO, SITE_NAME, SITE_URL } from '@/lib/companyInfo';
 
 export const metadata: Metadata = {
   title: `特定商取引法に基づく表記 | ${SITE_NAME}`,
+  alternates: { canonical: '/legal/tokushoho' },
 };
 
 export default function TokushohoPage() {

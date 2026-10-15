@@ -1,6 +1,6 @@
 'use client';
 
-import { Suspense, useEffect, useMemo, useState, type FormEvent } from 'react';
+import { Suspense, useEffect, useId, useMemo, useState, type FormEvent } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { collection, getDocs, query, where } from 'firebase/firestore';
@@ -31,10 +31,16 @@ import {
 import { cn } from '@/lib/cn';
 import type { Listing } from '@/types';
 
-export function ListingsSearch() {
+type ListingsSearchProps = {
+  initialListings?: Listing[];
+  initialError?: string;
+  renderedAt?: number;
+};
+
+export function ListingsSearch(props: ListingsSearchProps = {}) {
   return (
     <Suspense fallback={<p className="text-sm text-gray-500">読み込み中…</p>}>
-      <SearchContent />
+      <SearchContent {...props} />
     </Suspense>
   );
 }
@@ -83,14 +89,21 @@ const REGION_GROUP_LABELS: Record<string, string> = {
   kyushu: '九州・沖縄',
 };
 
-function SearchContent() {
+function SearchContent({
+  initialListings,
+  initialError,
+  renderedAt,
+}: ListingsSearchProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { categories, areas, loading: mastersLoading } = useMasters();
+  const promotionOrderSeed = useId();
+  const hasInitialListings = initialListings !== undefined;
 
-  const [listings, setListings] = useState<Listing[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [listings, setListings] = useState<Listing[]>(() => initialListings ?? []);
+  const [loading, setLoading] = useState(!hasInitialListings);
+  const [error, setError] = useState(initialError ?? '');
+  const [filterTime, setFilterTime] = useState(() => renderedAt ?? Date.now());
   const [sortKey, setSortKey] = useState<SortKey>('recommended');
   const [filterOpen, setFilterOpen] = useState(false);
   const [openTopFilter, setOpenTopFilter] = useState<TopFilterKey | null>(null);
@@ -155,6 +168,8 @@ function SearchContent() {
   };
 
   useEffect(() => {
+    if (hasInitialListings && !initialError) return;
+
     let active = true;
     setLoading(true);
     setError('');
@@ -162,6 +177,7 @@ function SearchContent() {
       .then((snap) => {
         if (!active) return;
         setListings(snap.docs.map((item) => ({ ...item.data(), id: item.id } as Listing)));
+        setFilterTime(Date.now());
       })
       .catch((err: unknown) => {
         if (active)
@@ -173,11 +189,10 @@ function SearchContent() {
     return () => {
       active = false;
     };
-  }, []);
+  }, [hasInitialListings, initialError]);
 
-    const filtered = useMemo(() => {
+  const filtered = useMemo(() => {
     const kw = keyword.toLowerCase().trim();
-    const now = Date.now();
 
     const matches = (l: Listing) => {
       if (kw && !(l.searchText ?? '').toLowerCase().includes(kw)) return false;
@@ -210,10 +225,22 @@ function SearchContent() {
       if (!l.isPromotedRecommend) return false;
       const until = l.promotedRecommendUntil;
       if (!until) return true;
-      return until.seconds * 1000 > now;
+      return until.seconds * 1000 > filterTime;
     };
 
-    const promotions = all.filter(isActivePromo).sort(() => Math.random() - 0.5).slice(0, 10);
+    const promotionScore = (listing: Listing) => {
+      const value = `${promotionOrderSeed}:${listing.id}`;
+      let hash = 0;
+      for (let index = 0; index < value.length; index += 1) {
+        hash = (hash * 31 + value.charCodeAt(index)) | 0;
+      }
+      return hash;
+    };
+
+    const promotions = all
+      .filter(isActivePromo)
+      .sort((a, b) => promotionScore(a) - promotionScore(b))
+      .slice(0, 10);
     const regular = all.filter((l) => !isActivePromo(l));
 
     // 通常案件のソート
@@ -259,7 +286,7 @@ function SearchContent() {
     return result;
   }, [listings, keyword, selectedTargets, selectedProducts, selectedModels, selectedCosts,
       selectedArea, selectedFee, selectedStock, selectedRevenue, selectedProfit,
-      selectedRevenueType, selectedOrg, sortKey]);
+      selectedRevenueType, selectedOrg, sortKey, filterTime, promotionOrderSeed]);
 
   const targetCategories = categories.filter((c) => c.axis === 'target');
   const productParents = categories.filter((c) => c.axis === 'product' && !c.parentSlug);

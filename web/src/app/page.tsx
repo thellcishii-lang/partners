@@ -1,8 +1,13 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { ListingsSearch } from '@/components/listings/ListingsSearch';
 import { FeaturedHero } from '@/components/listings/FeaturedHero';
 import { GuidePromoSection } from '@/components/guide/GuidePromoSection';
 import { Button } from '@/components/ui/Button';
+
+export const metadata: Metadata = {
+  alternates: { canonical: '/' },
+};
 
 export default function HomePage() {
   return (

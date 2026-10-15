@@ -3,6 +3,7 @@ import { COMPANY_INFO, SITE_NAME } from '@/lib/companyInfo';
 
 export const metadata: Metadata = {
   title: `プライバシーポリシー | ${SITE_NAME}`,
+  alternates: { canonical: '/legal/privacy' },
 };
 
 export default function PrivacyPage() {

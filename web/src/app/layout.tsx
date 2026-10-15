@@ -29,7 +29,6 @@ export const metadata: Metadata = {
     '代理店 マッチング',
     '加盟店 オーナー募集',
   ],
-  alternates: { canonical: '/' },
   openGraph: {
     type: 'website',
     locale: 'ja_JP',

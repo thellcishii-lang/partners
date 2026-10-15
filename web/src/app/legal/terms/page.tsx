@@ -3,6 +3,7 @@ import { COMPANY_INFO, SITE_NAME } from '@/lib/companyInfo';
 
 export const metadata: Metadata = {
   title: `利用規約 | ${SITE_NAME}`,
+  alternates: { canonical: '/legal/terms' },
 };
 
 export default function TermsPage() {

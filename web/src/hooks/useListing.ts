@@ -6,15 +6,23 @@ import { db } from '@/lib/firebase';
 import { useAuth } from '@/providers/AuthProvider';
 import type { Listing } from '@/types';
 
-export function useListing(id: string) {
+export function useListing(id: string, initialListing: Listing | null = null) {
   const { user, loading: authLoading } = useAuth();
   const [state, setState] = useState<{
     listing: Listing | null;
     loading: boolean;
     error: string;
-  }>({ listing: null, loading: true, error: '' });
+  }>({
+    listing: initialListing,
+    loading: initialListing === null,
+    error: '',
+  });
 
   useEffect(() => {
+    if (initialListing?.id === id) {
+      setState({ listing: initialListing, loading: false, error: '' });
+      return;
+    }
     if (authLoading) return;
     let active = true;
     setState({ listing: null, loading: true, error: '' });
@@ -32,7 +40,7 @@ export function useListing(id: string) {
       });
     });
     return () => { active = false; };
-  }, [id, user?.uid, authLoading]);
+  }, [id, user?.uid, authLoading, initialListing]);
 
   return state;
 }

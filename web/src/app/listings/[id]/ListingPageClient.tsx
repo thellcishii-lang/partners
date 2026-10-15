@@ -4,10 +4,15 @@ import { useParams } from 'next/navigation';
 import { useListing } from '@/hooks/useListing';
 import { useAuth } from '@/providers/AuthProvider';
 import { ListingDetail } from '@/components/listings/ListingDetail';
+import type { Listing } from '@/types';
 
-export function ListingPageClient() {
+export function ListingPageClient({
+  initialListing = null,
+}: {
+  initialListing?: Listing | null;
+}) {
   const { id } = useParams<{ id: string }>();
-  const { listing, loading, error } = useListing(id);
+  const { listing, loading, error } = useListing(id, initialListing);
   const { user } = useAuth();
 
   if (loading) {
