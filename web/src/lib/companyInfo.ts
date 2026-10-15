@@ -10,4 +10,4 @@ export const COMPANY_INFO = {
 } as const;
 
 export const SITE_NAME = '代理店・加盟店募集.com';
-export const SITE_URL = 'https://partners-tau-kohl.vercel.app';
+export const SITE_URL = 'https://www.代理店・加盟店募集.com';

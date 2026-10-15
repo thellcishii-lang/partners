@@ -5,7 +5,7 @@ export interface RenderedMail {
   text: string;
 }
 
-const SITE_URL = 'https://partners-tau-kohl.vercel.app';
+const SITE_URL = 'https://www.代理店・加盟店募集.com';
 const SITE_NAME = '代理店・加盟店募集.com';
 const UNLIMITED_DAYS_LABEL = 30;
 

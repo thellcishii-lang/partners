@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import GuideClient from './GuideClient';
 import { GUIDE_ARTICLES } from '@/lib/guideArticles';
 
-const SITE_URL = 'https://partners-tau-kohl.vercel.app';
+const SITE_URL = 'https://www.代理店・加盟店募集.com';
 
 export const metadata: Metadata = {
   title: '起業・代理店の実践ガイド | 代理店・加盟店募集.com',

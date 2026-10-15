@@ -12,7 +12,7 @@ import {
 } from '@/lib/guideArticles';
 import './article.css';
 
-const SITE_URL = 'https://partners-tau-kohl.vercel.app';
+const SITE_URL = 'https://www.代理店・加盟店募集.com';
 
 type Params = Promise<{ slug: string }>;
 

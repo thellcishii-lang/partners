@@ -167,7 +167,7 @@ For production, set the secrets with
 `firebase functions:secrets:set STRIPE_SECRET_KEY` and
 `firebase functions:secrets:set STRIPE_WEBHOOK_SECRET`. List the site origins
 allowed as Checkout return URLs in `functions/.env.production` (currently
-`APP_ORIGINS=https://partners-tau-kohl.vercel.app`; comma-separate extra
+`APP_ORIGINS=https://www.代理店・加盟店募集.com`; comma-separate extra
 domains). Register the deployed `stripeWebhook` URL as
 a Stripe webhook endpoint with the same four events.
 
