@@ -1,0 +1,78 @@
+'use client';
+
+import { useState } from 'react';
+import Link from 'next/link';
+
+export function SpecialtyBanners() {
+  const [isOpen, setIsOpen] = useState(true);
+
+  return (
+    <section className="mx-auto max-w-6xl px-4">
+      <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
+        <button
+          type="button"
+          onClick={() => setIsOpen(!isOpen)}
+          className="flex w-full items-center justify-between p-5 text-left transition hover:bg-gray-50 focus:outline-none"
+        >
+          <div>
+            <p className="text-xs font-bold text-emerald-600">業種を絞って探す</p>
+            <h2 className="mt-1 text-lg font-bold text-gray-900 sm:text-xl">
+              専門サイトから案件を探す
+            </h2>
+          </div>
+          <div
+            className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gray-100 text-gray-500 transition-transform duration-300 ${
+              isOpen ? 'rotate-180' : ''
+            }`}
+          >
+            ▼
+          </div>
+        </button>
+
+        {/* アニメーション用のラッパー */}
+        <div
+          className={`grid transition-all duration-300 ease-in-out ${
+            isOpen ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'
+          }`}
+        >
+          <div className="overflow-hidden">
+            <div className="grid gap-3 px-4 pb-5 pt-2 sm:grid-cols-3">
+              <Link
+                href="/eat"
+                className="block rounded-xl bg-orange-500 p-5 text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-orange-600 hover:shadow-md"
+              >
+                <p className="text-xs font-bold text-orange-100">🍽 飲食店専門</p>
+                <p className="mt-1 font-bold">飲食店の代理店・加盟店募集</p>
+                <p className="mt-1 text-xs text-orange-50">
+                  カフェ、居酒屋、POSレジ、食材仕入れ
+                </p>
+              </Link>
+
+              <Link
+                href="/beauty"
+                className="block rounded-xl bg-rose-500 p-5 text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-rose-600 hover:shadow-md"
+              >
+                <p className="text-xs font-bold text-rose-100">💅 美容・エステ専門</p>
+                <p className="mt-1 font-bold">美容サロンの代理店・加盟店募集</p>
+                <p className="mt-1 text-xs text-rose-50">
+                  美容室、エステ、ネイル、予約システム
+                </p>
+              </Link>
+
+              <Link
+                href="/it"
+                className="block rounded-xl bg-indigo-600 p-5 text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-indigo-700 hover:shadow-md"
+              >
+                <p className="text-xs font-bold text-indigo-100">💻 IT・AI専門</p>
+                <p className="mt-1 font-bold">ITツールの代理店募集</p>
+                <p className="mt-1 text-xs text-indigo-50">
+                  SaaS、生成AI、DX、システム開発
+                </p>
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
