@@ -12,3 +12,5 @@ web/node_modules/
 # generated
 web/tsconfig.tsbuildinfo
 web/audit-report.json
+partners-ab2a3-firebase-adminsdk-fbsvc-ba0b816c4c.json
+*-firebase-adminsdk-*.json
