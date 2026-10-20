@@ -50,6 +50,7 @@ export interface Category {
   seoTitle: string;
   seoDescription: string;
   isActive: boolean;
+  industry?: string;
 }
 
 export type AreaType = 'region' | 'prefecture' | 'city';
