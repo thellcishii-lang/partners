@@ -1,13 +1,8 @@
 import type { Metadata } from 'next';
-import { notFound } from 'next/navigation';
-import { getServerListing } from '@/lib/serverListings';
+import { getAdminDb } from '@/lib/firebaseAdmin';
 import { ListingPageClient } from './ListingPageClient';
 
 const SITE_URL = 'https://www.代理店・加盟店募集.com';
-
-function jsonLd(data: object): string {
-  return JSON.stringify(data).replace(/</g, '\\u003c');
-}
 
 export async function generateMetadata({
   params,
@@ -16,23 +11,13 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { id } = await params;
   try {
-    const listing = await getServerListing(id);
-    if (!listing) {
-      return {
-        title: '案件が見つかりません',
-        robots: { index: false, follow: false },
-      };
-    }
-
-    const title = listing.title || '案件';
-    if (listing.status !== 'published') {
-      return {
-        title,
-        robots: { index: false, follow: false },
-      };
-    }
-
-    const description = (listing.description ?? '').slice(0, 120);
+    const db = getAdminDb();
+    const snap = await db.collection('listings').doc(id).get();
+    if (!snap.exists) return { title: '案件が見つかりません' };
+    const data = snap.data()!;
+    const title = (data.title as string) ?? '案件';
+    const description = ((data.description as string) ?? '').slice(0, 120);
+    
     return {
       title: `${title} | 代理店・加盟店募集.com`,
       description,
@@ -41,15 +26,11 @@ export async function generateMetadata({
         title,
         description,
         url: `${SITE_URL}/listings/${id}`,
-        images: listing.images?.[0] ? [listing.images[0]] : undefined,
+        images: data.images?.[0] ? [data.images[0]] : undefined,
       },
     };
-  } catch (error) {
-    console.error('generateMetadata: failed to fetch listing', { id, error });
-    return {
-      title: '代理店・加盟店募集.com',
-      robots: { index: false, follow: false },
-    };
+  } catch {
+    return { title: '代理店・加盟店募集.com' };
   }
 }
 
@@ -59,59 +40,78 @@ export default async function ListingPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const listing = await getServerListing(id);
-  if (!listing) notFound();
+  
+  // 構造化データ用のデータを取得
+  let structuredData: any = null;
+  try {
+    const db = getAdminDb();
+    const snap = await db.collection('listings').doc(id).get();
+    if (snap.exists) {
+      const data = snap.data()!;
+      const title = (data.title as string) ?? '案件';
+      const companyName = (data.companyName as string) ?? '募集企業';
+      const description = ((data.description as string) ?? '').slice(0, 150);
 
-  if (listing.status !== 'published') {
-    return <ListingPageClient />;
+      structuredData = [
+        {
+          '@context': 'https://schema.org',
+          '@type': 'BreadcrumbList',
+          itemListElement: [
+            {
+              '@type': 'ListItem',
+              position: 1,
+              name: 'ホーム',
+              item: SITE_URL,
+            },
+            {
+              '@type': 'ListItem',
+              position: 2,
+              name: '案件一覧',
+              item: `${SITE_URL}/listings`,
+            },
+            {
+              '@type': 'ListItem',
+              position: 3,
+              name: title,
+              item: `${SITE_URL}/listings/${id}`,
+            },
+          ],
+        },
+        {
+          '@context': 'https://schema.org',
+          '@type': 'Product',
+          name: title,
+          description: description,
+          brand: {
+            '@type': 'Organization',
+            name: companyName,
+          },
+          offers: {
+            '@type': 'Offer',
+            url: `${SITE_URL}/listings/${id}`,
+            priceCurrency: 'JPY',
+            // 初期費用が0円なら0、不明なら省略
+            price: data.initialCostYen === 0 ? 0 : undefined,
+            availability: 'https://schema.org/InStock',
+          },
+        },
+      ];
+    }
+  } catch (error) {
+    console.error('Failed to generate structured data', error);
   }
-
-  const serviceJsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'Service',
-    name: listing.title,
-    description: listing.description,
-    url: `${SITE_URL}/listings/${id}`,
-    image: listing.images?.[0],
-    serviceType: listing.productLabels?.join('・') || listing.category,
-    areaServed: listing.areaLabels?.length ? listing.areaLabels : ['全国'],
-    provider: {
-      '@type': 'Organization',
-      name: listing.companyName,
-    },
-  };
-
-  const breadcrumbJsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'BreadcrumbList',
-    itemListElement: [
-      { '@type': 'ListItem', position: 1, name: 'ホーム', item: SITE_URL },
-      {
-        '@type': 'ListItem',
-        position: 2,
-        name: '案件一覧',
-        item: `${SITE_URL}/listings`,
-      },
-      {
-        '@type': 'ListItem',
-        position: 3,
-        name: listing.title,
-        item: `${SITE_URL}/listings/${id}`,
-      },
-    ],
-  };
 
   return (
     <>
-      <ListingPageClient initialListing={listing} />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: jsonLd(serviceJsonLd) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: jsonLd(breadcrumbJsonLd) }}
-      />
+      <ListingPageClient />
+      
+      {/* 構造化データの出力 */}
+      {structuredData && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+        />
+      )}
     </>
   );
 }
