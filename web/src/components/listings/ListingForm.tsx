@@ -56,13 +56,16 @@ export function ListingForm({
   advertiser,
   listing,
   adminMode = false,
+  industry, // ★追加
 }: {
   advertiser: Advertiser;
   listing?: Listing;
   adminMode?: boolean;
+  industry?: string; // ★追加
 }) {
   const router = useRouter();
-  const { categories, areas, loading: mastersLoading } = useMasters();
+  // ★ useMasters に industry を渡す
+  const { categories, areas, loading: mastersLoading } = useMasters(industry);
   const { smsVerified } = useAuth();
 
   const isPublished = !adminMode && listing?.status === 'published';
@@ -263,6 +266,7 @@ export function ListingForm({
       title: title.trim(),
       category,
       description: description.trim(),
+      industry,
       requirements: fields.requirements.trim(),
       reward: fields.reward.trim(),
       initialCost: fields.initialCost.trim(),
