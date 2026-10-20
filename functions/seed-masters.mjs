@@ -222,6 +222,34 @@ const categories = [
   { slug: 'beauty-product-other',     axis: 'product', industry: 'beauty', label: 'その他美容向け商材', parentSlug: null, order: 250,
     seoTitle: 'その他美容商材の代理店募集', seoDescription: 'その他美容向け商材の代理店募集一覧です。' },
 
+  // ───── 【IT・AI・DX特化】ターゲット ─────
+  { slug: 'it-startup',    axis: 'target', industry: 'it', label: 'スタートアップ・ベンチャー', parentSlug: null, order: 310,
+    seoTitle: 'スタートアップ向けIT代理店募集', seoDescription: 'スタートアップ向けIT商材の代理店募集一覧です。' },
+  { slug: 'it-smb',        axis: 'target', industry: 'it', label: '中小企業・店舗',             parentSlug: null, order: 320,
+    seoTitle: '中小企業向けIT代理店募集', seoDescription: '中小企業向けIT商材の代理店募集一覧です。' },
+  { slug: 'it-enterprise', axis: 'target', industry: 'it', label: '中堅・大企業',               parentSlug: null, order: 330,
+    seoTitle: '中堅・大企業向けIT代理店募集', seoDescription: '中堅・大企業向けIT商材の代理店募集一覧です。' },
+  { slug: 'it-freelance',  axis: 'target', industry: 'it', label: 'フリーランス・個人事業主',   parentSlug: null, order: 340,
+    seoTitle: 'フリーランス向けIT代理店募集', seoDescription: 'フリーランス向けIT商材の代理店募集一覧です。' },
+  { slug: 'it-public',     axis: 'target', industry: 'it', label: '官公庁・自治体',             parentSlug: null, order: 350,
+    seoTitle: '官公庁向けIT代理店募集', seoDescription: '官公庁・自治体向けIT商材の代理店募集一覧です。' },
+  { slug: 'it-other',      axis: 'target', industry: 'it', label: 'その他法人',                 parentSlug: null, order: 360,
+    seoTitle: 'その他法人向けIT代理店募集', seoDescription: 'その他法人向けIT商材の代理店募集一覧です。' },
+
+  // ───── 【IT・AI・DX特化】商材 ─────
+  { slug: 'it-product-saas',     axis: 'product', industry: 'it', label: 'SaaS・クラウドツール',   parentSlug: null, order: 310,
+    seoTitle: 'SaaSの代理店募集', seoDescription: 'SaaS・クラウドツールの代理店募集一覧です。' },
+  { slug: 'it-product-ai',       axis: 'product', industry: 'it', label: 'AI・生成AIツール',       parentSlug: null, order: 320,
+    seoTitle: 'AI・生成AIの代理店募集', seoDescription: 'AI・生成AIツールの代理店募集一覧です。' },
+  { slug: 'it-product-dx',       axis: 'product', industry: 'it', label: 'DX・業務効率化',         parentSlug: null, order: 330,
+    seoTitle: 'DX・業務効率化の代理店募集', seoDescription: 'DX・業務効率化商材の代理店募集一覧です。' },
+  { slug: 'it-product-security', axis: 'product', industry: 'it', label: 'セキュリティ・インフラ', parentSlug: null, order: 340,
+    seoTitle: 'セキュリティの代理店募集', seoDescription: 'セキュリティ・インフラ商材の代理店募集一覧です。' },
+  { slug: 'it-product-dev',      axis: 'product', industry: 'it', label: 'システム開発・Web制作',  parentSlug: null, order: 350,
+    seoTitle: 'システム開発の代理店募集', seoDescription: 'システム開発・Web制作の代理店募集一覧です。' },
+  { slug: 'it-product-other',    axis: 'product', industry: 'it', label: 'その他IT商材',           parentSlug: null, order: 360,
+    seoTitle: 'その他IT商材の代理店募集', seoDescription: 'その他IT商材の代理店募集一覧です。' },
+
 ].map((c) => ({ ...c, isActive: true, createdAt: now, updatedAt: now }));
 
 // ============================================================
