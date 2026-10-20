@@ -37,35 +37,35 @@ export function SpecialtyBanners() {
         >
           <div className="overflow-hidden">
             <div className="grid gap-3 px-4 pb-5 pt-2 sm:grid-cols-3">
-              <Link
+                            <Link
                 href="/eat"
-                className="block rounded-xl bg-orange-500 p-5 text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-orange-600 hover:shadow-md"
+                className="block rounded-xl border border-orange-200 bg-orange-50 p-5 text-orange-950 shadow-sm transition hover:-translate-y-0.5 hover:bg-orange-100 hover:shadow-md"
               >
-                <p className="text-xs font-bold text-orange-100">🍽 飲食店専門</p>
+                <p className="text-xs font-bold text-orange-600">🍽 飲食店専門</p>
                 <p className="mt-1 font-bold">飲食店の代理店・加盟店募集</p>
-                <p className="mt-1 text-xs text-orange-50">
+                <p className="mt-1 text-xs text-orange-700/80">
                   カフェ、居酒屋、POSレジ、食材仕入れ
                 </p>
               </Link>
 
               <Link
                 href="/beauty"
-                className="block rounded-xl bg-rose-500 p-5 text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-rose-600 hover:shadow-md"
+                className="block rounded-xl border border-rose-200 bg-rose-50 p-5 text-rose-950 shadow-sm transition hover:-translate-y-0.5 hover:bg-rose-100 hover:shadow-md"
               >
-                <p className="text-xs font-bold text-rose-100">💅 美容・エステ専門</p>
+                <p className="text-xs font-bold text-rose-600">💅 美容・エステ専門</p>
                 <p className="mt-1 font-bold">美容サロンの代理店・加盟店募集</p>
-                <p className="mt-1 text-xs text-rose-50">
+                <p className="mt-1 text-xs text-rose-700/80">
                   美容室、エステ、ネイル、予約システム
                 </p>
               </Link>
 
               <Link
                 href="/it"
-                className="block rounded-xl bg-indigo-600 p-5 text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-indigo-700 hover:shadow-md"
+                className="block rounded-xl border border-indigo-200 bg-indigo-50 p-5 text-indigo-950 shadow-sm transition hover:-translate-y-0.5 hover:bg-indigo-100 hover:shadow-md"
               >
-                <p className="text-xs font-bold text-indigo-100">💻 IT・AI専門</p>
+                <p className="text-xs font-bold text-indigo-600">💻 IT・AI専門</p>
                 <p className="mt-1 font-bold">ITツールの代理店募集</p>
-                <p className="mt-1 text-xs text-indigo-50">
+                <p className="mt-1 text-xs text-indigo-700/80">
                   SaaS、生成AI、DX、システム開発
                 </p>
               </Link>
