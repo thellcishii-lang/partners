@@ -59,6 +59,26 @@ export const CATEGORIES: Category[] = [
   { slug: 'model-franchise',      axis: 'model', label: 'フランチャイズ加盟',     parentSlug: null, order: 60, seoTitle: '', seoDescription: '', isActive: true },
   { slug: 'model-sales-agent',    axis: 'model', label: '販売代理店',             parentSlug: null, order: 70, seoTitle: '', seoDescription: '', isActive: true },
   { slug: 'model-referral',       axis: 'model', label: '紹介代理店',             parentSlug: null, order: 80, seoTitle: '', seoDescription: '', isActive: true },
+
+  // ============================================================
+  // 飲食店特化サイト用 (industry: 'eat')
+  // ============================================================
+  // 【ターゲット（業態）】
+  { slug: 'eat-cafe',     axis: 'target', industry: 'eat', label: 'カフェ・喫茶店',             parentSlug: null, order: 110, seoTitle: '', seoDescription: '', isActive: true },
+  { slug: 'eat-izakaya',  axis: 'target', industry: 'eat', label: '居酒屋・バー',               parentSlug: null, order: 120, seoTitle: '', seoDescription: '', isActive: true },
+  { slug: 'eat-diner',    axis: 'target', industry: 'eat', label: '定食・食堂',                 parentSlug: null, order: 130, seoTitle: '', seoDescription: '', isActive: true },
+  { slug: 'eat-noodle',   axis: 'target', industry: 'eat', label: 'ラーメン・麺類',             parentSlug: null, order: 140, seoTitle: '', seoDescription: '', isActive: true },
+  { slug: 'eat-fastfood', axis: 'target', industry: 'eat', label: 'ファストフード・テイクアウト', parentSlug: null, order: 150, seoTitle: '', seoDescription: '', isActive: true },
+  { slug: 'eat-ryotei',   axis: 'target', industry: 'eat', label: '料亭・割烹',                 parentSlug: null, order: 160, seoTitle: '', seoDescription: '', isActive: true },
+  { slug: 'eat-other',    axis: 'target', industry: 'eat', label: 'その他飲食',                 parentSlug: null, order: 170, seoTitle: '', seoDescription: '', isActive: true },
+
+  // 【商材（飲食店向け）】
+  { slug: 'eat-product-pos',      axis: 'product', industry: 'eat', label: 'POSレジ・キャッシュレス', parentSlug: null, order: 110, seoTitle: '', seoDescription: '', isActive: true },
+  { slug: 'eat-product-crm',      axis: 'product', industry: 'eat', label: '顧客管理・予約システム',   parentSlug: null, order: 120, seoTitle: '', seoDescription: '', isActive: true },
+  { slug: 'eat-product-food',     axis: 'product', industry: 'eat', label: '食材・仕入れ',             parentSlug: null, order: 130, seoTitle: '', seoDescription: '', isActive: true },
+  { slug: 'eat-product-delivery', axis: 'product', industry: 'eat', label: '集客・デリバリー',         parentSlug: null, order: 140, seoTitle: '', seoDescription: '', isActive: true },
+  { slug: 'eat-product-equip',    axis: 'product', industry: 'eat', label: '店舗設備・リフォーム',     parentSlug: null, order: 150, seoTitle: '', seoDescription: '', isActive: true },
+  { slug: 'eat-product-other',    axis: 'product', industry: 'eat', label: 'その他飲食向け商材',       parentSlug: null, order: 160, seoTitle: '', seoDescription: '', isActive: true },
 ];
 
 const REGION_DEFS: [string, string, string[]][] = [
