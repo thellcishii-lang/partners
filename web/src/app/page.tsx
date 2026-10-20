@@ -55,6 +55,26 @@ export default function HomePage() {
       {/* おすすめ案件（上部表示契約のもの） */}
       <FeaturedHero />
 
+      {/* ★追加：飲食店特化サイトへのバナー */}
+      <section className="mx-auto max-w-6xl px-4">
+        <Link href="/eat" className="block overflow-hidden rounded-2xl bg-orange-500 p-6 shadow-md transition hover:bg-orange-600 sm:p-8">
+          <div className="flex items-center justify-between gap-4">
+            <div>
+              <p className="text-xs font-bold text-orange-100">🍽 飲食店専門の代理店・加盟店募集</p>
+              <h2 className="mt-1 text-xl font-bold text-white sm:text-2xl">
+                飲食店の独立・開業をお考えの方はこちら
+              </h2>
+              <p className="mt-2 text-sm text-orange-50">
+                カフェ、居酒屋、ラーメン店、POSレジ・食材仕入れなどの専門案件が見つかります。
+              </p>
+            </div>
+            <div className="hidden shrink-0 text-2xl text-white sm:block">
+              →
+            </div>
+          </div>
+        </Link>
+      </section>
+
       <ListingsSearch />
 
       <GuidePromoSection />
