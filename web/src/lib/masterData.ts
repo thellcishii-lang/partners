@@ -79,6 +79,23 @@ export const CATEGORIES: Category[] = [
   { slug: 'eat-product-delivery', axis: 'product', industry: 'eat', label: '集客・デリバリー',         parentSlug: null, order: 140, seoTitle: '', seoDescription: '', isActive: true },
   { slug: 'eat-product-equip',    axis: 'product', industry: 'eat', label: '店舗設備・リフォーム',     parentSlug: null, order: 150, seoTitle: '', seoDescription: '', isActive: true },
   { slug: 'eat-product-other',    axis: 'product', industry: 'eat', label: 'その他飲食向け商材',       parentSlug: null, order: 160, seoTitle: '', seoDescription: '', isActive: true },
+
+  // ============================================================
+  // 美容・エステ特化サイト用 (industry: 'beauty')
+  // ============================================================
+  // 【ターゲット（業態）】
+  { slug: 'beauty-hair',       axis: 'target', industry: 'beauty', label: '美容室・ヘアサロン',       parentSlug: null, order: 210, seoTitle: '', seoDescription: '', isActive: true },
+  { slug: 'beauty-esthe',      axis: 'target', industry: 'beauty', label: 'エステ・脱毛サロン',       parentSlug: null, order: 220, seoTitle: '', seoDescription: '', isActive: true },
+  { slug: 'beauty-nail',       axis: 'target', industry: 'beauty', label: 'ネイル・まつげサロン',     parentSlug: null, order: 230, seoTitle: '', seoDescription: '', isActive: true },
+  { slug: 'beauty-relax',      axis: 'target', industry: 'beauty', label: 'リラクゼーション・整体',   parentSlug: null, order: 240, seoTitle: '', seoDescription: '', isActive: true },
+  { slug: 'beauty-other',      axis: 'target', industry: 'beauty', label: 'その他美容業態',           parentSlug: null, order: 250, seoTitle: '', seoDescription: '', isActive: true },
+
+  // 【商材（美容・サロン向け）】
+  { slug: 'beauty-product-crm',       axis: 'product', industry: 'beauty', label: '予約システム・顧客管理', parentSlug: null, order: 210, seoTitle: '', seoDescription: '', isActive: true },
+  { slug: 'beauty-product-machine',   axis: 'product', industry: 'beauty', label: '美容機器・脱毛機',       parentSlug: null, order: 220, seoTitle: '', seoDescription: '', isActive: true },
+  { slug: 'beauty-product-marketing', axis: 'product', industry: 'beauty', label: '集客・SNSマーケティング', parentSlug: null, order: 230, seoTitle: '', seoDescription: '', isActive: true },
+  { slug: 'beauty-product-supplies',  axis: 'product', industry: 'beauty', label: 'サロン用品・消耗品',     parentSlug: null, order: 240, seoTitle: '', seoDescription: '', isActive: true },
+  { slug: 'beauty-product-other',     axis: 'product', industry: 'beauty', label: 'その他美容向け商材',     parentSlug: null, order: 250, seoTitle: '', seoDescription: '', isActive: true },
 ];
 
 const REGION_DEFS: [string, string, string[]][] = [
