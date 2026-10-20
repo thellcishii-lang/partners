@@ -27,6 +27,13 @@ export default function EatHomePage() {
                 全業種の代理店募集はこちら
               </Button>
             </Link>
+
+            {/* ★追加：飲食店向けの案件を作成するボタン */}
+            <Link href="/eat/listings/new">
+              <Button size="lg" className="w-full bg-orange-600 text-white hover:bg-orange-700 sm:w-auto">
+                飲食店向けの案件を掲載する
+              </Button>
+            </Link>
           </div>
         </div>
       </section>
