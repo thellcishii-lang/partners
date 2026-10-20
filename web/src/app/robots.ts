@@ -18,6 +18,7 @@ export default function robots(): MetadataRoute.Robots {
         '/listings/*/apply',
         '/listings/*/edit',
         '/listings/new',
+        '/eat/listings/new', // ★これを追加
       ],
     },
     sitemap: `${SITE_URL}/sitemap.xml`,
