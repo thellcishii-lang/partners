@@ -965,10 +965,8 @@ function RadioRow({
     </label>
   );
 }
-```画像を見ると、美容とITの上部タイルや検索ボタンが緑（エメラルド）のままになっていますね。
-以前の実装で、Tailwind CSSの動的クラス名の生成（`bg-${color}-500` など）がビルド時に消されてしまう（パージされる）問題に引っかかっていたのが原因です。
 
-`web/src/components/listings/ListingsSearch.tsx` を**丸ごと**以下のコードに置き換えてください。各テーマ（緑、オレンジ、ローズ、インディゴ）のクラス名をすべて明示的に定義して切り替えるように修正しています。
+`web/src/components/listings/ListingsSearch.tsx` 
 
 ```tsx
 'use client';
