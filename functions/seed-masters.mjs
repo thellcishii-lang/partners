@@ -198,6 +198,30 @@ const categories = [
   { slug: 'eat-product-other',    axis: 'product', industry: 'eat', label: 'その他飲食向け商材',       parentSlug: null, order: 160,
     seoTitle: 'その他飲食向け商材の代理店募集', seoDescription: 'その他飲食店向け商材の代理店募集一覧です。' },
 
+  // ───── 【美容・エステ特化】ターゲット ─────
+  { slug: 'beauty-hair',  axis: 'target', industry: 'beauty', label: '美容室・ヘアサロン', parentSlug: null, order: 210,
+    seoTitle: '美容室・ヘアサロンの代理店募集', seoDescription: '美容室・ヘアサロン向けの代理店募集一覧です。' },
+  { slug: 'beauty-esthe', axis: 'target', industry: 'beauty', label: 'エステ・脱毛サロン', parentSlug: null, order: 220,
+    seoTitle: 'エステ・脱毛サロンの代理店募集', seoDescription: 'エステ・脱毛サロン向けの代理店募集一覧です。' },
+  { slug: 'beauty-nail',  axis: 'target', industry: 'beauty', label: 'ネイル・まつげサロン', parentSlug: null, order: 230,
+    seoTitle: 'ネイル・まつげサロンの代理店募集', seoDescription: 'ネイル・まつげサロン向けの代理店募集一覧です。' },
+  { slug: 'beauty-relax', axis: 'target', industry: 'beauty', label: 'リラクゼーション・整体', parentSlug: null, order: 240,
+    seoTitle: 'リラクゼーション・整体の代理店募集', seoDescription: 'リラクゼーション・整体向けの代理店募集一覧です。' },
+  { slug: 'beauty-other', axis: 'target', industry: 'beauty', label: 'その他美容業態', parentSlug: null, order: 250,
+    seoTitle: 'その他美容業態の代理店募集', seoDescription: 'その他美容業態向けの代理店募集一覧です。' },
+
+  // ───── 【美容・エステ特化】商材 ─────
+  { slug: 'beauty-product-crm',       axis: 'product', industry: 'beauty', label: '予約システム・顧客管理', parentSlug: null, order: 210,
+    seoTitle: '美容向け予約システムの代理店募集', seoDescription: '美容サロン向け予約システム・顧客管理商材の代理店募集一覧です。' },
+  { slug: 'beauty-product-machine',   axis: 'product', industry: 'beauty', label: '美容機器・脱毛機', parentSlug: null, order: 220,
+    seoTitle: '美容機器・脱毛機の代理店募集', seoDescription: '美容機器・脱毛機商材の代理店募集一覧です。' },
+  { slug: 'beauty-product-marketing', axis: 'product', industry: 'beauty', label: '集客・SNSマーケティング', parentSlug: null, order: 230,
+    seoTitle: '美容向け集客・SNSの代理店募集', seoDescription: '美容サロン向け集客・SNSマーケティング商材の代理店募集一覧です。' },
+  { slug: 'beauty-product-supplies',  axis: 'product', industry: 'beauty', label: 'サロン用品・消耗品', parentSlug: null, order: 240,
+    seoTitle: 'サロン用品・消耗品の代理店募集', seoDescription: 'サロン用品・消耗品の代理店募集一覧です。' },
+  { slug: 'beauty-product-other',     axis: 'product', industry: 'beauty', label: 'その他美容向け商材', parentSlug: null, order: 250,
+    seoTitle: 'その他美容商材の代理店募集', seoDescription: 'その他美容向け商材の代理店募集一覧です。' },
+
 ].map((c) => ({ ...c, isActive: true, createdAt: now, updatedAt: now }));
 
 // ============================================================
