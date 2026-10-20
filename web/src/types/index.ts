@@ -113,6 +113,7 @@ export interface Listing {
   publishedAt: { seconds: number; nanoseconds: number } | null;
   createdAt?: unknown;
   updatedAt?: unknown;
+  industry?: string;
 
   // ============================================================
   // フィルタ用（3軸 + 地域 + 費用）
