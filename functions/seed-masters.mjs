@@ -167,6 +167,37 @@ const categories = [
   { slug: 'model-referral',       axis: 'model', label: '紹介代理店',             parentSlug: null, order: 80,
     seoTitle: '紹介代理店募集',
     seoDescription: '顧客紹介型の代理店を募集している企業の一覧です。' },
+
+  // ───── 【飲食店特化】ターゲット ─────
+  { slug: 'eat-cafe',     axis: 'target', industry: 'eat', label: 'カフェ・喫茶店',             parentSlug: null, order: 110,
+    seoTitle: 'カフェ・喫茶店の代理店・加盟店募集', seoDescription: 'カフェ・喫茶店向けの代理店・加盟店募集一覧です。' },
+  { slug: 'eat-izakaya',  axis: 'target', industry: 'eat', label: '居酒屋・バー',               parentSlug: null, order: 120,
+    seoTitle: '居酒屋・バーの代理店・加盟店募集', seoDescription: '居酒屋・バー向けの代理店・加盟店募集一覧です。' },
+  { slug: 'eat-diner',    axis: 'target', industry: 'eat', label: '定食・食堂',                 parentSlug: null, order: 130,
+    seoTitle: '定食・食堂の代理店・加盟店募集', seoDescription: '定食屋・食堂向けの代理店・加盟店募集一覧です。' },
+  { slug: 'eat-noodle',   axis: 'target', industry: 'eat', label: 'ラーメン・麺類',             parentSlug: null, order: 140,
+    seoTitle: 'ラーメン・麺類の代理店・加盟店募集', seoDescription: 'ラーメン店・麺類店向けの代理店・加盟店募集一覧です。' },
+  { slug: 'eat-fastfood', axis: 'target', industry: 'eat', label: 'ファストフード・テイクアウト', parentSlug: null, order: 150,
+    seoTitle: 'ファストフード・テイクアウトの代理店・加盟店募集', seoDescription: 'ファストフード・テイクアウト向けの代理店・加盟店募集一覧です。' },
+  { slug: 'eat-ryotei',   axis: 'target', industry: 'eat', label: '料亭・割烹',                 parentSlug: null, order: 160,
+    seoTitle: '料亭・割烹の代理店・加盟店募集', seoDescription: '料亭・割烹向けの代理店・加盟店募集一覧です。' },
+  { slug: 'eat-other',    axis: 'target', industry: 'eat', label: 'その他飲食',                 parentSlug: null, order: 170,
+    seoTitle: 'その他飲食の代理店・加盟店募集', seoDescription: 'その他の飲食業態向けの代理店・加盟店募集一覧です。' },
+
+  // ───── 【飲食店特化】商材 ─────
+  { slug: 'eat-product-pos',      axis: 'product', industry: 'eat', label: 'POSレジ・キャッシュレス', parentSlug: null, order: 110,
+    seoTitle: '飲食店向けPOSレジ・キャッシュレスの代理店募集', seoDescription: '飲食店向けPOSレジ・キャッシュレス商材の代理店募集一覧です。' },
+  { slug: 'eat-product-crm',      axis: 'product', industry: 'eat', label: '顧客管理・予約システム',   parentSlug: null, order: 120,
+    seoTitle: '飲食店向け顧客管理・予約システムの代理店募集', seoDescription: '飲食店向け顧客管理・予約システム商材の代理店募集一覧です。' },
+  { slug: 'eat-product-food',     axis: 'product', industry: 'eat', label: '食材・仕入れ',             parentSlug: null, order: 130,
+    seoTitle: '飲食店向け食材・仕入れの代理店募集', seoDescription: '飲食店向け食材・仕入れ商材の代理店募集一覧です。' },
+  { slug: 'eat-product-delivery', axis: 'product', industry: 'eat', label: '集客・デリバリー',         parentSlug: null, order: 140,
+    seoTitle: '飲食店向け集客・デリバリーの代理店募集', seoDescription: '飲食店向け集客・デリバリー商材の代理店募集一覧です。' },
+  { slug: 'eat-product-equip',    axis: 'product', industry: 'eat', label: '店舗設備・リフォーム',     parentSlug: null, order: 150,
+    seoTitle: '飲食店向け店舗設備・リフォームの代理店募集', seoDescription: '飲食店向け店舗設備・リフォーム商材の代理店募集一覧です。' },
+  { slug: 'eat-product-other',    axis: 'product', industry: 'eat', label: 'その他飲食向け商材',       parentSlug: null, order: 160,
+    seoTitle: 'その他飲食向け商材の代理店募集', seoDescription: 'その他飲食店向け商材の代理店募集一覧です。' },
+
 ].map((c) => ({ ...c, isActive: true, createdAt: now, updatedAt: now }));
 
 // ============================================================
