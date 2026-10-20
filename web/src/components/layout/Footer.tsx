@@ -134,6 +134,9 @@ export function Footer() {
               <Link href="/listings" className="text-gray-600 hover:text-emerald-700 hover:underline">
                 案件を探す
               </Link>
+               <Link href="/eat" className="text-orange-600 hover:text-orange-700 hover:underline">
+                飲食店専門サイト
+              </Link>
               <Link href="/guide" className="text-gray-600 hover:text-emerald-700 hover:underline">
                 ガイド
               </Link>
