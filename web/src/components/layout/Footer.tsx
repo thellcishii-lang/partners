@@ -26,6 +26,15 @@ export function Footer() {
     <footer className="mt-16 border-t border-gray-200 bg-gray-50">
       {/* SEO リンク集 */}
       <div className="mx-auto max-w-6xl px-4 py-12">
+        
+        {/* ★追加：総合サイトであることを示す見出し */}
+        <div className="mb-8 border-b border-gray-200 pb-4">
+          <p className="text-xs font-bold text-emerald-600">総合サイト</p>
+          <h2 className="mt-1 text-sm font-bold text-gray-900">
+            業種・エリアから案件を探す
+          </h2>
+        </div>
+
         <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
           <div>
             <h3 className="mb-3 text-xs font-bold tracking-wide text-gray-900">商材から探す</h3>
@@ -134,17 +143,18 @@ export function Footer() {
               <Link href="/listings" className="text-gray-600 hover:text-emerald-700 hover:underline">
                 案件を探す
               </Link>
-               <Link href="/eat" className="text-orange-600 hover:text-orange-700 hover:underline">
-                飲食店専門サイト
-              </Link>
-              <Link href="/ beauty" className="text-indigo-600 hover:text-indigo-700 hover:underline">
-                美容エステ専門サイト
-              </Link>
-              <Link href="/it" className="text-indigo-600 hover:text-indigo-700 hover:underline">
-                IT・AI専門サイト
-              </Link>
               <Link href="/guide" className="text-gray-600 hover:text-emerald-700 hover:underline">
                 ガイド
+              </Link>
+              {/* ★修正：専門サイトのリンク色を統一 */}
+              <Link href="/eat" className="text-gray-600 hover:text-emerald-700 hover:underline">
+                飲食店専門サイト
+              </Link>
+              <Link href="/beauty" className="text-gray-600 hover:text-emerald-700 hover:underline">
+                美容・エステ専門サイト
+              </Link>
+              <Link href="/it" className="text-gray-600 hover:text-emerald-700 hover:underline">
+                IT・AI専門サイト
               </Link>
               <Link href="/legal/terms" className="text-gray-600 hover:text-emerald-700 hover:underline">
                 利用規約
@@ -154,13 +164,6 @@ export function Footer() {
               </Link>
               <Link href="/legal/tokushoho" className="text-gray-600 hover:text-emerald-700 hover:underline">
                 特定商取引法
-              </Link>
-              <Link
-                href="/admin"
-                aria-label="管理"
-                className="select-none text-gray-200 transition hover:text-gray-500"
-              >
-                ・
               </Link>
             </nav>
           </div>
