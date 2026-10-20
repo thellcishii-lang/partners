@@ -35,6 +35,7 @@ type ListingsSearchProps = {
   initialListings?: Listing[];
   initialError?: string;
   renderedAt?: number;
+  industry?: string; // ★追加
 };
 
 export function ListingsSearch(props: ListingsSearchProps = {}) {
@@ -78,25 +79,16 @@ const FILTER_ICONS: Record<TopFilterKey, LucideIcon> = {
   area: MapPin,
 };
 
-const REGION_GROUP_LABELS: Record<string, string> = {
-  hokkaido: '北海道',
-  tohoku: '東北',
-  kanto: '関東',
-  chubu: '中部',
-  kansai: '関西',
-  chugoku: '中国',
-  shikoku: '四国',
-  kyushu: '九州・沖縄',
-};
-
 function SearchContent({
   initialListings,
   initialError,
   renderedAt,
+  industry,
 }: ListingsSearchProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { categories, areas, loading: mastersLoading } = useMasters();
+  // ★ useMasters に industry を渡す
+  const { categories, areas, loading: mastersLoading } = useMasters(industry);
   const promotionOrderSeed = useId();
   const hasInitialListings = initialListings !== undefined;
 
@@ -173,7 +165,14 @@ function SearchContent({
     let active = true;
     setLoading(true);
     setError('');
-    getDocs(query(collection(db, 'listings'), where('status', '==', 'published')))
+
+    // ★ industry が指定されていればクエリに追加
+    const constraints = [where('status', '==', 'published')];
+    if (industry) {
+      constraints.push(where('industry', '==', industry));
+    }
+
+    getDocs(query(collection(db, 'listings'), ...constraints))
       .then((snap) => {
         if (!active) return;
         setListings(snap.docs.map((item) => ({ ...item.data(), id: item.id } as Listing)));
@@ -189,7 +188,7 @@ function SearchContent({
     return () => {
       active = false;
     };
-  }, [hasInitialListings, initialError]);
+  }, [hasInitialListings, initialError, industry]); // ★ industry を依存配列に追加
 
   const filtered = useMemo(() => {
     const kw = keyword.toLowerCase().trim();
@@ -243,7 +242,6 @@ function SearchContent({
       .slice(0, 10);
     const regular = all.filter((l) => !isActivePromo(l));
 
-    // 通常案件のソート
     if (sortKey === 'newest') {
       regular.sort((a, b) => {
         const aT = (a.publishedAt as { seconds?: number } | null)?.seconds ?? 0;
@@ -258,8 +256,6 @@ function SearchContent({
       });
     }
 
-    // おすすめ順（デフォルト）の時は、最初に5件まとめて出して、
-    // その後は5件に1回挿入
     if (sortKey === 'recommended') {
       const top = promotions.slice(0, 5);
       const rest = promotions.slice(5);
@@ -274,7 +270,6 @@ function SearchContent({
       return result;
     }
 
-    // 他のソート：5件に1回挿入（トップは無し）
     const result: Listing[] = [];
     let pIdx = 0;
     for (let i = 0; i < regular.length; i++) {
@@ -350,9 +345,17 @@ function SearchContent({
     setOpenTopFilter(null);
   };
 
+  // ★ 飲食店用ならオレンジ、通常ならエメラルド
+  const themeColor = industry === 'eat' ? 'orange' : 'emerald';
+  const btnClass = industry === 'eat' ? 'bg-orange-600 hover:bg-orange-700' : 'bg-emerald-600 hover:bg-emerald-700';
+  const activeBorderClass = industry === 'eat' ? 'border-orange-500' : 'border-emerald-500';
+  const activeBgClass = industry === 'eat' ? 'from-orange-50 to-orange-100' : 'from-emerald-50 to-emerald-100';
+  const inactiveBgClass = industry === 'eat' ? 'from-orange-50/60 to-orange-50 hover:border-orange-300' : 'from-emerald-50/60 to-emerald-50 hover:border-emerald-300';
+  const textClass = industry === 'eat' ? 'text-orange-700' : 'text-emerald-700';
+  const bgClass = industry === 'eat' ? 'bg-orange-100' : 'bg-emerald-100';
+
   return (
     <div className="space-y-4">
-
       {/* 上部タイル */}
       <div className="rounded-2xl bg-white p-4 shadow-sm">
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
@@ -369,21 +372,21 @@ function SearchContent({
                 className={cn(
                   'flex items-start gap-3 rounded-xl border-2 p-3.5 text-left transition',
                   isActive
-                    ? 'border-emerald-500 bg-gradient-to-b from-emerald-50 to-emerald-100 shadow-sm'
-                    : 'border-emerald-100 bg-gradient-to-b from-emerald-50/60 to-emerald-50 hover:border-emerald-300',
-                  isOpen && 'ring-2 ring-emerald-400',
+                    ? `${activeBorderClass} bg-gradient-to-b ${activeBgClass} shadow-sm`
+                    : `border-${themeColor}-100 bg-gradient-to-b ${inactiveBgClass}`,
+                  isOpen && `ring-2 ring-${themeColor}-400`,
                 )}
               >
                 <div
                   className={cn(
                     'flex h-9 w-9 shrink-0 items-center justify-center rounded-lg',
-                    isActive ? 'bg-emerald-500 text-white' : 'bg-emerald-100 text-emerald-700',
+                    isActive ? `${btnClass.replace('hover:', '')} text-white` : `${bgClass} ${textClass}`,
                   )}
                 >
                   <Icon className="h-5 w-5" />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="text-[11px] font-bold tracking-wide text-emerald-700">
+                  <p className={cn("text-[11px] font-bold tracking-wide", textClass)}>
                     {f.label}
                   </p>
                   <p
@@ -402,9 +405,9 @@ function SearchContent({
 
         {/* 展開中の選択肢 */}
         {openTopFilter && (
-          <div className="mt-4 rounded-xl border border-emerald-200 bg-emerald-50/50 p-4">
+          <div className={`mt-4 rounded-xl border border-${themeColor}-200 bg-${themeColor}-50/50 p-4`}>
             <div className="mb-2 flex items-center justify-between">
-              <p className="text-xs font-bold text-emerald-700">
+              <p className={`text-xs font-bold ${textClass}`}>
                 {TOP_FILTERS.find((f) => f.key === openTopFilter)?.label}
               </p>
               <button
@@ -446,8 +449,8 @@ function SearchContent({
                       className={cn(
                         'rounded-full border px-3 py-1 text-xs transition',
                         isSelected
-                          ? 'border-emerald-600 bg-emerald-600 text-white'
-                          : 'border-gray-300 bg-white text-gray-700 hover:border-emerald-500',
+                          ? `border-${themeColor}-600 ${btnClass} text-white`
+                          : `border-gray-300 bg-white text-gray-700 hover:border-${themeColor}-500`,
                       )}
                     >
                       {o.label}
@@ -463,7 +466,7 @@ function SearchContent({
           <button
             type="button"
             onClick={() => router.refresh()}
-            className="rounded-lg bg-emerald-600 px-8 py-3 text-sm font-bold text-white hover:bg-emerald-700"
+            className={`rounded-lg ${btnClass} px-8 py-3 text-sm font-bold text-white`}
           >
             この条件で検索
           </button>
@@ -513,12 +516,12 @@ function SearchContent({
                   type="text"
                   value={keywordInput}
                   onChange={(e) => setKeywordInput(e.target.value)}
-                  placeholder="例：AI、東京"
+                  placeholder="例：カフェ、東京"
                   className="h-9 min-w-0 flex-1 rounded-lg border border-gray-300 px-3 text-sm"
                 />
                 <button
                   type="submit"
-                  className="h-9 rounded-lg bg-emerald-600 px-3 text-xs text-white hover:bg-emerald-700"
+                  className={`h-9 rounded-lg ${btnClass} px-3 text-xs text-white`}
                 >
                   検索
                 </button>
@@ -527,7 +530,7 @@ function SearchContent({
 
             {!mastersLoading && (
               <>
-                <FilterGroup title="ターゲット">
+                <FilterGroup title="ターゲット（業態）">
                   {targetCategories.map((c) => (
                     <CheckRow
                       key={c.slug}
@@ -707,15 +710,15 @@ function SearchContent({
               </>
             )}
 
-            <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4">
+            <div className={`rounded-xl border border-${themeColor}-200 bg-${themeColor}-50 p-4`}>
               <p className="text-xs text-gray-700">
-                代理店・加盟店を募集したい企業の方
+                {industry === 'eat' ? '飲食店ビジネスを始めたい方' : '代理店・加盟店を募集したい企業の方'}
               </p>
               <Link
-                href="/signup"
-                className="mt-2 block rounded-lg bg-emerald-600 px-3 py-2 text-center text-xs font-medium text-white hover:bg-emerald-700"
+                href={industry === 'eat' ? '/' : '/signup'}
+                className={`mt-2 block rounded-lg ${btnClass} px-3 py-2 text-center text-xs font-medium text-white`}
               >
-                掲載についてはこちら
+                {industry === 'eat' ? '全業種の代理店募集を見る' : '掲載についてはこちら'}
               </Link>
             </div>
           </div>
@@ -753,7 +756,7 @@ function SearchContent({
                     <button
                       type="button"
                       onClick={clearAll}
-                      className="mt-3 text-sm text-emerald-700 underline"
+                      className={`mt-3 text-sm ${textClass} underline`}
                     >
                       条件をクリア
                     </button>
@@ -763,7 +766,7 @@ function SearchContent({
 
               <div className="space-y-3">
                 {filtered.map((listing) => (
-                  <ListingCard key={listing.id} listing={listing} />
+                  <ListingCard key={listing.id} listing={listing} industry={industry} />
                 ))}
               </div>
             </>
@@ -774,16 +777,18 @@ function SearchContent({
   );
 }
 
-function ListingCard({ listing }: { listing: Listing }) {
+function ListingCard({ listing, industry }: { listing: Listing, industry?: string }) {
   const areaText = listing.areaLabels?.length
     ? listing.areaLabels.slice(0, 2).join('・')
     : '全国';
   const mainImage = listing.images?.[0];
+  const themeClass = industry === 'eat' ? 'hover:ring-orange-500' : 'hover:ring-emerald-500';
+  const tagClass = industry === 'eat' ? 'bg-orange-50 text-orange-700' : 'bg-emerald-50 text-emerald-700';
 
   return (
-           <Link
+    <Link
       href={`/listings/${listing.id}`}
-      className="block overflow-hidden rounded-2xl bg-white shadow-sm transition hover:shadow-md hover:ring-2 hover:ring-emerald-500"
+      className={`block overflow-hidden rounded-2xl bg-white shadow-sm transition hover:shadow-md hover:ring-2 ${themeClass}`}
     >
       {/* 画像 */}
       <div className="aspect-[16/9] w-full overflow-hidden bg-gray-100 sm:hidden">
@@ -829,7 +834,7 @@ function ListingCard({ listing }: { listing: Listing }) {
               {areaText}
             </span>
             {listing.productLabels?.slice(0, 2).map((label) => (
-              <span key={label} className="rounded-md bg-emerald-50 px-2 py-0.5 text-[11px] font-bold text-emerald-700">
+              <span key={label} className={`rounded-md px-2 py-0.5 text-[11px] font-bold ${tagClass}`}>
                 {label}
               </span>
             ))}
