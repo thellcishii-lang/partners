@@ -4,8 +4,6 @@ import { GUIDE_ARTICLES } from '@/lib/guideArticles';
 
 const SITE_URL = 'https://www.代理店・加盟店募集.com';
 
-import type { Metadata } from 'next';
-
 export const metadata: Metadata = {
   title: '起業・代理店の実践ガイド｜独立開業のノウハウ',
   description:
@@ -22,7 +20,6 @@ export const metadata: Metadata = {
     description: '起業するなら代理店。費用・リスク・成功確率の違いから、選び方まで実践的に解説。',
     url: '/guide',
   },
-};
   robots: {
     index: true,
     follow: true,
