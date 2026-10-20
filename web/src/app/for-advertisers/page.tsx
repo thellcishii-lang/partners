@@ -5,9 +5,15 @@ import {
   ArrowRight, Sparkles, Zap, HeartHandshake,
 } from 'lucide-react';
 export const metadata: Metadata = {
-  title: '掲載について | 代理店・加盟店募集.com',
-  description: '代理店・加盟店募集を掲載しませんか？初期費用0円・月額0円、応募1件2,500円のデポジット型。最短即日で掲載開始。',
+  title: '掲載について（代理店・加盟店募集を掲載しませんか？）',
+  description: '代理店・加盟店の募集を掲載しませんか？初期費用0円・月額0円。応募1件2,500円のデポジット型だから、本当に必要な出会いだけにお金を払う仕組みです。最短3日で掲載開始。',
+  keywords: ['代理店募集 掲載', '加盟店募集 掲載', 'フランチャイズ 募集', '代理店 集客', '掲載 無料'],
   alternates: { canonical: '/for-advertisers' },
+  openGraph: {
+    title: '掲載について | 代理店・加盟店募集.com',
+    description: '初期費用0円・月額0円、成果報酬型の代理店・加盟店募集サイト。',
+    url: '/for-advertisers',
+  },
 };
 
 export default function ForAdvertisersPage() {
