@@ -96,6 +96,25 @@ export const CATEGORIES: Category[] = [
   { slug: 'beauty-product-marketing', axis: 'product', industry: 'beauty', label: '集客・SNSマーケティング', parentSlug: null, order: 230, seoTitle: '', seoDescription: '', isActive: true },
   { slug: 'beauty-product-supplies',  axis: 'product', industry: 'beauty', label: 'サロン用品・消耗品',     parentSlug: null, order: 240, seoTitle: '', seoDescription: '', isActive: true },
   { slug: 'beauty-product-other',     axis: 'product', industry: 'beauty', label: 'その他美容向け商材',     parentSlug: null, order: 250, seoTitle: '', seoDescription: '', isActive: true },
+
+  // ============================================================
+  // IT・AI・DX特化サイト用 (industry: 'it')
+  // ============================================================
+  // 【ターゲット（導入企業層）】
+  { slug: 'it-startup',    axis: 'target', industry: 'it', label: 'スタートアップ・ベンチャー', parentSlug: null, order: 310, seoTitle: '', seoDescription: '', isActive: true },
+  { slug: 'it-smb',        axis: 'target', industry: 'it', label: '中小企業・店舗',             parentSlug: null, order: 320, seoTitle: '', seoDescription: '', isActive: true },
+  { slug: 'it-enterprise', axis: 'target', industry: 'it', label: '中堅・大企業',               parentSlug: null, order: 330, seoTitle: '', seoDescription: '', isActive: true },
+  { slug: 'it-freelance',  axis: 'target', industry: 'it', label: 'フリーランス・個人事業主',   parentSlug: null, order: 340, seoTitle: '', seoDescription: '', isActive: true },
+  { slug: 'it-public',     axis: 'target', industry: 'it', label: '官公庁・自治体',             parentSlug: null, order: 350, seoTitle: '', seoDescription: '', isActive: true },
+  { slug: 'it-other',      axis: 'target', industry: 'it', label: 'その他法人',                 parentSlug: null, order: 360, seoTitle: '', seoDescription: '', isActive: true },
+
+  // 【商材（ITツール・サービス）】
+  { slug: 'it-product-saas',     axis: 'product', industry: 'it', label: 'SaaS・クラウドツール',   parentSlug: null, order: 310, seoTitle: '', seoDescription: '', isActive: true },
+  { slug: 'it-product-ai',       axis: 'product', industry: 'it', label: 'AI・生成AIツール',       parentSlug: null, order: 320, seoTitle: '', seoDescription: '', isActive: true },
+  { slug: 'it-product-dx',       axis: 'product', industry: 'it', label: 'DX・業務効率化',         parentSlug: null, order: 330, seoTitle: '', seoDescription: '', isActive: true },
+  { slug: 'it-product-security', axis: 'product', industry: 'it', label: 'セキュリティ・インフラ', parentSlug: null, order: 340, seoTitle: '', seoDescription: '', isActive: true },
+  { slug: 'it-product-dev',      axis: 'product', industry: 'it', label: 'システム開発・Web制作',  parentSlug: null, order: 350, seoTitle: '', seoDescription: '', isActive: true },
+  { slug: 'it-product-other',    axis: 'product', industry: 'it', label: 'その他IT商材',           parentSlug: null, order: 360, seoTitle: '', seoDescription: '', isActive: true },
 ];
 
 const REGION_DEFS: [string, string, string[]][] = [
