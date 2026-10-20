@@ -33,24 +33,6 @@ export function Header() {
           >
             案件を探す
           </Link>
-          <Link
-            href="/eat"
-            className="hidden text-sm font-bold text-orange-600 hover:text-orange-700 sm:inline"
-          >
-            飲食店専門
-          </Link>
-                    <Link
-            href="/beauty"
-            className="hidden text-sm font-bold text-indigo-600 hover:text-indigo-700 sm:inline"
-          >
-            美容エステ専門
-          </Link>
-                    <Link
-            href="/it"
-            className="hidden text-sm font-bold text-indigo-600 hover:text-indigo-700 sm:inline"
-          >
-            IT専門
-          </Link>
         </div>
         <nav className="flex items-center gap-3 text-sm">
           {loading ? null : user ? (
