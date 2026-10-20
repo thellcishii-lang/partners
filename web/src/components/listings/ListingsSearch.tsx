@@ -825,20 +825,7 @@ function SearchContent({
   );
 }
 
-type Theme = {
-  btn: string;
-  border: string;
-  activeBg: string;
-  inactiveBg: string;
-  text: string;
-  iconBg: string;
-  iconActiveBg: string;
-  ring: string;
-  tag: string;
-  hoverRing: string;
-};
-
-function ListingCard({ listing, theme }: { listing: Listing, theme: Theme }) {
+function ListingCard({ listing, theme }: { listing: Listing, theme: any }) {
   const areaText = listing.areaLabels?.length
     ? listing.areaLabels.slice(0, 2).join('・')
     : '全国';
