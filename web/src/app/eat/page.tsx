@@ -1,6 +1,18 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { ListingsSearch } from '@/components/listings/ListingsSearch';
 import { Button } from '@/components/ui/Button';
+
+export const metadata: Metadata = {
+  title: '飲食店の代理店・加盟店募集｜飲食店専門サイト',
+  description: 'カフェ、居酒屋、ラーメン店から、POSレジ・食材仕入れの商材まで。飲食店ビジネスに特化した代理店・加盟店の募集案件が見つかります。業態別、エリア別に検索可能です。',
+  alternates: { canonical: '/eat' },
+  openGraph: {
+    title: '飲食店の代理店・加盟店募集｜飲食店専門サイト',
+    description: 'カフェ、居酒屋、ラーメン店など飲食店ビジネスに特化した代理店・加盟店の募集案件を探せます。',
+    url: '/eat',
+  },
+};
 
 export default function EatHomePage() {
   return (
@@ -28,7 +40,7 @@ export default function EatHomePage() {
               </Button>
             </Link>
 
-            {/* ★追加：飲食店向けの案件を作成するボタン */}
+            {/* 飲食店向けの案件を作成するボタン */}
             <Link href="/eat/listings/new">
               <Button size="lg" className="w-full bg-orange-600 text-white hover:bg-orange-700 sm:w-auto">
                 飲食店向けの案件を掲載する
