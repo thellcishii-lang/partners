@@ -156,6 +156,9 @@ export function Footer() {
               <Link href="/it" className="text-gray-600 hover:text-emerald-700 hover:underline">
                 IT・AI専門サイト
               </Link>
+              <Link href="/school" className="text-gray-600 hover:text-emerald-700 hover:underline">
+                教育・スクール専門サイト
+              </Link>
               <Link href="/legal/terms" className="text-gray-600 hover:text-emerald-700 hover:underline">
                 利用規約
               </Link>
