@@ -141,6 +141,61 @@ export const CATEGORIES: Category[] = [
   { slug: 'medical-product-equipment', axis: 'product', industry: 'medical', label: '医療機器・備品',         parentSlug: null, order: 530, seoTitle: '', seoDescription: '', isActive: true },
   { slug: 'medical-product-marketing', axis: 'product', industry: 'medical', label: '集客・MEO・Web集患',     parentSlug: null, order: 540, seoTitle: '', seoDescription: '', isActive: true },
   { slug: 'medical-product-other',     axis: 'product', industry: 'medical', label: 'その他医療向け商材',     parentSlug: null, order: 550, seoTitle: '', seoDescription: '', isActive: true },
+
+  // ============================================================
+  // 運送・物流特化サイト用 (industry: 'logistics')
+  // ============================================================
+  { slug: 'logistics-keikamotsu', axis: 'target', industry: 'logistics', label: '軽貨物・宅配代行', parentSlug: null, order: 610, seoTitle: '', seoDescription: '', isActive: true },
+  { slug: 'logistics-truck',      axis: 'target', industry: 'logistics', label: 'トラック運送',      parentSlug: null, order: 620, seoTitle: '', seoDescription: '', isActive: true },
+  { slug: 'logistics-warehouse',  axis: 'target', industry: 'logistics', label: '倉庫・物流センター', parentSlug: null, order: 630, seoTitle: '', seoDescription: '', isActive: true },
+  { slug: 'logistics-other',      axis: 'target', industry: 'logistics', label: 'その他物流',        parentSlug: null, order: 640, seoTitle: '', seoDescription: '', isActive: true },
+
+  { slug: 'logistics-product-system',    axis: 'product', industry: 'logistics', label: '配車・運行管理システム', parentSlug: null, order: 610, seoTitle: '', seoDescription: '', isActive: true },
+  { slug: 'logistics-product-equipment', axis: 'product', industry: 'logistics', label: '車両・物流機器',       parentSlug: null, order: 620, seoTitle: '', seoDescription: '', isActive: true },
+  { slug: 'logistics-product-fuel',      axis: 'product', industry: 'logistics', label: '燃料・メンテナンス',   parentSlug: null, order: 630, seoTitle: '', seoDescription: '', isActive: true },
+  { slug: 'logistics-product-other',     axis: 'product', industry: 'logistics', label: 'その他物流向け商材',   parentSlug: null, order: 640, seoTitle: '', seoDescription: '', isActive: true },
+
+  // ============================================================
+  // 建築・不動産特化サイト用 (industry: 'realestate')
+  // ============================================================
+  { slug: 'realestate-sale',     axis: 'target', industry: 'realestate', label: '不動産売買',       parentSlug: null, order: 610, seoTitle: '', seoDescription: '', isActive: true },
+  { slug: 'realestate-rental',   axis: 'target', industry: 'realestate', label: '賃貸管理',         parentSlug: null, order: 620, seoTitle: '', seoDescription: '', isActive: true },
+  { slug: 'realestate-design',   axis: 'target', industry: 'realestate', label: '建築設計',         parentSlug: null, order: 630, seoTitle: '', seoDescription: '', isActive: true },
+  { slug: 'realestate-construction', axis: 'target', industry: 'realestate', label: '施工・リフォーム', parentSlug: null, order: 640, seoTitle: '', seoDescription: '', isActive: true },
+  { slug: 'realestate-other',    axis: 'target', industry: 'realestate', label: 'その他不動産',     parentSlug: null, order: 650, seoTitle: '', seoDescription: '', isActive: true },
+
+  { slug: 'realestate-product-system', axis: 'product', industry: 'realestate', label: '物件管理システム',     parentSlug: null, order: 610, seoTitle: '', seoDescription: '', isActive: true },
+  { slug: 'realestate-product-cad',    axis: 'product', industry: 'realestate', label: '図面・CADソフト',      parentSlug: null, order: 620, seoTitle: '', seoDescription: '', isActive: true },
+  { slug: 'realestate-product-material', axis: 'product', industry: 'realestate', label: '建築資材・設備',      parentSlug: null, order: 630, seoTitle: '', seoDescription: '', isActive: true },
+  { slug: 'realestate-product-marketing', axis: 'product', industry: 'realestate', label: '集客・ポータルサイト', parentSlug: null, order: 640, seoTitle: '', seoDescription: '', isActive: true },
+  { slug: 'realestate-product-other',  axis: 'product', industry: 'realestate', label: 'その他不動産向け商材', parentSlug: null, order: 650, seoTitle: '', seoDescription: '', isActive: true },
+
+  // ============================================================
+  // オフィス・法人向け特化サイト用 (industry: 'office')
+  // ============================================================
+  { slug: 'office-it',        axis: 'target', industry: 'office', label: 'IT・Web企業',       parentSlug: null, order: 710, seoTitle: '', seoDescription: '', isActive: true },
+  { slug: 'office-startup',   axis: 'target', industry: 'office', label: 'スタートアップ',   parentSlug: null, order: 720, seoTitle: '', seoDescription: '', isActive: true },
+  { slug: 'office-sme',       axis: 'target', industry: 'office', label: '中小企業',         parentSlug: null, order: 730, seoTitle: '', seoDescription: '', isActive: true },
+  { slug: 'office-other',     axis: 'target', industry: 'office', label: 'その他法人',       parentSlug: null, order: 740, seoTitle: '', seoDescription: '', isActive: true },
+
+  { slug: 'office-product-saas',      axis: 'product', industry: 'office', label: 'バックオフィスSaaS', parentSlug: null, order: 710, seoTitle: '', seoDescription: '', isActive: true },
+  { slug: 'office-product-hr',        axis: 'product', industry: 'office', label: '人材・採用サービス', parentSlug: null, order: 720, seoTitle: '', seoDescription: '', isActive: true },
+  { slug: 'office-product-supplies',  axis: 'product', industry: 'office', label: 'オフィス用品・設備', parentSlug: null, order: 730, seoTitle: '', seoDescription: '', isActive: true },
+  { slug: 'office-product-other',     axis: 'product', industry: 'office', label: 'その他法人向け商材', parentSlug: null, order: 740, seoTitle: '', seoDescription: '', isActive: true },
+
+  // ============================================================
+  // 暮らしのサービス・インフラ特化サイト用 (industry: 'life')
+  // ============================================================
+  { slug: 'life-housekeeping', axis: 'target', industry: 'life', label: '家事代行・ハウスクリーニング', parentSlug: null, order: 810, seoTitle: '', seoDescription: '', isActive: true },
+  { slug: 'life-moving',       axis: 'target', industry: 'life', label: '引越し・運搬',                 parentSlug: null, order: 820, seoTitle: '', seoDescription: '', isActive: true },
+  { slug: 'life-infra',        axis: 'target', industry: 'life', label: '電気・ガス・水道',             parentSlug: null, order: 830, seoTitle: '', seoDescription: '', isActive: true },
+  { slug: 'life-reform',       axis: 'target', industry: 'life', label: 'リフォーム・修理',             parentSlug: null, order: 840, seoTitle: '', seoDescription: '', isActive: true },
+  { slug: 'life-other',        axis: 'target', industry: 'life', label: 'その他生活サービス',           parentSlug: null, order: 850, seoTitle: '', seoDescription: '', isActive: true },
+
+  { slug: 'life-product-system',    axis: 'product', industry: 'life', label: '予約・顧客管理システム', parentSlug: null, order: 810, seoTitle: '', seoDescription: '', isActive: true },
+  { slug: 'life-product-supplies',  axis: 'product', industry: 'life', label: '業務用資材・消耗品',     parentSlug: null, order: 820, seoTitle: '', seoDescription: '', isActive: true },
+  { slug: 'life-product-marketing', axis: 'product', industry: 'life', label: '集客・地域マーケティング', parentSlug: null, order: 830, seoTitle: '', seoDescription: '', isActive: true },
+  { slug: 'life-product-other',     axis: 'product', industry: 'life', label: 'その他生活サービス商材', parentSlug: null, order: 840, seoTitle: '', seoDescription: '', isActive: true },
 ];
 
 const REGION_DEFS: [string, string, string[]][] = [
