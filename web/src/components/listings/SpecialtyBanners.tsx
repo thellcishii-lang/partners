@@ -96,16 +96,32 @@ export function SpecialtyBanners() {
                 </p>
               </Link>
 
-               {/* ★追加：運送・物流専門 */}
-              <Link
-                href="/logistics"
-                className="block rounded-xl border border-amber-200 bg-amber-50 p-5 text-amber-950 shadow-sm transition hover:-translate-y-0.5 hover:bg-amber-100 hover:shadow-md"
-              >
+                             {/* ★追加：運送・物流専門 */}
+              <Link href="/logistics" className="block rounded-xl border border-amber-200 bg-amber-50 p-5 text-amber-950 shadow-sm transition hover:-translate-y-0.5 hover:bg-amber-100 hover:shadow-md">
                 <p className="text-xs font-bold text-amber-600">🚚 運送・物流専門</p>
                 <p className="mt-1 font-bold">運送・物流の代理店・加盟店募集</p>
-                <p className="mt-1 text-xs text-amber-700/80">
-                  軽貨物、宅配代行、トラック、配車システム
-                </p>
+                <p className="mt-1 text-xs text-amber-700/80">軽貨物、宅配代行、配車システム</p>
+              </Link>
+
+              {/* ★追加：建築・不動産専門 */}
+              <Link href="/realestate" className="block rounded-xl border border-stone-200 bg-stone-50 p-5 text-stone-950 shadow-sm transition hover:-translate-y-0.5 hover:bg-stone-100 hover:shadow-md">
+                <p className="text-xs font-bold text-stone-600">🏠 建築・不動産専門</p>
+                <p className="mt-1 font-bold">建築・不動産の代理店・加盟店募集</p>
+                <p className="mt-1 text-xs text-stone-700/80">売買、賃貸管理、リフォーム</p>
+              </Link>
+
+              {/* ★追加：オフィス・法人向け */}
+              <Link href="/office" className="block rounded-xl border border-slate-200 bg-slate-50 p-5 text-slate-950 shadow-sm transition hover:-translate-y-0.5 hover:bg-slate-100 hover:shadow-md">
+                <p className="text-xs font-bold text-slate-600">🏢 オフィス・法人向け</p>
+                <p className="mt-1 font-bold">法人向けサービスの代理店募集</p>
+                <p className="mt-1 text-xs text-slate-700/80">バックオフィス、備品、BPO</p>
+              </Link>
+
+              {/* ★追加：暮らしのサービス */}
+              <Link href="/life" className="block rounded-xl border border-lime-200 bg-lime-50 p-5 text-lime-950 shadow-sm transition hover:-translate-y-0.5 hover:bg-lime-100 hover:shadow-md">
+                <p className="text-xs font-bold text-lime-700">✨ 暮らしのサービス</p>
+                <p className="mt-1 font-bold">暮らしのサービスの代理店募集</p>
+                <p className="mt-1 text-xs text-lime-800/80">家事代行、引越し、害虫駆除</p>
               </Link>
             </div>
           </div>
