@@ -63,7 +63,6 @@ export const CATEGORIES: Category[] = [
   // ============================================================
   // 飲食店特化サイト用 (industry: 'eat')
   // ============================================================
-  // 【ターゲット（業態）】
   { slug: 'eat-cafe',     axis: 'target', industry: 'eat', label: 'カフェ・喫茶店',             parentSlug: null, order: 110, seoTitle: '', seoDescription: '', isActive: true },
   { slug: 'eat-izakaya',  axis: 'target', industry: 'eat', label: '居酒屋・バー',               parentSlug: null, order: 120, seoTitle: '', seoDescription: '', isActive: true },
   { slug: 'eat-diner',    axis: 'target', industry: 'eat', label: '定食・食堂',                 parentSlug: null, order: 130, seoTitle: '', seoDescription: '', isActive: true },
@@ -72,7 +71,6 @@ export const CATEGORIES: Category[] = [
   { slug: 'eat-ryotei',   axis: 'target', industry: 'eat', label: '料亭・割烹',                 parentSlug: null, order: 160, seoTitle: '', seoDescription: '', isActive: true },
   { slug: 'eat-other',    axis: 'target', industry: 'eat', label: 'その他飲食',                 parentSlug: null, order: 170, seoTitle: '', seoDescription: '', isActive: true },
 
-  // 【商材（飲食店向け）】
   { slug: 'eat-product-pos',      axis: 'product', industry: 'eat', label: 'POSレジ・キャッシュレス', parentSlug: null, order: 110, seoTitle: '', seoDescription: '', isActive: true },
   { slug: 'eat-product-crm',      axis: 'product', industry: 'eat', label: '顧客管理・予約システム',   parentSlug: null, order: 120, seoTitle: '', seoDescription: '', isActive: true },
   { slug: 'eat-product-food',     axis: 'product', industry: 'eat', label: '食材・仕入れ',             parentSlug: null, order: 130, seoTitle: '', seoDescription: '', isActive: true },
@@ -83,14 +81,12 @@ export const CATEGORIES: Category[] = [
   // ============================================================
   // 美容・エステ特化サイト用 (industry: 'beauty')
   // ============================================================
-  // 【ターゲット（業態）】
   { slug: 'beauty-hair',       axis: 'target', industry: 'beauty', label: '美容室・ヘアサロン',       parentSlug: null, order: 210, seoTitle: '', seoDescription: '', isActive: true },
   { slug: 'beauty-esthe',      axis: 'target', industry: 'beauty', label: 'エステ・脱毛サロン',       parentSlug: null, order: 220, seoTitle: '', seoDescription: '', isActive: true },
   { slug: 'beauty-nail',       axis: 'target', industry: 'beauty', label: 'ネイル・まつげサロン',     parentSlug: null, order: 230, seoTitle: '', seoDescription: '', isActive: true },
   { slug: 'beauty-relax',      axis: 'target', industry: 'beauty', label: 'リラクゼーション・整体',   parentSlug: null, order: 240, seoTitle: '', seoDescription: '', isActive: true },
   { slug: 'beauty-other',      axis: 'target', industry: 'beauty', label: 'その他美容業態',           parentSlug: null, order: 250, seoTitle: '', seoDescription: '', isActive: true },
 
-  // 【商材（美容・サロン向け）】
   { slug: 'beauty-product-crm',       axis: 'product', industry: 'beauty', label: '予約システム・顧客管理', parentSlug: null, order: 210, seoTitle: '', seoDescription: '', isActive: true },
   { slug: 'beauty-product-machine',   axis: 'product', industry: 'beauty', label: '美容機器・脱毛機',       parentSlug: null, order: 220, seoTitle: '', seoDescription: '', isActive: true },
   { slug: 'beauty-product-marketing', axis: 'product', industry: 'beauty', label: '集客・SNSマーケティング', parentSlug: null, order: 230, seoTitle: '', seoDescription: '', isActive: true },
@@ -100,7 +96,6 @@ export const CATEGORIES: Category[] = [
   // ============================================================
   // IT・AI・DX特化サイト用 (industry: 'it')
   // ============================================================
-  // 【ターゲット（導入企業層）】
   { slug: 'it-startup',    axis: 'target', industry: 'it', label: 'スタートアップ・ベンチャー', parentSlug: null, order: 310, seoTitle: '', seoDescription: '', isActive: true },
   { slug: 'it-smb',        axis: 'target', industry: 'it', label: '中小企業・店舗',             parentSlug: null, order: 320, seoTitle: '', seoDescription: '', isActive: true },
   { slug: 'it-enterprise', axis: 'target', industry: 'it', label: '中堅・大企業',               parentSlug: null, order: 330, seoTitle: '', seoDescription: '', isActive: true },
@@ -108,7 +103,6 @@ export const CATEGORIES: Category[] = [
   { slug: 'it-public',     axis: 'target', industry: 'it', label: '官公庁・自治体',             parentSlug: null, order: 350, seoTitle: '', seoDescription: '', isActive: true },
   { slug: 'it-other',      axis: 'target', industry: 'it', label: 'その他法人',                 parentSlug: null, order: 360, seoTitle: '', seoDescription: '', isActive: true },
 
-  // 【商材（ITツール・サービス）】
   { slug: 'it-product-saas',     axis: 'product', industry: 'it', label: 'SaaS・クラウドツール',   parentSlug: null, order: 310, seoTitle: '', seoDescription: '', isActive: true },
   { slug: 'it-product-ai',       axis: 'product', industry: 'it', label: 'AI・生成AIツール',       parentSlug: null, order: 320, seoTitle: '', seoDescription: '', isActive: true },
   { slug: 'it-product-dx',       axis: 'product', industry: 'it', label: 'DX・業務効率化',         parentSlug: null, order: 330, seoTitle: '', seoDescription: '', isActive: true },
@@ -119,7 +113,6 @@ export const CATEGORIES: Category[] = [
   // ============================================================
   // 教室・スクール特化サイト用 (industry: 'school')
   // ============================================================
-  // 【ターゲット（業態）】
   { slug: 'school-cram',      axis: 'target', industry: 'school', label: '学習塾・進学塾',       parentSlug: null, order: 410, seoTitle: '', seoDescription: '', isActive: true },
   { slug: 'school-language',  axis: 'target', industry: 'school', label: '英会話・語学スクール', parentSlug: null, order: 420, seoTitle: '', seoDescription: '', isActive: true },
   { slug: 'school-qualify',   axis: 'target', industry: 'school', label: '資格・スキルスクール', parentSlug: null, order: 430, seoTitle: '', seoDescription: '', isActive: true },
@@ -127,12 +120,27 @@ export const CATEGORIES: Category[] = [
   { slug: 'school-art',       axis: 'target', industry: 'school', label: '音楽・芸術教室',       parentSlug: null, order: 450, seoTitle: '', seoDescription: '', isActive: true },
   { slug: 'school-other',     axis: 'target', industry: 'school', label: 'その他スクール',       parentSlug: null, order: 460, seoTitle: '', seoDescription: '', isActive: true },
 
-  // 【商材（教室・スクール向け）】
   { slug: 'school-product-crm',       axis: 'product', industry: 'school', label: '生徒管理・予約システム', parentSlug: null, order: 410, seoTitle: '', seoDescription: '', isActive: true },
   { slug: 'school-product-online',    axis: 'product', industry: 'school', label: 'オンライン授業・配信ツール', parentSlug: null, order: 420, seoTitle: '', seoDescription: '', isActive: true },
   { slug: 'school-product-material',  axis: 'product', industry: 'school', label: '教材・コンテンツ',       parentSlug: null, order: 430, seoTitle: '', seoDescription: '', isActive: true },
   { slug: 'school-product-marketing', axis: 'product', industry: 'school', label: '集客・SNSマーケティング', parentSlug: null, order: 440, seoTitle: '', seoDescription: '', isActive: true },
   { slug: 'school-product-other',     axis: 'product', industry: 'school', label: 'その他スクール向け商材', parentSlug: null, order: 450, seoTitle: '', seoDescription: '', isActive: true },
+
+  // ============================================================
+  // 医療・クリニック特化サイト用 (industry: 'medical')
+  // ============================================================
+  { slug: 'medical-clinic',    axis: 'target', industry: 'medical', label: 'クリニック・医院',   parentSlug: null, order: 510, seoTitle: '', seoDescription: '', isActive: true },
+  { slug: 'medical-dental',    axis: 'target', industry: 'medical', label: '歯科・矯正歯科',     parentSlug: null, order: 520, seoTitle: '', seoDescription: '', isActive: true },
+  { slug: 'medical-seitai',    axis: 'target', industry: 'medical', label: '整体・整骨院・鍼灸', parentSlug: null, order: 530, seoTitle: '', seoDescription: '', isActive: true },
+  { slug: 'medical-pharmacy',  axis: 'target', industry: 'medical', label: '薬局・ドラッグストア', parentSlug: null, order: 540, seoTitle: '', seoDescription: '', isActive: true },
+  { slug: 'medical-nursing',   axis: 'target', industry: 'medical', label: '介護・福祉施設',     parentSlug: null, order: 550, seoTitle: '', seoDescription: '', isActive: true },
+  { slug: 'medical-other',     axis: 'target', industry: 'medical', label: 'その他医療・福祉',   parentSlug: null, order: 560, seoTitle: '', seoDescription: '', isActive: true },
+
+  { slug: 'medical-product-ehr',       axis: 'product', industry: 'medical', label: '電子カルテ・レセコン',   parentSlug: null, order: 510, seoTitle: '', seoDescription: '', isActive: true },
+  { slug: 'medical-product-reserve',   axis: 'product', industry: 'medical', label: '予約システム・オンライン診療', parentSlug: null, order: 520, seoTitle: '', seoDescription: '', isActive: true },
+  { slug: 'medical-product-equipment', axis: 'product', industry: 'medical', label: '医療機器・備品',         parentSlug: null, order: 530, seoTitle: '', seoDescription: '', isActive: true },
+  { slug: 'medical-product-marketing', axis: 'product', industry: 'medical', label: '集客・MEO・Web集患',     parentSlug: null, order: 540, seoTitle: '', seoDescription: '', isActive: true },
+  { slug: 'medical-product-other',     axis: 'product', industry: 'medical', label: 'その他医療向け商材',     parentSlug: null, order: 550, seoTitle: '', seoDescription: '', isActive: true },
 ];
 
 const REGION_DEFS: [string, string, string[]][] = [
