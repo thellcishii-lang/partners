@@ -148,16 +148,19 @@ export function Footer() {
               </Link>
               {/* ★修正：専門サイトのリンク色を統一 */}
               <Link href="/eat" className="text-gray-600 hover:text-emerald-700 hover:underline">
-                飲食店専門サイト
+                飲食店の専門サイト
               </Link>
               <Link href="/beauty" className="text-gray-600 hover:text-emerald-700 hover:underline">
-                美容・エステ専門サイト
+                美容・エステの専門サイト
               </Link>
               <Link href="/it" className="text-gray-600 hover:text-emerald-700 hover:underline">
-                IT・AI専門サイト
+                IT・AI・DXの専門サイト
               </Link>
               <Link href="/school" className="text-gray-600 hover:text-emerald-700 hover:underline">
-                教育・スクール専門サイト
+                教育・スクールの専門サイト
+              </Link>
+              <Link href="/medical" className="text-gray-600 hover:text-emerald-700 hover:underline">
+                医療・クリニック・整体の専門サイト
               </Link>
               <Link href="/legal/terms" className="text-gray-600 hover:text-emerald-700 hover:underline">
                 利用規約
