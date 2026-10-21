@@ -162,6 +162,18 @@ export function Footer() {
               <Link href="/medical" className="text-gray-600 hover:text-emerald-700 hover:underline">
                 医療・クリニック・整体の専門サイト
               </Link>
+              <Link href="/logistics" className="text-gray-600 hover:text-emerald-700 hover:underline">
+                運送・物流の専門サイト
+              </Link>
+              <Link href="/realestate" className="text-gray-600 hover:text-emerald-700 hover:underline">
+                建築・不動産の専門サイト
+              </Link>
+              <Link href="/office" className="text-gray-600 hover:text-emerald-700 hover:underline">
+                オフィス・法人向けの専門サイト
+              </Link>
+              <Link href="/life" className="text-gray-600 hover:text-emerald-700 hover:underline">
+                暮らしのサービスの専門サイト
+              </Link>
               <Link href="/legal/terms" className="text-gray-600 hover:text-emerald-700 hover:underline">
                 利用規約
               </Link>
