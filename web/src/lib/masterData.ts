@@ -115,6 +115,24 @@ export const CATEGORIES: Category[] = [
   { slug: 'it-product-security', axis: 'product', industry: 'it', label: 'セキュリティ・インフラ', parentSlug: null, order: 340, seoTitle: '', seoDescription: '', isActive: true },
   { slug: 'it-product-dev',      axis: 'product', industry: 'it', label: 'システム開発・Web制作',  parentSlug: null, order: 350, seoTitle: '', seoDescription: '', isActive: true },
   { slug: 'it-product-other',    axis: 'product', industry: 'it', label: 'その他IT商材',           parentSlug: null, order: 360, seoTitle: '', seoDescription: '', isActive: true },
+
+  // ============================================================
+  // 教室・スクール特化サイト用 (industry: 'school')
+  // ============================================================
+  // 【ターゲット（業態）】
+  { slug: 'school-cram',      axis: 'target', industry: 'school', label: '学習塾・進学塾',       parentSlug: null, order: 410, seoTitle: '', seoDescription: '', isActive: true },
+  { slug: 'school-language',  axis: 'target', industry: 'school', label: '英会話・語学スクール', parentSlug: null, order: 420, seoTitle: '', seoDescription: '', isActive: true },
+  { slug: 'school-qualify',   axis: 'target', industry: 'school', label: '資格・スキルスクール', parentSlug: null, order: 430, seoTitle: '', seoDescription: '', isActive: true },
+  { slug: 'school-program',   axis: 'target', industry: 'school', label: 'プログラミング・STEM', parentSlug: null, order: 440, seoTitle: '', seoDescription: '', isActive: true },
+  { slug: 'school-art',       axis: 'target', industry: 'school', label: '音楽・芸術教室',       parentSlug: null, order: 450, seoTitle: '', seoDescription: '', isActive: true },
+  { slug: 'school-other',     axis: 'target', industry: 'school', label: 'その他スクール',       parentSlug: null, order: 460, seoTitle: '', seoDescription: '', isActive: true },
+
+  // 【商材（教室・スクール向け）】
+  { slug: 'school-product-crm',       axis: 'product', industry: 'school', label: '生徒管理・予約システム', parentSlug: null, order: 410, seoTitle: '', seoDescription: '', isActive: true },
+  { slug: 'school-product-online',    axis: 'product', industry: 'school', label: 'オンライン授業・配信ツール', parentSlug: null, order: 420, seoTitle: '', seoDescription: '', isActive: true },
+  { slug: 'school-product-material',  axis: 'product', industry: 'school', label: '教材・コンテンツ',       parentSlug: null, order: 430, seoTitle: '', seoDescription: '', isActive: true },
+  { slug: 'school-product-marketing', axis: 'product', industry: 'school', label: '集客・SNSマーケティング', parentSlug: null, order: 440, seoTitle: '', seoDescription: '', isActive: true },
+  { slug: 'school-product-other',     axis: 'product', industry: 'school', label: 'その他スクール向け商材', parentSlug: null, order: 450, seoTitle: '', seoDescription: '', isActive: true },
 ];
 
 const REGION_DEFS: [string, string, string[]][] = [
@@ -179,7 +197,6 @@ const PREFECTURE_DEFS: [string, string, string][] = [
 ];
 
 export const AREAS: Area[] = [
-  // 全国（特殊）
   {
     slug: 'all', label: '全国', type: 'region', parentSlug: null,
     prefectures: [], order: 0,
