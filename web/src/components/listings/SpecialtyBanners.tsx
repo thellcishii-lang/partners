@@ -95,6 +95,18 @@ export function SpecialtyBanners() {
                   クリニック、歯科、整体、電子カルテ
                 </p>
               </Link>
+
+               {/* ★追加：運送・物流専門 */}
+              <Link
+                href="/logistics"
+                className="block rounded-xl border border-amber-200 bg-amber-50 p-5 text-amber-950 shadow-sm transition hover:-translate-y-0.5 hover:bg-amber-100 hover:shadow-md"
+              >
+                <p className="text-xs font-bold text-amber-600">🚚 運送・物流専門</p>
+                <p className="mt-1 font-bold">運送・物流の代理店・加盟店募集</p>
+                <p className="mt-1 text-xs text-amber-700/80">
+                  軽貨物、宅配代行、トラック、配車システム
+                </p>
+              </Link>
             </div>
           </div>
         </div>
