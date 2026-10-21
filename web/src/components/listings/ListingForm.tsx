@@ -266,7 +266,7 @@ export function ListingForm({
       title: title.trim(),
       category,
       description: description.trim(),
-      industry,
+      industry|| null, 
       requirements: fields.requirements.trim(),
       reward: fields.reward.trim(),
       initialCost: fields.initialCost.trim(),
