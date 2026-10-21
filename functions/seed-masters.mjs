@@ -276,6 +276,32 @@ const categories = [
   { slug: 'school-product-other',     axis: 'product', industry: 'school', label: 'その他スクール向け商材', parentSlug: null, order: 450,
     seoTitle: 'その他スクール商材の代理店募集', seoDescription: 'その他スクール向け商材の代理店募集一覧です。' },
 
+  // ───── 【医療・クリニック特化】ターゲット ─────
+  { slug: 'medical-clinic',    axis: 'target', industry: 'medical', label: 'クリニック・医院',   parentSlug: null, order: 510,
+    seoTitle: 'クリニックの代理店募集', seoDescription: 'クリニック向けの代理店募集一覧です。' },
+  { slug: 'medical-dental',    axis: 'target', industry: 'medical', label: '歯科・矯正歯科',     parentSlug: null, order: 520,
+    seoTitle: '歯科の代理店募集', seoDescription: '歯科・矯正歯科向けの代理店募集一覧です。' },
+  { slug: 'medical-seitai',    axis: 'target', industry: 'medical', label: '整体・整骨院・鍼灸', parentSlug: null, order: 530,
+    seoTitle: '整体の代理店募集', seoDescription: '整体・整骨院・鍼灸向けの代理店募集一覧です。' },
+  { slug: 'medical-pharmacy',  axis: 'target', industry: 'medical', label: '薬局・ドラッグストア', parentSlug: null, order: 540,
+    seoTitle: '薬局の代理店募集', seoDescription: '薬局・ドラッグストア向けの代理店募集一覧です。' },
+  { slug: 'medical-nursing',   axis: 'target', industry: 'medical', label: '介護・福祉施設',     parentSlug: null, order: 550,
+    seoTitle: '介護施設の代理店募集', seoDescription: '介護・福祉施設向けの代理店募集一覧です。' },
+  { slug: 'medical-other',     axis: 'target', industry: 'medical', label: 'その他医療・福祉',   parentSlug: null, order: 560,
+    seoTitle: 'その他医療の代理店募集', seoDescription: 'その他医療・福祉向けの代理店募集一覧です。' },
+
+  // ───── 【医療・クリニック特化】商材 ─────
+  { slug: 'medical-product-ehr',       axis: 'product', industry: 'medical', label: '電子カルテ・レセコン',   parentSlug: null, order: 510,
+    seoTitle: '電子カルテの代理店募集', seoDescription: '電子カルテ・レセコン商材の代理店募集一覧です。' },
+  { slug: 'medical-product-reserve',   axis: 'product', industry: 'medical', label: '予約システム・オンライン診療', parentSlug: null, order: 520,
+    seoTitle: '医療予約システムの代理店募集', seoDescription: '予約システム・オンライン診療の代理店募集一覧です。' },
+  { slug: 'medical-product-equipment', axis: 'product', industry: 'medical', label: '医療機器・備品',         parentSlug: null, order: 530,
+    seoTitle: '医療機器の代理店募集', seoDescription: '医療機器・備品の代理店募集一覧です。' },
+  { slug: 'medical-product-marketing', axis: 'product', industry: 'medical', label: '集客・MEO・Web集患',     parentSlug: null, order: 540,
+    seoTitle: '医療集客の代理店募集', seoDescription: '集客・MEO・Web集患の代理店募集一覧です。' },
+  { slug: 'medical-product-other',     axis: 'product', industry: 'medical', label: 'その他医療向け商材',     parentSlug: null, order: 550,
+    seoTitle: 'その他医療商材の代理店募集', seoDescription: 'その他医療向け商材の代理店募集一覧です。' },
+
 ].map((c) => ({ ...c, isActive: true, createdAt: now, updatedAt: now }));
 
 // ============================================================
@@ -375,7 +401,6 @@ const areas = [
 // costRanges（費用レンジ）
 // ============================================================
 const costRanges = [
-  // 初期費用
   { slug: 'initial-free',     label: '初期費用無料',  type: 'initial_cost', min: 0,         max: 0,          order: 10,
     seoTitle: '初期費用無料の代理店募集', isActive: true },
   { slug: 'initial-under100', label: '100万円以下',   type: 'initial_cost', min: 1,         max: 1_000_000,  order: 20,
@@ -387,7 +412,6 @@ const costRanges = [
   { slug: 'initial-unknown',  label: '応相談',        type: 'initial_cost', min: -1,        max: null,       order: 50,
     seoTitle: '初期費用応相談の代理店募集', isActive: true },
 
-  // 想定売上（年商）
   { slug: 'revenue-under300',  label: '年商300万円以下',  type: 'expected_revenue', min: 0,          max: 3_000_000,  order: 10,
     seoTitle: '年商300万円以下の代理店募集', isActive: true },
   { slug: 'revenue-under500',  label: '年商500万円以下',  type: 'expected_revenue', min: 3_000_001,  max: 5_000_000,  order: 20,
