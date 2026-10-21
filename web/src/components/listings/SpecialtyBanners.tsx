@@ -83,6 +83,18 @@ export function SpecialtyBanners() {
                   学習塾、英会話、プログラミング、教材
                 </p>
               </Link>
+
+               {/* ★追加：医療・クリニック専門 */}
+              <Link
+                href="/medical"
+                className="block rounded-xl border border-blue-200 bg-blue-50 p-5 text-blue-950 shadow-sm transition hover:-translate-y-0.5 hover:bg-blue-100 hover:shadow-md"
+              >
+                <p className="text-xs font-bold text-blue-600">🏥 医療・クリニック専門</p>
+                <p className="mt-1 font-bold">医療・クリニックの代理店・加盟店募集</p>
+                <p className="mt-1 text-xs text-blue-700/80">
+                  クリニック、歯科、整体、電子カルテ
+                </p>
+              </Link>
             </div>
           </div>
         </div>
