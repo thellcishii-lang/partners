@@ -262,11 +262,11 @@ export function ListingForm({
       companyName: advertiser.companyName,
     });
 
-    return {
+     return {
       title: title.trim(),
       category,
       description: description.trim(),
-      industry|| null, 
+      industry: industry || null,
       requirements: fields.requirements.trim(),
       reward: fields.reward.trim(),
       initialCost: fields.initialCost.trim(),
