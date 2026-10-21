@@ -4,8 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 
 export function SpecialtyBanners() {
-  const [isOpen, setIsOpen] = useState(true);
-
+  const [isOpen, setIsOpen] = useState(false);
   return (
     <section className="mx-auto max-w-6xl px-4">
       <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
