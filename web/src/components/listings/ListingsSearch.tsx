@@ -400,6 +400,20 @@ function SearchContent({
       hoverRing: 'hover:ring-indigo-500',
       linkHover: 'hover:text-indigo-700',
     };
+    } else if (industry === 'school') {
+    theme = {
+      btn: 'bg-teal-600 hover:bg-teal-700',
+      border: 'border-teal-500',
+      activeBg: 'bg-gradient-to-b from-teal-50 to-teal-100',
+      inactiveBg: 'border-teal-100 bg-gradient-to-b from-teal-50/60 to-teal-50 hover:border-teal-300',
+      text: 'text-teal-700',
+      iconBg: 'bg-teal-100',
+      iconActiveBg: 'bg-teal-500',
+      ring: 'ring-teal-400',
+      tag: 'bg-teal-50 text-teal-700',
+      hoverRing: 'hover:ring-teal-500',
+      linkHover: 'hover:text-teal-700',
+    };
   }
 
   return (
