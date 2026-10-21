@@ -250,6 +250,32 @@ const categories = [
   { slug: 'it-product-other',    axis: 'product', industry: 'it', label: 'その他IT商材',           parentSlug: null, order: 360,
     seoTitle: 'その他IT商材の代理店募集', seoDescription: 'その他IT商材の代理店募集一覧です。' },
 
+  // ───── 【教室・スクール特化】ターゲット ─────
+  { slug: 'school-cram',      axis: 'target', industry: 'school', label: '学習塾・進学塾',       parentSlug: null, order: 410,
+    seoTitle: '学習塾の代理店募集', seoDescription: '学習塾向けの代理店募集一覧です。' },
+  { slug: 'school-language',  axis: 'target', industry: 'school', label: '英会話・語学スクール', parentSlug: null, order: 420,
+    seoTitle: '英会話スクールの代理店募集', seoDescription: '英会話スクール向けの代理店募集一覧です。' },
+  { slug: 'school-qualify',   axis: 'target', industry: 'school', label: '資格・スキルスクール', parentSlug: null, order: 430,
+    seoTitle: '資格スクールの代理店募集', seoDescription: '資格スクール向けの代理店募集一覧です。' },
+  { slug: 'school-program',   axis: 'target', industry: 'school', label: 'プログラミング・STEM', parentSlug: null, order: 440,
+    seoTitle: 'プログラミングスクールの代理店募集', seoDescription: 'プログラミングスクール向けの代理店募集一覧です。' },
+  { slug: 'school-art',       axis: 'target', industry: 'school', label: '音楽・芸術教室',       parentSlug: null, order: 450,
+    seoTitle: '音楽教室の代理店募集', seoDescription: '音楽・芸術教室向けの代理店募集一覧です。' },
+  { slug: 'school-other',     axis: 'target', industry: 'school', label: 'その他スクール',       parentSlug: null, order: 460,
+    seoTitle: 'その他スクールの代理店募集', seoDescription: 'その他スクール向けの代理店募集一覧です。' },
+
+  // ───── 【教室・スクール特化】商材 ─────
+  { slug: 'school-product-crm',       axis: 'product', industry: 'school', label: '生徒管理・予約システム', parentSlug: null, order: 410,
+    seoTitle: '生徒管理システムの代理店募集', seoDescription: '生徒管理・予約システムの代理店募集一覧です。' },
+  { slug: 'school-product-online',    axis: 'product', industry: 'school', label: 'オンライン授業・配信ツール', parentSlug: null, order: 420,
+    seoTitle: 'オンライン授業ツールの代理店募集', seoDescription: 'オンライン授業・配信ツールの代理店募集一覧です。' },
+  { slug: 'school-product-material',  axis: 'product', industry: 'school', label: '教材・コンテンツ',       parentSlug: null, order: 430,
+    seoTitle: '教材の代理店募集', seoDescription: '教材・コンテンツの代理店募集一覧です。' },
+  { slug: 'school-product-marketing', axis: 'product', industry: 'school', label: '集客・SNSマーケティング', parentSlug: null, order: 440,
+    seoTitle: 'スクール向け集客の代理店募集', seoDescription: 'スクール向け集客・SNSマーケティングの代理店募集一覧です。' },
+  { slug: 'school-product-other',     axis: 'product', industry: 'school', label: 'その他スクール向け商材', parentSlug: null, order: 450,
+    seoTitle: 'その他スクール商材の代理店募集', seoDescription: 'その他スクール向け商材の代理店募集一覧です。' },
+
 ].map((c) => ({ ...c, isActive: true, createdAt: now, updatedAt: now }));
 
 // ============================================================
@@ -380,7 +406,6 @@ const costRanges = [
 async function seed() {
   console.log('Seeding masters...');
 
-  // ドキュメント数が多いので、500件ずつバッチ
   const BATCH_SIZE = 400;
 
   async function commitAll(collectionName, items) {
