@@ -442,6 +442,38 @@ function SearchContent({
       hoverRing: 'hover:ring-amber-500',
       linkHover: 'hover:text-amber-700',
     };
+    } else if (industry === 'logistics') {
+    theme = {
+      btn: 'bg-amber-600 hover:bg-amber-700', border: 'border-amber-500',
+      activeBg: 'bg-gradient-to-b from-amber-50 to-amber-100',
+      inactiveBg: 'border-amber-100 bg-gradient-to-b from-amber-50/60 to-amber-50 hover:border-amber-300',
+      text: 'text-amber-700', iconBg: 'bg-amber-100', iconActiveBg: 'bg-amber-500',
+      ring: 'ring-amber-400', tag: 'bg-amber-50 text-amber-700', hoverRing: 'hover:ring-amber-500', linkHover: 'hover:text-amber-700',
+    };
+  } else if (industry === 'realestate') {
+    theme = {
+      btn: 'bg-stone-600 hover:bg-stone-700', border: 'border-stone-500',
+      activeBg: 'bg-gradient-to-b from-stone-50 to-stone-100',
+      inactiveBg: 'border-stone-100 bg-gradient-to-b from-stone-50/60 to-stone-50 hover:border-stone-300',
+      text: 'text-stone-700', iconBg: 'bg-stone-100', iconActiveBg: 'bg-stone-500',
+      ring: 'ring-stone-400', tag: 'bg-stone-50 text-stone-700', hoverRing: 'hover:ring-stone-500', linkHover: 'hover:text-stone-700',
+    };
+  } else if (industry === 'office') {
+    theme = {
+      btn: 'bg-slate-600 hover:bg-slate-700', border: 'border-slate-500',
+      activeBg: 'bg-gradient-to-b from-slate-50 to-slate-100',
+      inactiveBg: 'border-slate-100 bg-gradient-to-b from-slate-50/60 to-slate-50 hover:border-slate-300',
+      text: 'text-slate-700', iconBg: 'bg-slate-100', iconActiveBg: 'bg-slate-500',
+      ring: 'ring-slate-400', tag: 'bg-slate-50 text-slate-700', hoverRing: 'hover:ring-slate-500', linkHover: 'hover:text-slate-700',
+    };
+  } else if (industry === 'life') {
+    theme = {
+      btn: 'bg-lime-600 hover:bg-lime-700', border: 'border-lime-500',
+      activeBg: 'bg-gradient-to-b from-lime-50 to-lime-100',
+      inactiveBg: 'border-lime-100 bg-gradient-to-b from-lime-50/60 to-lime-50 hover:border-lime-300',
+      text: 'text-lime-700', iconBg: 'bg-lime-100', iconActiveBg: 'bg-lime-600',
+      ring: 'ring-lime-400', tag: 'bg-lime-50 text-lime-700', hoverRing: 'hover:ring-lime-500', linkHover: 'hover:text-lime-700',
+    };
   }
 
   return (
