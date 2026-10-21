@@ -428,6 +428,20 @@ function SearchContent({
       hoverRing: 'hover:ring-blue-500',
       linkHover: 'hover:text-blue-700',
     };
+    } else if (industry === 'logistics') {
+    theme = {
+      btn: 'bg-amber-600 hover:bg-amber-700',
+      border: 'border-amber-500',
+      activeBg: 'bg-gradient-to-b from-amber-50 to-amber-100',
+      inactiveBg: 'border-amber-100 bg-gradient-to-b from-amber-50/60 to-amber-50 hover:border-amber-300',
+      text: 'text-amber-700',
+      iconBg: 'bg-amber-100',
+      iconActiveBg: 'bg-amber-500',
+      ring: 'ring-amber-400',
+      tag: 'bg-amber-50 text-amber-700',
+      hoverRing: 'hover:ring-amber-500',
+      linkHover: 'hover:text-amber-700',
+    };
   }
 
   return (
