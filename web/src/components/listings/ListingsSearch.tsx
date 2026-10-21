@@ -414,6 +414,20 @@ function SearchContent({
       hoverRing: 'hover:ring-teal-500',
       linkHover: 'hover:text-teal-700',
     };
+    } else if (industry === 'medical') {
+    theme = {
+      btn: 'bg-blue-600 hover:bg-blue-700',
+      border: 'border-blue-500',
+      activeBg: 'bg-gradient-to-b from-blue-50 to-blue-100',
+      inactiveBg: 'border-blue-100 bg-gradient-to-b from-blue-50/60 to-blue-50 hover:border-blue-300',
+      text: 'text-blue-700',
+      iconBg: 'bg-blue-100',
+      iconActiveBg: 'bg-blue-500',
+      ring: 'ring-blue-400',
+      tag: 'bg-blue-50 text-blue-700',
+      hoverRing: 'hover:ring-blue-500',
+      linkHover: 'hover:text-blue-700',
+    };
   }
 
   return (
