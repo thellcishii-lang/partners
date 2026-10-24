@@ -106,7 +106,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <Header />
           <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8">{children}</main>
           <Footer />
-          <PromotionToast />
         </AuthProvider>
       </body>
     </html>
