@@ -165,10 +165,17 @@ function SearchContent({
     setLoading(true);
     setError('');
 
-    const constraints = [where('status', '==', 'published')];
-    if (industry) {
-      constraints.push(where('industry', '==', industry));
-    }
+        const isActivePromo = (l: Listing) => {
+      // 総合ページなら 'all' を、専門ページならそのindustry（'eat'など）を対象にする
+      const currentTarget = industry || 'all';
+      
+      // 対象ページに含まれていない場合は除外
+      if (!l.promotedRecommendTargets?.includes(currentTarget)) return false;
+      
+      const until = l.promotedRecommendUntil;
+      if (!until) return true;
+      return until.seconds * 1000 > filterTime;
+    };
 
     getDocs(query(collection(db, 'listings'), ...constraints))
       .then((snap) => {
