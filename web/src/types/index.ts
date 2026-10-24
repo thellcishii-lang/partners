@@ -193,13 +193,13 @@ export interface Listing {
   adminSuspended?: boolean;
   pendingEditSubmitted?: boolean;
 
-  /** 上部表示中かどうか */
-  isPromotedTop?: boolean;
-  /** おすすめ表示中かどうか */
-  isPromotedRecommend?: boolean;
+  /** 上部表示の対象ページ (例: ['all'] or ['eat']) */
+  promotedTopTargets?: string[];
+  /** オススメ表示の対象ページ (例: ['all'] or ['eat']) */
+  promotedRecommendTargets?: string[];
   /** 上部表示の有効期限 */
   promotedTopUntil?: { seconds: number; nanoseconds: number } | null;
-  /** おすすめ表示の有効期限 */
+  /** オススメ表示の有効期限 */
   promotedRecommendUntil?: { seconds: number; nanoseconds: number } | null;
 }
 
