@@ -123,12 +123,12 @@ export default function AdminListingsPage() {
     call('forceCloseListing', id, { reason }, false);
   };
 
-  const togglePromoTop = (id: string, enabled: boolean) => {
-    call('togglePromotion', id, { plan: 'top', enabled }, false);
+    const togglePromoTop = (id: string, enabled: boolean, targetIndustry: string) => {
+    call('togglePromotion', id, { plan: 'top', enabled, targetIndustry }, false);
   };
 
-  const togglePromoRecommend = (id: string, enabled: boolean) => {
-    call('togglePromotion', id, { plan: 'recommend', enabled }, false);
+  const togglePromoRecommend = (id: string, enabled: boolean, targetIndustry: string) => {
+    call('togglePromotion', id, { plan: 'recommend', enabled, targetIndustry }, false);
   };
 
   const previewMerged: Listing | null = useMemo(() => {
@@ -317,23 +317,51 @@ export default function AdminListingsPage() {
                   )}
                   {/* おすすめ表示（公開中のみ） */}
                   {l.status === 'published' && (
-                    <>
-                      <Button
-                        size="sm"
-                        variant={l.promotedTopTargets && l.promotedTopTargets.length > 0 ? 'primary' : 'outline'}
-                        disabled={busy === l.id}
-                        onClick={() => togglePromoTop(l.id, !(l.promotedTopTargets && l.promotedTopTargets.length > 0))}
-                      >
-                        {l.promotedTopTargets && l.promotedTopTargets.length > 0 ? '★ 上部表示中' : '上部表示'}
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant={l.promotedRecommendTargets && l.promotedRecommendTargets.length > 0 ? 'primary' : 'outline'}
-                        disabled={busy === l.id}
-                        onClick={() => togglePromoRecommend(l.id, !(l.promotedRecommendTargets && l.promotedRecommendTargets.length > 0))}
-                      >
-                        {l.promotedRecommendTargets && l.promotedRecommendTargets.length > 0 ? '★ おすすめ中' : 'おすすめ表示'}
-                      </Button>
+                    <div className="flex flex-col gap-2 rounded-lg border border-gray-200 bg-gray-50 p-2">
+                      {/* 上部表示 */}
+                      <div className="flex items-center gap-2">
+                        <span className="text-[10px] font-bold text-gray-500 w-8">上部</span>
+                        <Button
+                          size="sm"
+                          variant={l.promotedTopTargets?.includes('all') ? 'primary' : 'outline'}
+                          disabled={busy === l.id}
+                          onClick={() => togglePromoTop(l.id, !l.promotedTopTargets?.includes('all'), 'all')}
+                        >
+                          総合ページ
+                        </Button>
+                        {/* 案件に業種（industry）が設定されている時だけ、個別ボタンを表示 */}
+                        {l.industry && (
+                          <Button
+                            size="sm"
+                            variant={l.promotedTopTargets?.includes(l.industry) ? 'primary' : 'outline'}
+                            disabled={busy === l.id}
+                            onClick={() => togglePromoTop(l.id, !l.promotedTopTargets?.includes(l.industry!), l.industry!)}
+                          >
+                            個別({l.industry})
+                          </Button>
+                        )}
+                      </div>
+
+                      {/* おすすめ表示 */}
+                      <div className="flex items-center gap-2">
+                        <span className="text-[10px] font-bold text-gray-500 w-8">オススメ</span>
+                        <Button
+                          size="sm"
+                          variant={l.promotedRecommendTargets?.includes('all') ? 'primary' : 'outline'}
+                          disabled={busy === l.id}
+                          onClick={() => togglePromoRecommend(l.id, !l.promotedRecommendTargets?.includes('all'), 'all')}
+                        >
+                          総合ページ
+                        </Button>
+                        {l.industry && (
+                          <Button
+                            size="sm"
+                            variant={l.promotedRecommendTargets?.includes(l.industry) ? 'primary' : 'outline'}
+                            disabled={busy === l.id}
+                            onClick={() => togglePromoRecommend(l.id, !l.promotedRecommendTargets?.includes(l.industry!), l.industry!)}
+                          >
+                            個別({l.industry})
+                          </Button>
                     </>
                   )}
                 </div>
