@@ -228,13 +228,17 @@ function SearchContent({
     };
 
     const all = listings.filter(matches);
-    const isActivePromo = (l: Listing) => {
-      if (!l.isPromotedRecommend) return false;
+     const isActivePromo = (l: Listing) => {
+      // 総合ページなら 'all' を、専門ページならそのindustry（'eat'など）を対象にする
+      const currentTarget = industry || 'all';
+      
+      // promotedRecommendTargets という配列の中に、対象の業種が含まれているかチェック
+      if (!l.promotedRecommendTargets?.includes(currentTarget)) return false;
+
       const until = l.promotedRecommendUntil;
       if (!until) return true;
       return until.seconds * 1000 > filterTime;
     };
-
     const promotionScore = (listing: Listing) => {
       const value = `${promotionOrderSeed}:${listing.id}`;
       let hash = 0;
