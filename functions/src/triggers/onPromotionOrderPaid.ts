@@ -34,11 +34,13 @@ export const onPromotionOrderPaid = onDocumentUpdated(
     const update: Record<string, unknown> = {
       updatedAt: new Date(),
     };
+        const targetIndustry = (after.targetIndustry as string) || 'all'; // ★追加
+
     if (plan === 'top') {
-      update.isPromotedTop = true;
+      update.promotedTopTargets = [targetIndustry]; // ★配列で保存
       update.promotedTopUntil = endAt ?? null;
     } else {
-      update.isPromotedRecommend = true;
+      update.promotedRecommendTargets = [targetIndustry]; // ★配列で保存
       update.promotedRecommendUntil = endAt ?? null;
     }
     await listingRef.update(update);
