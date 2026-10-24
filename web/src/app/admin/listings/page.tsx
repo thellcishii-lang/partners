@@ -55,7 +55,7 @@ export default function AdminListingsPage() {
     load(tab);
   }, [tab, load]);
 
-    const call = async (
+  const call = async (
     fnName:
       | 'approveListing' | 'rejectListing'
       | 'approvePendingEdit' | 'rejectPendingEdit'
@@ -123,7 +123,7 @@ export default function AdminListingsPage() {
     call('forceCloseListing', id, { reason }, false);
   };
 
-    const togglePromoTop = (id: string, enabled: boolean, targetIndustry: string) => {
+  const togglePromoTop = (id: string, enabled: boolean, targetIndustry: string) => {
     call('togglePromotion', id, { plan: 'top', enabled, targetIndustry }, false);
   };
 
@@ -238,89 +238,93 @@ export default function AdminListingsPage() {
                     </div>
                   )}
                 </div>
-                <div className="flex shrink-0 flex-wrap gap-2">
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    disabled={busy === l.id}
-                    onClick={() => setPreviewListing(l)}
-                  >
-                    プレビュー
-                  </Button>
+                
+                <div className="flex shrink-0 flex-col gap-2">
+                  <div className="flex flex-wrap gap-2">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      disabled={busy === l.id}
+                      onClick={() => setPreviewListing(l)}
+                    >
+                      プレビュー
+                    </Button>
 
-                  {(tab === 'new' || tab === 'edit') && (
-                    <>
-                      <Button
-                        size="sm"
-                        disabled={busy === l.id}
-                        onClick={() => approve(l.id)}
-                      >
-                        {tab === 'new' ? '承認して公開' : '編集を承認'}
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        disabled={busy === l.id}
-                        onClick={() => reject(l.id)}
-                      >
-                        却下
-                      </Button>
-                    </>
-                  )}
-
-                  {tab === 'all' && (
-                    <>
-                      {/* 非公開（募集者は再公開できる） */}
-                      {l.status === 'published' && (
+                    {(tab === 'new' || tab === 'edit') && (
+                      <>
+                        <Button
+                          size="sm"
+                          disabled={busy === l.id}
+                          onClick={() => approve(l.id)}
+                        >
+                          {tab === 'new' ? '承認して公開' : '編集を承認'}
+                        </Button>
                         <Button
                           size="sm"
                           variant="outline"
                           disabled={busy === l.id}
-                          onClick={() => forcePause(l.id)}
+                          onClick={() => reject(l.id)}
                         >
-                          非公開
+                          却下
                         </Button>
-                      )}
-                      {/* 公開停止 / 再開 */}
-                      {l.adminSuspended ? (
-                        <Button
-                          size="sm"
-                          disabled={busy === l.id}
-                          onClick={() => unsuspend(l.id)}
-                        >
-                          公開停止を解除
-                        </Button>
-                      ) : (
-                        l.status !== 'closed' && (
+                      </>
+                    )}
+
+                    {tab === 'all' && (
+                      <>
+                        {/* 非公開（募集者は再公開できる） */}
+                        {l.status === 'published' && (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            disabled={busy === l.id}
+                            onClick={() => forcePause(l.id)}
+                          >
+                            非公開
+                          </Button>
+                        )}
+                        {/* 公開停止 / 再開 */}
+                        {l.adminSuspended ? (
+                          <Button
+                            size="sm"
+                            disabled={busy === l.id}
+                            onClick={() => unsuspend(l.id)}
+                          >
+                            公開停止を解除
+                          </Button>
+                        ) : (
+                          l.status !== 'closed' && (
+                            <Button
+                              size="sm"
+                              variant="danger"
+                              disabled={busy === l.id}
+                              onClick={() => suspend(l.id)}
+                            >
+                              公開停止
+                            </Button>
+                          )
+                        )}
+                        {/* 募集終了 */}
+                        {l.status !== 'closed' && (
                           <Button
                             size="sm"
                             variant="danger"
                             disabled={busy === l.id}
-                            onClick={() => suspend(l.id)}
+                            onClick={() => forceClose(l.id)}
                           >
-                            公開停止
+                            募集終了
                           </Button>
-                        )
-                      )}
-                      {/* 募集終了 */}
-                      {l.status !== 'closed' && (
-                        <Button
-                          size="sm"
-                          variant="danger"
-                          disabled={busy === l.id}
-                          onClick={() => forceClose(l.id)}
-                        >
-                          募集終了
-                        </Button>
-                      )}
-                    </>
-                  )}
+                        )}
+                      </>
+                    )}
+                  </div>
+
                   {/* おすすめ表示（公開中のみ） */}
                   {l.status === 'published' && (
-                    <div className="flex flex-col gap-2 rounded-lg border border-gray-200 bg-gray-50 p-2">
+                    <div className="mt-2 flex flex-col gap-2 rounded-lg border border-gray-200 bg-gray-50 p-2">
                       {/* 上部表示 */}
                       <div className="flex items-center gap-2">
-                        <span className="text-[10px] font-bold text-gray-500 w-8">上部</span>
+                        <span className="w-12 text-[10px] font-bold text-gray-500">上部</span>
                         <Button
                           size="sm"
                           variant={l.promotedTopTargets?.includes('all') ? 'primary' : 'outline'}
@@ -329,7 +333,6 @@ export default function AdminListingsPage() {
                         >
                           総合ページ
                         </Button>
-                        {/* 案件に業種（industry）が設定されている時だけ、個別ボタンを表示 */}
                         {l.industry && (
                           <Button
                             size="sm"
@@ -344,7 +347,7 @@ export default function AdminListingsPage() {
 
                       {/* おすすめ表示 */}
                       <div className="flex items-center gap-2">
-                        <span className="text-[10px] font-bold text-gray-500 w-8">オススメ</span>
+                        <span className="w-12 text-[10px] font-bold text-gray-500">オススメ</span>
                         <Button
                           size="sm"
                           variant={l.promotedRecommendTargets?.includes('all') ? 'primary' : 'outline'}
@@ -362,7 +365,9 @@ export default function AdminListingsPage() {
                           >
                             個別({l.industry})
                           </Button>
-                    </>
+                        )}
+                      </div>
+                    </div>
                   )}
                 </div>
               </div>
