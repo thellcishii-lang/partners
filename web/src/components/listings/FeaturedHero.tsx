@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { collection, getDocs, query, where, limit } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
@@ -9,30 +9,34 @@ import type { Listing } from '@/types';
 const MAX = 5;
 const INTERVAL_MS = 5000;
 
-export function FeaturedHero() {
+// ★ここで industry (総合ならundefined、専門なら'eat'など) を受け取る
+export function FeaturedHero({ industry }: { industry?: string }) {
   const [items, setItems] = useState<Listing[]>([]);
   const [index, setIndex] = useState(0);
 
   useEffect(() => {
     let active = true;
     const now = new Date();
+    // 総合ページの場合は 'all' をターゲットにする
+    const currentTarget = industry || 'all'; 
+
     (async () => {
       try {
         const snap = await getDocs(
           query(
             collection(db, 'listings'),
-            where('isPromotedTop', '==', true),
+            // ★変更：promotedTopTargets に currentTarget が含まれているものを取得
+            where('promotedTopTargets', 'array-contains', currentTarget),
             where('status', '==', 'published'),
             limit(50)
           )
         );
         if (!active) return;
-        // promotedTopUntil が未来のもののみ
+        
         const valid = snap.docs
           .map((d) => ({ ...d.data(), id: d.id } as Listing))
-                    .filter((l) => {
+          .filter((l) => {
             const until = l.promotedTopUntil;
-            // 期限なし（管理者の手動ON）も許可
             if (!until) return true;
             return until.seconds * 1000 > now.getTime();
           })
@@ -45,7 +49,7 @@ export function FeaturedHero() {
       }
     })();
     return () => { active = false; };
-  }, []);
+  }, [industry]); // ★industry が変わったら再取得
 
   useEffect(() => {
     if (items.length <= 1) return;
