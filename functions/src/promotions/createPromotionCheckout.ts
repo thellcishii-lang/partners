@@ -6,6 +6,8 @@ import { isEmulator, stripeClient, STRIPE_SECRET_KEY } from '../lib/stripe';
 
 const TOP_PRICE_JPY = 55000;
 const RECOMMEND_PRICE_JPY = 33000;
+const EXPERT_TOP_PRICE_JPY = 35000;      
+const EXPERT_RECOMMEND_PRICE_JPY = 18000;
 const TAX_RATE = 0.1;
 const TOP_SLOTS = 5;
 const RECOMMEND_SLOTS = 10;
