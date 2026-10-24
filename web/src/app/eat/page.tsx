@@ -78,7 +78,7 @@ export default function EatHomePage() {
       </section>
 
       {/* 検索・一覧 */}
-      <div className="mx-auto max-w-6xl px-4">
+      <div className="mx-auto max-w-6xl px-4 space-y-6">
         <FeaturedHero industry="eat" />
         <ListingsSearch industry="eat" />
       </div>
