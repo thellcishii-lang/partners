@@ -320,19 +320,19 @@ export default function AdminListingsPage() {
                     <>
                       <Button
                         size="sm"
-                        variant={l.isPromotedTop ? 'primary' : 'outline'}
+                        variant={l.promotedTopTargets && l.promotedTopTargets.length > 0 ? 'primary' : 'outline'}
                         disabled={busy === l.id}
-                        onClick={() => togglePromoTop(l.id, !l.isPromotedTop)}
+                        onClick={() => togglePromoTop(l.id, !(l.promotedTopTargets && l.promotedTopTargets.length > 0))}
                       >
-                        {l.isPromotedTop ? '★ 上部表示中' : '上部表示'}
+                        {l.promotedTopTargets && l.promotedTopTargets.length > 0 ? '★ 上部表示中' : '上部表示'}
                       </Button>
                       <Button
                         size="sm"
-                        variant={l.isPromotedRecommend ? 'primary' : 'outline'}
+                        variant={l.promotedRecommendTargets && l.promotedRecommendTargets.length > 0 ? 'primary' : 'outline'}
                         disabled={busy === l.id}
-                        onClick={() => togglePromoRecommend(l.id, !l.isPromotedRecommend)}
+                        onClick={() => togglePromoRecommend(l.id, !(l.promotedRecommendTargets && l.promotedRecommendTargets.length > 0))}
                       >
-                        {l.isPromotedRecommend ? '★ おすすめ中' : 'おすすめ表示'}
+                        {l.promotedRecommendTargets && l.promotedRecommendTargets.length > 0 ? '★ おすすめ中' : 'おすすめ表示'}
                       </Button>
                     </>
                   )}
