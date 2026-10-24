@@ -18,6 +18,7 @@ export const togglePromotion = onCall({ region: REGION }, async (request) => {
   const listingId = text(data, 'listingId', 1500, true);
   const plan = text(data, 'plan', 20, true);
   const enabled = data.enabled === true;
+  const targetIndustry = typeof data.targetIndustry === 'string' ? data.targetIndustry : 'all';
 
   if (listingId.includes('/')) {
     throw new HttpsError('invalid-argument', '案件IDが正しくありません。');
@@ -35,13 +36,12 @@ export const togglePromotion = onCall({ region: REGION }, async (request) => {
   };
 
   if (plan === 'top') {
-    update.isPromotedTop = enabled;
+    update.promotedTopTargets = enabled ? [targetIndustry] : []; // ★配列をセット
     if (!enabled) update.promotedTopUntil = null;
   } else {
-    update.isPromotedRecommend = enabled;
+    update.promotedRecommendTargets = enabled ? [targetIndustry] : []; // ★配列をセット
     if (!enabled) update.promotedRecommendUntil = null;
   }
-
   await listingRef.update(update);
 
   return { listingId, plan, enabled };
