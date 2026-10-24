@@ -35,11 +35,18 @@ export const togglePromotion = onCall({ region: REGION }, async (request) => {
     updatedAt: FV.serverTimestamp(),
   };
 
+    const currentTopTargets = (snap.get('promotedTopTargets') as string[] | undefined) || [];
+  const currentRecTargets = (snap.get('promotedRecommendTargets') as string[] | undefined) || [];
+
   if (plan === 'top') {
-    update.promotedTopTargets = enabled ? [targetIndustry] : []; // ★配列をセット
+    update.promotedTopTargets = enabled
+      ? [...new Set([...currentTopTargets, targetIndustry])]
+      : currentTopTargets.filter((t) => t !== targetIndustry);
     if (!enabled) update.promotedTopUntil = null;
   } else {
-    update.promotedRecommendTargets = enabled ? [targetIndustry] : []; // ★配列をセット
+    update.promotedRecommendTargets = enabled
+      ? [...new Set([...currentRecTargets, targetIndustry])]
+      : currentRecTargets.filter((t) => t !== targetIndustry);
     if (!enabled) update.promotedRecommendUntil = null;
   }
   await listingRef.update(update);
