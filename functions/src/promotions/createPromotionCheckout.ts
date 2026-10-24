@@ -44,6 +44,7 @@ export const createPromotionCheckout = onCall(
     if (plan !== 'top' && plan !== 'recommend') {
       throw new HttpsError('invalid-argument', 'プランが正しくありません。');
     }
+    const targetIndustry = typeof data.targetIndustry === 'string' ? data.targetIndustry : 'all';
     const billingType = data.billingType;
     if (billingType !== 'one_time' && billingType !== 'subscription') {
       throw new HttpsError('invalid-argument', '課金タイプが正しくありません。');
@@ -109,7 +110,10 @@ export const createPromotionCheckout = onCall(
       throw new HttpsError('failed-precondition', '現在、枠が満杯です。空きが出るまでお待ちください。');
     }
 
-    const priceJpy = plan === 'top' ? TOP_PRICE_JPY : RECOMMEND_PRICE_JPY;
+    const priceJpy =
+      plan === 'top'
+        ? (targetIndustry === 'all' ? TOP_PRICE_JPY : EXPERT_TOP_PRICE_JPY)
+        : (targetIndustry === 'all' ? RECOMMEND_PRICE_JPY : EXPERT_RECOMMEND_PRICE_JPY);
     const totalJpy = withTax(priceJpy);
 
     const advSnap = await db.collection(COLLECTIONS.ADVERTISERS).doc(advertiserId).get();
@@ -127,6 +131,7 @@ export const createPromotionCheckout = onCall(
       advertiserId,
       listingId,
       plan,
+      targetIndustry,
       priceJpy,
       totalJpy,
       taxRate: TAX_RATE,
