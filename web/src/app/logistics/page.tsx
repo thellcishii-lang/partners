@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { ListingsSearch } from '@/components/listings/ListingsSearch';
+import { FeaturedHero } from '@/components/listings/FeaturedHero';
 import { Button } from '@/components/ui/Button';
 
 export const metadata: Metadata = {
@@ -42,7 +43,10 @@ export default function LogisticsHomePage() {
         </div>
       </section>
 
-      <div className="mx-auto max-w-6xl px-4"><ListingsSearch industry="logistics" /></div>
+      <div className="mx-auto max-w-6xl px-4 space-y-6"> 
+        <FeaturedHero industry="logistics" />
+        <ListingsSearch industry="logistics" />
+      </div>
 
       <section className="mx-auto max-w-4xl px-4 py-12">
         <h2 className="mb-6 border-b-2 border-amber-200 pb-2 text-2xl font-bold text-amber-950">物流・運送ビジネスの今</h2>
