@@ -3,7 +3,8 @@ import Link from 'next/link';
 import { ListingsSearch } from '@/components/listings/ListingsSearch';
 import { FeaturedHero } from '@/components/listings/FeaturedHero';
 import { GuidePromoSection } from '@/components/guide/GuidePromoSection';
-import { SpecialtyBanners } from '@/components/listings/SpecialtyBanners'; // ★追加
+import { SpecialtyBanners } from '@/components/listings/SpecialtyBanners';
+import { PromotionToast } from '@/components/listings/PromotionToast';// ★追加
 import { Button } from '@/components/ui/Button';
 
 export const metadata: Metadata = {
