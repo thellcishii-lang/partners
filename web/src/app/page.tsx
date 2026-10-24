@@ -62,6 +62,8 @@ export default function HomePage() {
       <ListingsSearch />
 
       <GuidePromoSection />
+
+      <PromotionToast />
     </div>
   );
 }
