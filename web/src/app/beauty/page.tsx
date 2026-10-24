@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { ListingsSearch } from '@/components/listings/ListingsSearch';
+import { FeaturedHero } from '@/components/listings/FeaturedHero';
 import { Button } from '@/components/ui/Button';
 
 export const metadata: Metadata = {
@@ -42,7 +43,10 @@ export default function BeautyHomePage() {
         </div>
       </section>
 
-      <div className="mx-auto max-w-6xl px-4"><ListingsSearch industry="beauty" /></div>
+      <div className="mx-auto max-w-6xl px-4 space-y-6"> 
+        <FeaturedHero industry="beauty" />
+        <ListingsSearch industry="beauty" />
+      </div>
 
       <section className="mx-auto max-w-4xl px-4 py-12">
         <h2 className="mb-6 border-b-2 border-rose-200 pb-2 text-2xl font-bold text-rose-950">美容サロンの独立・開業とは？</h2>
