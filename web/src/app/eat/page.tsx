@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { ListingsSearch } from '@/components/listings/ListingsSearch';
+import { FeaturedHero } from '@/components/listings/FeaturedHero'; 
 import { Button } from '@/components/ui/Button';
 
 export const metadata: Metadata = {
@@ -78,6 +79,7 @@ export default function EatHomePage() {
 
       {/* 検索・一覧 */}
       <div className="mx-auto max-w-6xl px-4">
+        <FeaturedHero industry="eat" />
         <ListingsSearch industry="eat" />
       </div>
 
