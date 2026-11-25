@@ -138,7 +138,7 @@ export function Footer() {
 
             {/* ★右側：リンクをカテゴリ分けしてグリッドに */}
             <div className="flex-1">
-              <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3">
+              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
                 
                 {/* 専門サイト */}
                 <div>
@@ -163,6 +163,17 @@ export function Footer() {
                     <li><Link href="/for-advertisers" className="text-gray-600 hover:text-emerald-700 hover:underline">掲載をご検討の方</Link></li>
                     <li><Link href="/listings" className="text-gray-600 hover:text-emerald-700 hover:underline">案件を探す</Link></li>
                     <li><Link href="/guide" className="text-gray-600 hover:text-emerald-700 hover:underline">ガイド記事</Link></li>
+                  </ul>
+                </div>
+
+                {/* 運営サービス */}
+                <div>
+                  <h4 className="mb-3 text-xs font-bold text-gray-900">運営サービス</h4>
+                  <ul className="space-y-2 text-xs">
+                    <li><a href="https://xn--xcke3b8fv95ofytnj8aba636o.com" target="_blank" rel="noopener" className="text-gray-600 hover:text-emerald-700 hover:underline">代理店管理システム</a></li>
+                    <li><a href="https://xn--xcke3b8fvf4865a1zhxj3amx2arvc.com/" target="_blank" rel="noopener" className="text-gray-600 hover:text-emerald-700 hover:underline">見積・請求書システム</a></li>
+                    <li><a href="https://xn--xcke3b8fvf4865a1zhxj3amx2arvc.com/construction/" target="_blank" rel="noopener" className="text-gray-600 hover:text-emerald-700 hover:underline">見積・請求書システム 建築版</a></li>
+                    <li><a href="https://xn--xcke3b8fvf4865a1zhxj3amx2arvc.com/html-mail/" target="_blank" rel="noopener" className="text-gray-600 hover:text-emerald-700 hover:underline">HTMLメール</a></li>
                   </ul>
                 </div>
 
