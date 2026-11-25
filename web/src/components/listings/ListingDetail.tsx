@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import { LISTING_STATUS_LABELS, type Listing } from '@/types';
+import { SiblingProductCards } from '@/components/listings/SiblingProductCards';
 
 type Props = {
   listing: Listing;
@@ -304,6 +305,8 @@ export function ListingDetail({
               案件を編集
             </Link>
           )}
+
+          <SiblingProductCards />
         </aside>
 
         <div>
