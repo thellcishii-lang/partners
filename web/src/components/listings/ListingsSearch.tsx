@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { db } from '@/lib/firebase';
 import { useMasters } from '@/hooks/useMasters';
+import { SiblingProductCards } from '@/components/listings/SiblingProductCards';
 import {
   INITIAL_COST_RANGES,
   FRANCHISE_FEE_RANGES,
@@ -857,6 +858,8 @@ function SearchContent({
                 {industry ? '全業種の代理店募集を見る' : '掲載についてはこちら'}
               </Link>
             </div>
+
+            <SiblingProductCards />
           </div>
         </aside>
 
